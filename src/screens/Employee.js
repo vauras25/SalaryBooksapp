@@ -1,21 +1,40 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Image,
   TouchableOpacity,
-  SafeAreaView,
   ScrollView,
   Dimensions,
-  useColorScheme,
+  BackHandler,
+  Alert
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'; // ✅ use this
 import BottomNavigation from './BottomNavigation';
 import { useTheme } from './ThemeContext'; 
+import { useFocusEffect } from '@react-navigation/native';
+
 const { width, height } = Dimensions.get('window');
 
 const Employee = ({ navigation }) => {
-  const  { isDarkMode }  = useTheme();
+  const { isDarkMode } = useTheme();
+  const insets = useSafeAreaInsets(); // ✅ get safe area insets
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const backAction = () => {
+        Alert.alert('Logout', 'Do you want to logout?', [
+          { text: 'Cancel', onPress: () => null, style: 'cancel' },
+          { text: 'Yes', onPress: () => navigation.replace('SignUpScreen') },
+        ]);
+        return true;
+      };
+
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+      return () => backHandler.remove();
+    }, [navigation])
+  );
 
   const actions = [
     { title: 'Complete Onboarding', screen: 'Personal_Details' },
@@ -27,7 +46,15 @@ const Employee = ({ navigation }) => {
   ];
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: isDarkMode ? '#000' : '#fff' }]}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDarkMode ? '#000' : '#fff',
+          paddingTop: insets.top, // ✅ avoid content under status bar
+        },
+      ]}
+    >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.innerContent}>
           {/* Profile Card */}
@@ -62,11 +89,8 @@ const Employee = ({ navigation }) => {
                     backgroundColor: isDarkMode ? '#222' : '#f2f2f2',
                   },
                 ]}
-                onPress={() => {
-                  if (item.screen) {
-                    navigation.navigate(item.screen);
-                  }
-                }}>
+                onPress={() => item.screen && navigation.navigate(item.screen)}
+              >
                 <Text style={[styles.buttonText, { color: isDarkMode ? '#fff' : '#000' }]}>
                   {item.title}
                 </Text>
@@ -102,7 +126,6 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     marginVertical: height * 0.02,
-    marginTop: 29,
   },
   profileImage: {
     width: width * 0.2,
@@ -114,19 +137,25 @@ const styles = StyleSheet.create({
   },
   profileText: {
     flex: 1,
-    left: 90,
+    marginLeft: width * 0.02,
+     // changed from left: 90 (which causes layout problems)
+     textAlign:'left'
   },
   name: {
     fontWeight: 'bold',
     fontSize: width * 0.045,
+    marginLeft:120,
+    
   },
   empId: {
     fontSize: width * 0.035,
     marginTop: 5,
+    marginLeft:120,
   },
   email: {
     fontSize: width * 0.035,
     marginTop: 5,
+    marginLeft:80,
   },
   buttonsContainer: {
     width: '100%',

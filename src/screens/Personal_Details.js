@@ -15,7 +15,7 @@ import BottomNavigation from './BottomNavigation';
 
 const { width } = Dimensions.get('window');
 
-const BankDetailsForm = ({ navigation }) => {
+const BankDetailsForm = ({navigation}) => {
   const [form, setForm] = useState({
     // first_name: '',
     // gross: '',
@@ -77,9 +77,15 @@ const BankDetailsForm = ({ navigation }) => {
 
   const handleNext = () => {
     setSubmitted(true);
-    if (form.first_name.trim() === '' || form.last_name.trim() === '' || form.mobile.trim() || form.dob.trim() || form.gender.trim()) {
-      return; // Do not proceed if first_name is empty
-    }
+    if (
+  form.first_name.trim() === '' ||
+  form.last_name.trim() === '' ||
+  form.mobile.trim() === '' ||
+  form.dob.trim() === '' ||
+  form.gender.trim() === ''
+) {
+  return;
+}
     navigation.navigate('Address');
   };
 
@@ -158,7 +164,7 @@ const BankDetailsForm = ({ navigation }) => {
           <Text style={styles.nextText}>NEXT</Text>
         </TouchableOpacity>
       </ScrollView>
-      <BottomNavigation />
+      {/* <BottomNavigation /> */}
     </SafeAreaView>
   );
 };

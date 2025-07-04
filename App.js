@@ -14,6 +14,9 @@ import AttendanceScreen from './src/screens/AttendanceScreen';
 import Leaves from './src/screens/Leaves';
 import Settings from './src/screens/Settings';
 import { ThemeProvider } from './src/screens/ThemeContext';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+Ionicons.loadFont();
 const Stack = createNativeStackNavigator();
 
 function App() {
@@ -27,7 +30,8 @@ function App() {
           backgroundColor={isDarkMode ? '#000' : '#fff'}
         />
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="SignUp">
+          <Stack.Navigator initialRouteName="SignUp" >
+            <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
             <Stack.Screen name="AttendanceScreen" component={AttendanceScreen} options={{ headerShown: false }} />
             <Stack.Screen name="BankDetailsForm" component={BankDetailsForm} options={{ headerShown: false }} />
             <Stack.Screen name="Address" component={Address} options={{ headerShown: false }} />
