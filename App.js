@@ -36,7 +36,7 @@ function App() {
             <Stack.Screen name="BankDetailsForm" component={BankDetailsForm} options={{ headerShown: false }} />
             <Stack.Screen name="Address" component={Address} options={{ headerShown: false }} />
             <Stack.Screen name="Personal_Details" component={Personal_Details} options={{ headerShown: false }} />
-            <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
+            {/* <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} /> */}
             <Stack.Screen name="Employee" component={Employee} options={{ headerShown: false }} />
             <Stack.Screen name="Payslips" component={Payslips} options={{ headerShown: false }} />
             <Stack.Screen name="Expense" component={Expense} options={{ headerShown: false }} />
