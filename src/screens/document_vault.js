@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,8 +10,10 @@ import {
   SafeAreaView,
   Platform,
   Alert,
-  PermissionsAndroid
+  PermissionsAndroid,
+  Linking,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // import DocumentPicker from 'react-native-document-picker';
 import BottomNavigation from './BottomNavigation';
 
@@ -20,14 +22,14 @@ const iconRows = [1, 2, 3, 4];
 
 const DocumentVaultScreen = () => {
   const [fileName, setFileName] = useState(null);
+  const insets = useSafeAreaInsets();
 
-  // Check and request storage permission
   const checkStoragePermission = async () => {
     if (Platform.OS === 'android') {
       try {
         const permission = PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
         const hasPermission = await PermissionsAndroid.check(permission);
-        
+
         if (!hasPermission) {
           const status = await PermissionsAndroid.request(permission, {
             title: 'Storage Permission',
@@ -35,7 +37,7 @@ const DocumentVaultScreen = () => {
             buttonPositive: 'OK',
             buttonNegative: 'Cancel',
           });
-          return status === 'granted';
+          return status === PermissionsAndroid.RESULTS.GRANTED;
         }
         return true;
       } catch (err) {
@@ -43,54 +45,42 @@ const DocumentVaultScreen = () => {
         return false;
       }
     }
-    return true; // iOS doesn't need this permission
+    return true;
   };
 
-  const pickDocument = async () => {
-    try {
-      const hasPermission = await checkStoragePermission();
-      if (!hasPermission) {
-        Alert.alert(
-          'Permission Required',
-          'Please grant storage permission in app settings',
-          [
-            {
-              text: 'Cancel',
-              style: 'cancel',
-            },
-            {
-              text: 'Open Settings',
-              onPress: () => Linking.openSettings(),
-            },
-          ]
-        );
-        return;
-      }
+  // const pickDocument = async () => {
+  //   try {
+  //     const hasPermission = await checkStoragePermission();
+  //     if (!hasPermission) {
+  //       Alert.alert(
+  //         'Permission Required',
+  //         'Please grant storage permission in app settings',
+  //         [
+  //           { text: 'Cancel', style: 'cancel' },
+  //           { text: 'Open Settings', onPress: () => Linking.openSettings() },
+  //         ]
+  //       );
+  //       return;
+  //     }
 
-      const res = await DocumentPicker.pickSingle({
-        type: [
-          DocumentPicker.types.pdf,
-          DocumentPicker.types.doc,
-          DocumentPicker.types.docx,
-          DocumentPicker.types.images,
-          DocumentPicker.types.allFiles,
-        ],
-      });
-      
-      setFileName(res.name);
-      Alert.alert('Success', `File selected: ${res.name}`);
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        console.log('User cancelled file picker');
-      } else {
-        console.error('Document picker error:', err);
-        Alert.alert('Error', err.message || 'Failed to pick document');
-      }
-    }
-  };
+  //     const res = await DocumentPicker.pickSingle({
+  //       type: [DocumentPicker.types.allFiles],
+  //     });
+
+  //     setFileName(res.name);
+  //     Alert.alert('Success', `File selected: ${res.name}`);
+  //   } catch (err) {
+  //     if (DocumentPicker.isCancel(err)) {
+  //       console.log('User cancelled file picker');
+  //     } else {
+  //       console.error('Document picker error:', err);
+  //       Alert.alert('Error', err.message || 'Failed to pick document');
+  //     }
+  //   }
+  // };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <Text style={styles.headerText}>DOCUMENT VAULT</Text>
       </View>
@@ -99,12 +89,10 @@ const DocumentVaultScreen = () => {
         {iconRows.map((_, rowIndex) => (
           <View key={rowIndex} style={styles.row}>
             {[1, 2, 3, 4].map((_, colIndex) => {
-              let iconSource;
-              switch (rowIndex) {
-                case 1: iconSource = require('../assets/file.png'); break;
-                case 2: iconSource = require('../assets/pdf.png'); break;
-                default: iconSource = require('../assets/checkin.png');
-              }
+              let iconSource = require('../assets/checkin.png');
+              if (rowIndex === 1) iconSource = require('../assets/file.png');
+              else if (rowIndex === 2) iconSource = require('../assets/pdf.png');
+
               return (
                 <Image
                   key={`${rowIndex}-${colIndex}`}
@@ -117,14 +105,10 @@ const DocumentVaultScreen = () => {
         ))}
 
         <View style={styles.uploadContainer}>
-          <TouchableOpacity 
-            style={styles.uploadButton} 
-            onPress={pickDocument}
-            activeOpacity={0.7}
-          >
+          <TouchableOpacity style={styles.uploadButton} >
             <Text style={styles.uploadButtonText}>Upload Document</Text>
           </TouchableOpacity>
-          
+
           {fileName && (
             <Text style={styles.fileName}>Selected file: {fileName}</Text>
           )}
@@ -136,6 +120,8 @@ const DocumentVaultScreen = () => {
   );
 };
 
+export default DocumentVaultScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -145,18 +131,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#D8D8D8',
     paddingVertical: 20,
     alignItems: 'center',
-    marginTop: Platform.OS === 'android' ? 30 : 0
   },
   headerText: {
-    fontSize: 0.05 * width, 
+    fontSize: 0.05 * width,
     fontWeight: '600',
     color: '#000',
   },
   scrollContainer: {
     paddingVertical: 10,
-    paddingHorizontal: width * 0.05, 
+    paddingHorizontal: width * 0.05,
     alignItems: 'center',
-    paddingBottom: 30
+    paddingBottom: 30,
   },
   row: {
     flexDirection: 'row',
@@ -185,14 +170,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
   },
   uploadButtonText: {
     color: '#fff',
-    fontSize: width * 0.04, 
+    fontSize: width * 0.04,
     fontWeight: '600',
   },
   fileName: {
@@ -203,5 +184,3 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
 });
-
-export default DocumentVaultScreen;

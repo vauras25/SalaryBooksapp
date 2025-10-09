@@ -13,6 +13,8 @@ import BottomNavigation from './BottomNavigation';
 import { Calendar } from 'react-native-calendars';
 import moment from 'moment';
 import { Picker } from '@react-native-picker/picker';
+import { useTheme } from './ThemeContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -26,6 +28,9 @@ const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 10 }, (_, i) => CURRENT_YEAR - 5 + i);
 
 const AttendanceScreen = () => {
+  const { isDarkMode } = useTheme();
+  const insets = useSafeAreaInsets();
+
   const [inTime, setInTime] = useState(null);
   const [outTime, setOutTime] = useState(null);
   const [status, setStatus] = useState('-');
@@ -48,6 +53,8 @@ const AttendanceScreen = () => {
     return `${selectedYear}-${monthIndex.toString().padStart(2, '0')}-01`;
   };
 
+  const styles = getStyles(isDarkMode, insets);
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -68,7 +75,7 @@ const AttendanceScreen = () => {
               onPress={() => setModalVisible(true)}
             >
               <Text style={styles.boxTitle}>{title}</Text>
-              <Text style={styles.boxValue}>{[0, 2, 10, 26][index]}</Text>
+              <Text style={styles.boxValue}>{[14, 2, 10, 26][index]}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -116,6 +123,7 @@ const AttendanceScreen = () => {
               <Picker
                 selectedValue={selectedMonth}
                 style={styles.picker}
+                dropdownIconColor={isDarkMode ? '#fff' : '#000'}
                 onValueChange={(itemValue) => setSelectedMonth(itemValue)}
               >
                 {MONTHS.map((month) => (
@@ -125,6 +133,7 @@ const AttendanceScreen = () => {
               <Picker
                 selectedValue={selectedYear}
                 style={styles.picker}
+                dropdownIconColor={isDarkMode ? '#fff' : '#000'}
                 onValueChange={(itemValue) => setSelectedYear(itemValue)}
               >
                 {YEARS.map((year) => (
@@ -135,23 +144,20 @@ const AttendanceScreen = () => {
 
             <Calendar
               current={getCalendarDate()}
-              onDayPress={(day) => {
-                console.log('Selected day', day.dateString);
-                setModalVisible(false);
-              }}
+              onDayPress={() => setModalVisible(false)}
               markedDates={{
                 '2025-01-06': { selected: true, selectedColor: '#004aad' },
                 '2025-01-24': { selected: true, selectedColor: '#004aad' },
               }}
               theme={{
-                backgroundColor: '#ffffff',
-                calendarBackground: '#ffffff',
-                textSectionTitleColor: '#000',
+                backgroundColor: isDarkMode ? '#000' : '#fff',
+                calendarBackground: isDarkMode ? '#000' : '#fff',
+                textSectionTitleColor: isDarkMode ? '#fff' : '#000',
                 selectedDayBackgroundColor: '#004aad',
                 selectedDayTextColor: '#fff',
                 todayTextColor: '#004aad',
-                dayTextColor: '#000',
-                textDisabledColor: '#d9e1e8',
+                dayTextColor: isDarkMode ? '#fff' : '#000',
+                textDisabledColor: '#444',
                 arrowColor: '#004aad',
                 monthTextColor: '#004aad',
                 indicatorColor: '#004aad',
@@ -171,8 +177,8 @@ const AttendanceScreen = () => {
                         color: isSunday
                           ? 'red'
                           : state === 'disabled'
-                          ? '#ccc'
-                          : '#000',
+                          ? '#555'
+                          : isDarkMode ? '#fff' : '#000',
                       }}
                     >
                       {date.day}
@@ -201,128 +207,133 @@ const AttendanceScreen = () => {
 
 export default AttendanceScreen;
 
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    padding:30
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    marginTop: 60,
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
-
-  },
-  modalTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  pickerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  picker: {
-    flex: 1,
-  },
-  confirmButton: {
-    backgroundColor: '#004aad',
-    padding: 10,
-    marginTop: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  confirmButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  scrollContent: {
-    paddingBottom: 100,
-  },
-  monthContainer: {
-    alignItems: 'center',
-    backgroundColor: '#004aad',
-    paddingVertical: 10,
-    borderRadius: 10,
-    marginTop: 30,
-    marginHorizontal: 20,
-  },
-  monthText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  summaryContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    marginTop: 5,
-    padding: 15,
-  },
-  box: {
-    width: width * 0.42,
-    backgroundColor: '#f1f1f1',
-    borderRadius: 10,
-    padding: 15,
-    marginVertical: 10,
-    alignItems: 'center',
-  },
-  boxTitle: {
-    fontSize: 13,
-    color: '#333',
-    textAlign: 'center',
-  },
-  boxValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 5,
-  },
-  mapContainer: {
-    height: 150,
-    marginHorizontal: 40,
-    borderRadius: 10,
-    overflow: 'hidden',
-    marginVertical: 0,
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  markButton: {
-    backgroundColor: '#004aad',
-    borderRadius: 10,
-    marginHorizontal: 100,
-    paddingVertical: 10,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  markButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  attendanceDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 15,
-    paddingHorizontal: 10,
-  },
-  statusText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-});
+const getStyles = (isDarkMode, insets) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: isDarkMode ? '#000' : '#fff',
+      paddingTop: insets.top,
+    },
+    scrollContent: {
+      paddingBottom: 100,
+    },
+    monthContainer: {
+      alignItems: 'center',
+      backgroundColor: '#004aad',
+      paddingVertical: 10,
+      borderRadius: 10,
+      marginTop: 20,
+      marginHorizontal: 20,
+    },
+    monthText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    summaryContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-around',
+      marginTop: 5,
+      padding: 15,
+    },
+    box: {
+      width: width * 0.42,
+      backgroundColor: isDarkMode ? '#1c1c1e' : '#f1f1f1',
+      borderRadius: 10,
+      padding: 15,
+      marginVertical: 10,
+      alignItems: 'center',
+    },
+    boxTitle: {
+      fontSize: 13,
+      color: isDarkMode ? '#ccc' : '#333',
+      textAlign: 'center',
+    },
+    boxValue: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginTop: 5,
+      color: isDarkMode ? '#fff' : '#000',
+    },
+    mapContainer: {
+      height: 150,
+      marginHorizontal: 40,
+      borderRadius: 10,
+      overflow: 'hidden',
+      marginVertical: 0,
+    },
+    map: {
+      ...StyleSheet.absoluteFillObject,
+    },
+    markButton: {
+      backgroundColor: '#004aad',
+      borderRadius: 10,
+      marginHorizontal: 100,
+      paddingVertical: 10,
+      alignItems: 'center',
+      marginTop: 10,
+    },
+    markButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    attendanceDetails: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      marginTop: 15,
+      paddingHorizontal: 10,
+    },
+    statusText: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: isDarkMode ? '#fff' : '#000',
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      padding: 30,
+    },
+    modalContent: {
+      backgroundColor: isDarkMode ? '#1c1c1e' : '#fff',
+      padding: 20,
+      marginTop: 60,
+      borderTopLeftRadius: 15,
+      borderTopRightRadius: 15,
+    },
+    modalTitle: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      marginBottom: 10,
+      textAlign: 'center',
+      color: isDarkMode ? '#fff' : '#000',
+    },
+    pickerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 10,
+    },
+    picker: {
+      flex: 1,
+      color: isDarkMode ? '#fff' : '#000',
+    },
+    confirmButton: {
+      backgroundColor: '#004aad',
+      padding: 10,
+      marginTop: 20,
+      borderRadius: 10,
+      alignItems: 'center',
+    },
+    confirmButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    bottomNav: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+    },
+  });
