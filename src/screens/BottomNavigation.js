@@ -22,7 +22,7 @@ const BottomNavigation = () => {
   const translateY = useRef(new Animated.Value(0)).current;
   
   const handleHomePress = () => {
-    navigation.navigate('Employee');
+    navigation.navigate('Dashboard');
   };
 
   const panResponder = useRef(

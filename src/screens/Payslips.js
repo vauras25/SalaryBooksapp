@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,140 +6,109 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Alert,
-  PermissionsAndroid,
-  Platform,
-  SafeAreaView,
-} from 'react-native';
-import RNFS from 'react-native-fs';
-import FileViewer from 'react-native-file-viewer';
-import { useNavigation } from '@react-navigation/native';
-import { Picker } from '@react-native-picker/picker';
-import { useTheme } from './ThemeContext';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import BottomNavigation from './BottomNavigation';
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import BottomNavigation from "./BottomNavigation";
 
 const PayslipScreen = () => {
-  const navigation = useNavigation();
-  const { isDarkMode } = useTheme();
-  const insets = useSafeAreaInsets();
-
-  const allMonths = [
-    'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL',
-    'MAY', 'JUNE', 'JULY', 'AUGUST',
-    'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER',
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
   ];
 
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState('');
-  const years = [2022, 2023, 2024, 2025];
-  const filteredMonths = selectedMonth ? [selectedMonth] : allMonths;
+  const handleView = (month) => {
+    console.log("View payslip for:", month);
+    // navigation.navigate('PayslipDetails', { month })
+  };
 
-  const handleDownload = async (month) => {
-    const fileName = `${month.toLowerCase()}.pdf`;
-    const destPath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
+  const handleDownload = (month) => {
+    console.log("Download payslip for:", month);
+    // Implement download logic
+  };
 
-    if (Platform.OS === 'android') {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
-      );
-      if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        Alert.alert('Permission denied', 'Enable storage permission.');
-        return;
+  const handleSignIn = async () => {
+    // const data = {
+    //       corporate_id: corporateId,
+    //       password: password,
+    //       userid: userId
+    //     };
+    try {
+      // const url = 'https://api.vauras.cloud/api/employee_signin';
+      const url = 'https://back.finalpayroll.in/employee_signin';
+      navigation.navigate('Dashboard');
+      const data = { corporate_id: corporateId, userid: userId, password };
+      const response = await axios.post(url, data, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (response.data.status === 'success') {
+        navigation.navigate('Dashboard');
       }
-    }
-
-    try {
-      const assetPath = `pdfs/${fileName}`;
-      await RNFS.copyFileAssets(assetPath, destPath);
-      Alert.alert('Download complete', `Saved to: ${destPath}`);
     } catch (error) {
-      console.log('Copy error:', error);
-      Alert.alert('Error', 'Failed to download file.');
+      console.error('Login Failed:', error.response?.data || error.message);
     }
   };
-
-  const handleView = async (month) => {
-    const fileName = `${month.toLowerCase()}.pdf`;
-    const filePath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
-
-    try {
-      await FileViewer.open(filePath, { showOpenWithDialog: true });
-    } catch (error) {
-      console.log('View error:', error);
-      Alert.alert('Error', 'Failed to open file. Make sure it is downloaded.');
-    }
-  };
-
-  const styles = getStyles(isDarkMode, insets);
+ useEffect(() =>{
+  handleSignIn();
+ })
 
   return (
-    <SafeAreaView style={styles.screenWrapper}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>PAYSLIPS STATEMENTS</Text>
+    <SafeAreaView style={styles.container}>
+      {/* Top Header */}
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <Icon name="logo-usd" size={24} color="#fff" />
+          <Text style={styles.headerTitle}>Payslips</Text>
         </View>
-
-        <View style={styles.filterRow}>
-          <View style={styles.pickerWrapper}>
-            <Text style={styles.pickerLabel}>Year</Text>
-            <Picker
-              selectedValue={selectedYear}
-              onValueChange={(value) => setSelectedYear(value)}
-              style={styles.picker}
-              dropdownIconColor={isDarkMode ? '#fff' : '#000'}
-            >
-              {years.map((year) => (
-                <Picker.Item key={year} label={`${year}`} value={year} />
-              ))}
-            </Picker>
-          </View>
-          <View style={styles.pickerWrapper}>
-            <Text style={styles.pickerLabel}>Month</Text>
-            <Picker
-              selectedValue={selectedMonth}
-              onValueChange={(value) =>
-                setSelectedMonth(value === selectedMonth ? '' : value)
-              }
-              style={styles.picker}
-              dropdownIconColor={isDarkMode ? '#fff' : '#000'}
-            >
-              <Picker.Item label="All" value="" />
-              {allMonths.map((month) => (
-                <Picker.Item key={month} label={month} value={month} />
-              ))}
-            </Picker>
-          </View>
+        <View style={styles.headerIcons}>
+          <Icon name="search-outline" size={22} color="#fff" style={styles.icon} />
+          <Icon name="notifications-outline" size={22} color="#fff" />
         </View>
-
-        <ScrollView
-          style={{ marginBottom: 100 }}
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          {filteredMonths.map((month, index) => (
-            <View key={index} style={styles.row}>
-              <Text style={styles.monthText}>{month}</Text>
-              <View style={styles.iconGroup}>
-                <TouchableOpacity onPress={() => handleView(month)}>
-                  <Image
-                    source={require('../assets/eye.png')}
-                    style={styles.iconImage}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDownload(month)}>
-                  <Image
-                    source={require('../assets/download.png')}
-                    style={styles.iconImage}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.underline} />
-            </View>
-          ))}
-        </ScrollView>
       </View>
+
+      {/* Filters */}
+      <View style={styles.filterContainer}>
+        <TouchableOpacity style={styles.filterButton}>
+          <Text style={styles.filterText}>Month</Text>
+          <Icon name="chevron-down-outline" size={18} color="#ccc" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.filterButton}>
+          <Text style={styles.filterText}>Year</Text>
+          <Icon name="chevron-down-outline" size={18} color="#ccc" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Month List */}
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {months.map((month, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[
+              styles.monthCard,
+              selectedMonth === month && { backgroundColor: "#0D1B2A" },
+            ]}
+            onPress={() => setSelectedMonth(month)}
+          >
+            <Text style={styles.monthText}>{month}</Text>
+            <View style={styles.actionIcons}>
+              <TouchableOpacity onPress={() => handleView(month)}>
+                <Image
+                  source={require('../assets/eye.png')}
+                  style={styles.iconImage}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleDownload(month)}>
+                <Image
+                  source={require('../assets/download.png')}
+                  style={styles.iconImage}
+                />
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
       <BottomNavigation />
     </SafeAreaView>
   );
@@ -147,70 +116,83 @@ const PayslipScreen = () => {
 
 export default PayslipScreen;
 
-const getStyles = (isDarkMode, insets) =>
-  StyleSheet.create({
-    screenWrapper: {
-      flex: 1,
-      backgroundColor: isDarkMode ? '#000' : '#f2f2f2',
-      paddingTop: insets.top,
-    },
-    container: {
-      flex: 1,
-    },
-    header: {
-      backgroundColor: isDarkMode ? '#111' : '#ccc',
-      padding: 15,
-      alignItems: 'center',
-    },
-    headerText: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      color: isDarkMode ? '#fff' : '#000',
-    },
-    filterRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      paddingHorizontal: 10,
-      marginVertical: 10,
-    },
-    pickerWrapper: {
-      flex: 1,
-      marginHorizontal: 5,
-    },
-    pickerLabel: {
-      fontWeight: 'bold',
-      color: isDarkMode ? '#fff' : '#000',
-      marginBottom: 5,
-    },
-    picker: {
-      backgroundColor: isDarkMode ? '#1a1a1a' : '#fff',
-      color: isDarkMode ? '#fff' : '#000',
-      borderRadius: 8,
-    },
-    scrollContainer: {
-      padding: 10,
-    },
-    row: {
-      marginBottom: 15,
-    },
-    monthText: {
-      fontSize: 16,
-      fontWeight: '500',
-      color: isDarkMode ? '#fff' : '#000',
-    },
-    iconGroup: {
-      flexDirection: 'row',
-      justifyContent: 'flex-end',
-      marginTop: -20,
-    },
-    iconImage: {
-      width: 20,
-      height: 20,
-      marginLeft: 10,
-    },
-    underline: {
-      height: 1,
-      backgroundColor: isDarkMode ? '#fff' : '#000',
-      marginTop: 10,
-    },
-  });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#001F3F",
+    paddingHorizontal: 15,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+    marginBottom: 15,
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  headerTitle: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+    marginLeft: 8,
+  },
+  headerIcons: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  icon: {
+    marginRight: 12,
+  },
+  filterContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#102A43",
+    borderRadius: 15,
+    padding: 10,
+    marginBottom: 20,
+  },
+  filterButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#0F345C",
+    borderRadius: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    width: "47%",
+    justifyContent: "space-between",
+  },
+  filterText: {
+    color: "#ccc",
+    fontSize: 14,
+  },
+  monthCard: {
+    backgroundColor: "#123456",
+    borderRadius: 15,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  monthText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  actionIcons: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  actionIcon: {
+    marginRight: 15,
+  },
+  iconImage: {
+    width: 20,
+    height: 20,
+    marginLeft: 10,
+  },
+});

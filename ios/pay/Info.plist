@@ -47,6 +47,11 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
+
+
+	<key>NSLocationWhenInUseUsageDescription</key>
+<string>App needs location access to mark your attendance.</string>
+
 	<false/>
 </dict>
 </plist>

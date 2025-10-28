@@ -3,7 +3,7 @@ import { SafeAreaView, StatusBar, useColorScheme } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SignUpScreen from './src/screens/SignUpScreen';
-import Employee from './src/screens/Employee';
+import Dashboard from './src/screens/Dashboard';
 import Payslips from './src/screens/Payslips';
 import Expense from './src/screens/Expense';
 import Document_vault from './src/screens/document_vault';
@@ -30,14 +30,14 @@ function App() {
           backgroundColor={isDarkMode ? '#000' : '#fff'}
         />
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="SignUp" >
+          <Stack.Navigator initialRouteName="SignUpScreen" >
             <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
             <Stack.Screen name="AttendanceScreen" component={AttendanceScreen} options={{ headerShown: false }} />
             <Stack.Screen name="BankDetailsForm" component={BankDetailsForm} options={{ headerShown: false }} />
             <Stack.Screen name="Address" component={Address} options={{ headerShown: false }} />
             <Stack.Screen name="Personal_Details" component={Personal_Details} options={{ headerShown: false }} />
             {/* <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} /> */}
-            <Stack.Screen name="Employee" component={Employee} options={{ headerShown: false }} />
+            <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
             <Stack.Screen name="Payslips" component={Payslips} options={{ headerShown: false }} />
             <Stack.Screen name="Expense" component={Expense} options={{ headerShown: false }} />
             <Stack.Screen name="document_vault" component={Document_vault} options={{ headerShown: false }} />
