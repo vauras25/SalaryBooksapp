@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -11,13 +11,48 @@ import {
 import * as Progress from "react-native-progress";
 import BottomNavigation from './BottomNavigation';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import Reimbursement from "./Dashboardscreen/Reimbursement";
-import Advance from "./Dashboardscreen/Advance";
+import Reimbursement from "./Dashboardscreen/Dashboard_Reimbursement";
+import Advance from "./Dashboardscreen/Dashboard_Advance";
+import { BackHandler, ToastAndroid } from "react-native";
+// import { useFocusEffect } from "@react-navigation/native";
 
 const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
+
+
+
 const Dashboard = () => {
 
+  useEffect(() => {
+    const backAction = () => {
+      BackHandler.exitApp(); 
+      return true;
+    };
 
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+    return () => backHandler.remove(); 
+  }, []);
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const backAction = () => {
+  //       BackHandler.exitApp(); 
+  //       return true; 
+  //     };
+
+  //     const backHandler = BackHandler.addEventListener(
+  //       "hardwareBackPress",
+  //       backAction
+  //     );
+
+  //     // Cleanup when screen is unfocused
+  //     return () => backHandler.remove();
+  //   }, [])
+  // );
+
+  
   return (
 
     <SafeAreaView
@@ -30,7 +65,7 @@ const Dashboard = () => {
       ]}
     >
 
-      
+
 
       <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
         {/* Header */}
@@ -68,17 +103,17 @@ const Dashboard = () => {
 
                 const calendarCells = [];
 
-               
+
                 for (let i = 0; i < firstDay; i++) {
                   calendarCells.push(
-                    <View     
+                    <View
                       key={`empty-${i}`}
                       style={[styles.dayBox, { backgroundColor: "transparent" }]}
                     />
                   );
                 }
 
-                
+
                 for (let day = 1; day <= totalDays; day++) {
                   const date = new Date(year, month, day);
                   const isSunday = date.getDay() === 0;
@@ -105,7 +140,7 @@ const Dashboard = () => {
                   );
                 }
 
-                // Ensure 7 columns (if last row is incomplete)
+
                 const remainder = calendarCells.length % 7;
                 if (remainder !== 0) {
                   for (let i = 0; i < 7 - remainder; i++) {
@@ -179,16 +214,10 @@ const Dashboard = () => {
         </View>
 
         <Reimbursement />
-<Advance/>
-       
+        <Advance />
+
       </ScrollView>
       <BottomNavigation />
-
-
-
-
-      
-     
     </SafeAreaView>
 
   );
@@ -262,23 +291,23 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 8,
   },
-calendarGrid: {
-  flexDirection: "row",
-  flexWrap: "wrap",
-  width: "100%",
-  marginTop: 6,
-},
+  calendarGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    width: "100%",
+    marginTop: 6,
+  },
 
 
 
- dayBox: {
-  width: "14%",
-  height: 28,
-  justifyContent: "center",
-  alignItems: "center",
-  borderRadius: 6,
-  marginVertical: 2,
-},
+  dayBox: {
+    width: "14%",
+    height: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 6,
+    marginVertical: 2,
+  },
 
   dayText: {
     fontSize: 12,
@@ -323,14 +352,14 @@ calendarGrid: {
 
 
 
-attendanceStats: {
-  width: "33%",      // explicit width for stats
-  alignItems: "center",
-  justifyContent: "flex-start",
-  paddingTop: 6,
-  marginLeft:20,
-  
-},
+  attendanceStats: {
+    width: "33%",      // explicit width for stats
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: 6,
+    marginLeft: 20,
+
+  },
   sectionTitle: {
     color: "#fff",
     fontSize: 16,
@@ -341,7 +370,7 @@ attendanceStats: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
-    marginLeft:25
+    marginLeft: 25
   },
   stats: {
     marginLeft: 20,
@@ -361,28 +390,28 @@ attendanceStats: {
     fontSize: 14,
   },
   dayHeader: {
-  color: "#A9A9A9",
-  width: "14%",
-  textAlign: "center",
-  fontSize: 12,
-  fontWeight: "600",
-  marginVertical: 2,
-},
+    color: "#A9A9A9",
+    width: "14%",
+    textAlign: "center",
+    fontSize: 12,
+    fontWeight: "600",
+    marginVertical: 2,
+  },
 
 
   attendanceCard: {
-  flexDirection: "row",
-  backgroundColor: "#1C2541",
-  borderRadius: 20,
-  padding: 15,
-  marginBottom: 15,
-  alignItems: 'flex-start',
-},
+    flexDirection: "row",
+    backgroundColor: "#1C2541",
+    borderRadius: 20,
+    padding: 15,
+    marginBottom: 15,
+    alignItems: 'flex-start',
+  },
 
-calendarSection: {
-  width: "45%",      // explicit width for calendar
-  marginRight: 12,
-},
+  calendarSection: {
+    width: "45%",      // explicit width for calendar
+    marginRight: 12,
+  },
 
 
 });

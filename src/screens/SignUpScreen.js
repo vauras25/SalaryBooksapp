@@ -8,11 +8,13 @@ import {
   Image,
   Dimensions,
   ScrollView,
+  Alert
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import CheckBox from '@react-native-community/checkbox';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -24,28 +26,55 @@ const SignUpScreen = () => {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSignIn = async () => {
-// const data = {
-//       corporate_id: corporateId,
-//       password: password,
-//       userid: userId
-//     };
-try{  
-      // const url = 'https://api.vauras.cloud/api/employee_signin';
-      const url = 'https://back.finalpayroll.in/employee_signin';
-      navigation.navigate('Dashboard'); 
-      const data = { corporate_id: corporateId, userid: userId, password };
-      const response = await axios.post(url, data, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+//   const handleSignIn = async () => {
 
-      if (response.data.status === 'success') {
-        navigation.navigate('Dashboard');
-      }
-    } catch (error) {
-      console.error('Login Failed:', error.response?.data || error.message);
+// try{  
+//       // const url = 'https://api.vauras.cloud/api/employee_signin';
+//       const url = 'https://back.finalpayroll.in/employee_signin';
+//       navigation.navigate('Dashboard'); 
+//       const data = { corporate_id: corporateId, userid: userId, password };
+//       const response = await axios.post(url, data, {
+//         headers: { 'Content-Type': 'application/json' },
+//       });
+
+//       if (response.data.status === 'success') {
+//         navigation.navigate('Dashboard');
+//       }
+//     } catch (error) {
+//       console.error('Login Failed:', error.response?.data || error.message);
+//     }
+//   };
+
+const handleSignIn = async () => {
+  try {
+    const url = 'https://back.finalpayroll.in/employee_signin';
+    // const url = 'http://10.0.2.2:8080/employee_signin';
+    const data = { corporate_id: corporateId, userid: userId, password };
+
+    const response = await axios.post(url, data, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+navigation.navigate('Dashboard');
+    if (response.data.status === 'success') {
+      const token = response.data.token;
+      const user = response.data.user;
+
+     
+      await AsyncStorage.setItem('authToken', token);
+      await AsyncStorage.setItem('userData', JSON.stringify(user));
+      // Alert.alert("token", token );
+      console.log('Token saved:', token);
+      console.log('User saved:', user);
+
+      navigation.navigate('Dashboard');
+    } else {
+      Alert.alert(response.data.message || 'Login failed');
     }
-  };
+  } catch (error) {
+    console.error('Login Failed:', error.response?.data || error.message);
+    Alert.alert('Something went wrong. Please try again.');
+  }
+};
 
   return (
     <LinearGradient

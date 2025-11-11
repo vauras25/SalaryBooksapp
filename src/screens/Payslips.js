@@ -28,31 +28,31 @@ const PayslipScreen = () => {
     // Implement download logic
   };
 
-  const handleSignIn = async () => {
-    // const data = {
-    //       corporate_id: corporateId,
-    //       password: password,
-    //       userid: userId
-    //     };
-    try {
-      // const url = 'https://api.vauras.cloud/api/employee_signin';
-      const url = 'https://back.finalpayroll.in/employee_signin';
-      navigation.navigate('Dashboard');
-      const data = { corporate_id: corporateId, userid: userId, password };
-      const response = await axios.post(url, data, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+//   const handleSignIn = async () => {
+//     // const data = {
+//     //       corporate_id: corporateId,
+//     //       password: password,
+//     //       userid: userId
+//     //     };
+//     try {
+//       // const url = 'https://api.vauras.cloud/api/employee_signin';
+//       const url = 'https://back.finalpayroll.in/employee_signin';
+//       navigation.navigate('Dashboard');
+//       const data = { corporate_id: corporateId, userid: userId, password };
+//       const response = await axios.post(url, data, {
+//         headers: { 'Content-Type': 'application/json' },
+//       });
 
-      if (response.data.status === 'success') {
-        navigation.navigate('Dashboard');
-      }
-    } catch (error) {
-      console.error('Login Failed:', error.response?.data || error.message);
-    }
-  };
- useEffect(() =>{
-  handleSignIn();
- })
+//       if (response.data.status === 'success') {
+//         navigation.navigate('Dashboard');
+//       }
+//     } catch (error) {
+//       console.error('Login Failed:', error.response?.data || error.message);
+//     }
+//   };
+//  useEffect(() =>{
+//   handleSignIn();
+//  })
 
   return (
     <SafeAreaView style={styles.container}>

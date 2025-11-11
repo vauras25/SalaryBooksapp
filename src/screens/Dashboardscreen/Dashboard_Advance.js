@@ -22,6 +22,12 @@ const Advance = () => {
     else if (item === "Payslips") {
       navigation.navigate("Payslips");
     }
+    else if (item === "Expense Management") {
+      navigation.navigate("Expense");
+    }
+    else if (item === "Advance Management") {
+      navigation.navigate("Advance");
+    }
     
   }
 

@@ -38,7 +38,7 @@ const BottomNavigation = () => {
       },
       onPanResponderRelease: (_, gestureState) => {
         translateY.flattenOffset();
-        if (gestureState.dy < -40) { // Swipe up threshold
+        if (gestureState.dy < -40) {
           handleHomePress();
         }
         Animated.spring(translateY, {

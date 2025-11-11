@@ -3,7 +3,7 @@ import { SafeAreaView, StatusBar, useColorScheme } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SignUpScreen from './src/screens/SignUpScreen';
-import Dashboard from './src/screens/Dashboard';
+import Dashboard from './src/screens/DashboardScreen';
 import Payslips from './src/screens/Payslips';
 import Expense from './src/screens/Expense';
 import Document_vault from './src/screens/document_vault';
@@ -15,6 +15,7 @@ import Leaves from './src/screens/Leaves';
 import Settings from './src/screens/Settings';
 import { ThemeProvider } from './src/screens/ThemeContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Advance from './src/screens/AdvanceScreen/Advance';
 
 Ionicons.loadFont();
 const Stack = createNativeStackNavigator();
@@ -43,6 +44,7 @@ function App() {
             <Stack.Screen name="document_vault" component={Document_vault} options={{ headerShown: false }} />
             <Stack.Screen name="Leaves" component={Leaves} options={{ headerShown: false }} />
             <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
+            <Stack.Screen name="Advance" component={Advance} options={{ headerShown: false }} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>
