@@ -1,16 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
+  TextInput,
   TouchableOpacity,
   StyleSheet,
+  Modal,
   ScrollView,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import LinearGradient from "react-native-linear-gradient";
 import BottomNavigation from "../BottomNavigation";
+import { Picker } from "@react-native-picker/picker";
 
 const AdvanceManagement = () => {
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [advanceAmount, setAdvanceAmount] = useState("");
+  const [recoveryFrom, setRecoveryFrom] = useState("");
+  const [installments, setInstallments] = useState("03");
+  const [frequency, setFrequency] = useState("");
+  const [month, setMonth] = useState("September");
+  const [year, setYear] = useState("2025");
+  const [reason, setReason] = useState("");
+
   return (
     <LinearGradient colors={["#05203C", "#0A3B63"]} style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -39,9 +52,146 @@ const AdvanceManagement = () => {
         <View style={styles.overviewBox}>
           <View style={styles.overviewHeader}>
             <Text style={styles.sectionTitle}>Advance Overview</Text>
-            <TouchableOpacity style={styles.addBtn}>
+            {/* <TouchableOpacity style={styles.addBtn}>
               <Text style={styles.addBtnText}>+ Advance Request</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+
+            <View style={styles.container1}>
+              {/* + Advance Request button */}
+              <TouchableOpacity
+                style={styles.addBtn}
+                onPress={() => setModalVisible(true)}
+              >
+                <Text style={styles.addBtnText}>+ Advance Request</Text>
+              </TouchableOpacity>
+
+              {/* Modal */}
+              <Modal visible={modalVisible} transparent animationType="fade">
+                <View style={styles.overlay}>
+                  <View style={styles.modalBox}>
+                    {/* Header */}
+                    <View style={styles.header}>
+                      <Text style={styles.headerTitle}>Enter the following details</Text>
+                      <TouchableOpacity onPress={() => setModalVisible(false)}>
+                        <Text style={styles.closeBtn}>✕</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    {/* Fields */}
+                    <View style={styles.field}>
+                      <Text style={styles.label}>Advance Amount :</Text>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Enter amount"
+                        placeholderTextColor="#ccc"
+                        keyboardType="numeric"
+                        value={advanceAmount}
+                        onChangeText={setAdvanceAmount}
+                      />
+                    </View>
+
+                    <View style={styles.field}>
+                      <Text style={styles.label}>Recovery From :</Text>
+                      <View style={styles.pickerWrapper}>
+                        <Picker
+                          selectedValue={recoveryFrom}
+                          onValueChange={setRecoveryFrom}
+                          dropdownIconColor="#fff"
+                          style={styles.picker}
+                        >
+                          <Picker.Item label="Select One" value="" />
+                          <Picker.Item label="Salary" value="salary" />
+                          <Picker.Item label="Bonus" value="bonus" />
+                        </Picker>
+                      </View>
+                    </View>
+
+                    <View style={styles.field}>
+                      <Text style={styles.label}>No. of Installments :</Text>
+                      <TextInput
+                        style={styles.input}
+                        keyboardType="numeric"
+                        value={installments}
+                        onChangeText={setInstallments}
+                      />
+                    </View>
+
+                    <View style={styles.field}>
+                      <Text style={styles.label}>Recovery Frequency :</Text>
+                      <View style={styles.pickerWrapper}>
+                        <Picker
+                          selectedValue={frequency}
+                          onValueChange={setFrequency}
+                          dropdownIconColor="#fff"
+                          style={styles.picker}
+                        >
+                          <Picker.Item label="Select One" value="" />
+                          <Picker.Item label="Monthly" value="monthly" />
+                          <Picker.Item label="Weekly" value="weekly" />
+                        </Picker>
+                      </View>
+                    </View>
+
+                    {/* Month & Year Row */}
+                    <View style={styles.row}>
+                      <View style={styles.column}>
+                        <Text style={styles.label}>Month :</Text>
+                        <View style={styles.pickerWrapper}>
+                          <Picker
+                            selectedValue={month}
+                            onValueChange={setMonth}
+                            dropdownIconColor="#fff"
+                            style={styles.picker}
+                          >
+                            <Picker.Item label="September" value="September" />
+                            <Picker.Item label="October" value="October" />
+                            <Picker.Item label="November" value="November" />
+                          </Picker>
+                        </View>
+                      </View>
+
+                      <View style={styles.column}>
+                        <Text style={styles.label}>Year :</Text>
+                        <View style={styles.pickerWrapper}>
+                          <Picker
+                            selectedValue={year}
+                            onValueChange={setYear}
+                            dropdownIconColor="#fff"
+                            style={styles.picker}
+                          >
+                            <Picker.Item label="2025" value="2025" />
+                            <Picker.Item label="2026" value="2026" />
+                          </Picker>
+                        </View>
+                      </View>
+                    </View>
+
+                    <View style={styles.field}>
+                      <Text style={styles.label}>Reason :</Text>
+                      <TextInput
+                        style={[styles.input, { height: 80, textAlignVertical: "top" }]}
+                        multiline
+                        placeholder="Enter reason"
+                        placeholderTextColor="#ccc"
+                        value={reason}
+                        onChangeText={setReason}
+                      />
+                    </View>
+
+                    {/* Submit Button */}
+                    <TouchableOpacity
+                      style={styles.submitBtn}
+                      onPress={() => {
+                        setModalVisible(false);
+                        // You can handle submit here
+                      }}
+                    >
+                      <Text style={styles.submitText}>SUBMIT</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </Modal>
+            </View>
           </View>
 
           {/* Progress bar */}
@@ -88,7 +238,7 @@ const AdvanceManagement = () => {
           </View>
         </View>
       </ScrollView>
-      <BottomNavigation/>
+      <BottomNavigation />
     </LinearGradient>
   );
 };
@@ -148,7 +298,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   addBtn: {
-    backgroundColor: "#5A6BF2",
+    backgroundColor: "#414141ff",
     borderRadius: 10,
     paddingVertical: 6,
     paddingHorizontal: 12,
@@ -230,6 +380,59 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 3,
   },
+
+   container1: { flex: 1, padding: 20 },
+  addBtn: {
+    backgroundColor: "#3a8fff",
+    borderRadius: 10,
+    alignSelf: "flex-end",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  addBtnText: { color: "#fff", fontWeight: "bold" },
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.6)",
+  },
+  modalBox: {
+    width: "90%",
+    backgroundColor: "#02294f",
+    borderRadius: 10,
+    padding: 16,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  headerTitle: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  closeBtn: { color: "#f55", fontSize: 20 },
+  field: { marginVertical: 5 },
+  label: { color: "#fff", marginBottom: 4 },
+  input: {
+    backgroundColor: "#003a6d",
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    color: "#fff",
+  },
+  pickerWrapper: {
+    backgroundColor: "#003a6d",
+    borderRadius: 6,
+  },
+  picker: { color: "#fff", height: 40 },
+  row: { flexDirection: "row", justifyContent: "space-between" },
+  column: { flex: 0.48 },
+  submitBtn: {
+    backgroundColor: "#7faaf9",
+    borderRadius: 6,
+    alignItems: "center",
+    marginTop: 10,
+    paddingVertical: 10,
+  },
+  submitText: { color: "#001f3f", fontWeight: "700" },
 });
 
 export default AdvanceManagement;

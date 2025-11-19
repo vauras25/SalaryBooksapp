@@ -15,9 +15,12 @@ import Icon from "react-native-vector-icons/Ionicons";
 import BottomNavigation from "./BottomNavigation";
 import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Image } from "react-native";
+import { launchImageLibrary } from "react-native-image-picker";
+
 const Expense = () => {
 
- 
+
 
   const [claimsData, setClaimsData] = useState([]);
   const [activeTab, setActiveTab] = useState("previous");
@@ -33,16 +36,38 @@ const Expense = () => {
   const [headId, setHeadId] = useState('');
   const [amount, setAmount] = useState('');
   const [remark, setRemark] = useState('');
+  const [image, setImage] = useState(null);
 
   const getToken = async () => {
-  const token = await AsyncStorage.getItem('authToken');
-  console.log('Stored token:', token);
-  return token;
-};
+    const token = await AsyncStorage.getItem('authToken');
+    console.log('Stored token:', token);
+    return token;
+  };
 
   useEffect(() => {
     fetchClaimsData();
   }, []);
+
+  const pickImage = () => {
+  const options = {
+    mediaType: 'photo',
+    includeBase64: false,
+  };
+
+  launchImageLibrary(options, (response) => {
+    if (response.didCancel) {
+      console.log('User cancelled image picker');
+    } else if (response.errorCode) {
+      console.log('Image Picker Error: ', response.errorMessage);
+    } else {
+      const uri = response.assets[0].uri;
+      setImage(uri);
+    }
+  });
+};
+
+
+
   const formatDate = (isoString) => {
     const date = new Date(isoString);
     const options = { month: "short", day: "2-digit" };
@@ -58,8 +83,8 @@ const Expense = () => {
   const fetchClaimsData = async () => {
     try {
       const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
-// const token =  getToken();
-// Alert.alert("token",token);
+      // const token =  getToken();
+      // Alert.alert("token",token);
       const payload = {
         pageno: 1,
         type: 'reimbursement',
@@ -77,7 +102,7 @@ const Expense = () => {
 
       if (response.data.status === "success") {
         const docs = response.data.data.docs || [];
-// Alert.alert("apisuccess");
+        // Alert.alert("apisuccess");
         // transform data to match your UI
         const formattedData = docs.map((item) => ({
           id: item._id,
@@ -182,7 +207,7 @@ const Expense = () => {
       }
     }
   };
-  
+
 
 
 
@@ -271,8 +296,8 @@ const Expense = () => {
               <Text style={styles.newClaimText}>File New Claim</Text>
             </TouchableOpacity>
           </View>
-        
-         
+
+
           {/* <ScrollView style={styles.list}>
             {expenses.map((item, index) => (
               <View key={index} style={styles.expenseCard}>
@@ -283,7 +308,7 @@ const Expense = () => {
               </View>
             ))}
           </ScrollView> */}
-           {loading ? (
+          {loading ? (
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
               <Text>Loading...</Text>
             </View>
@@ -362,26 +387,26 @@ const Expense = () => {
         </>
       )}
       <View>
-          <Modal
-            visible={modalVisible}
-            transparent
-            animationType="fade"
-            onRequestClose={() => setModalVisible(false)}
-          >
-            <View style={styles.overlay}>
-              <LinearGradient
-                colors={["#00213F", "#002C56"]}
-                style={styles.modalContainer}
-              >
-                <View style={styles.modalHeader}>
-                  <Text style={styles.modalTitle}>Enter the following details</Text>
-                  <TouchableOpacity onPress={() => setModalVisible(false)}>
-                    <Text style={styles.closeBtn}>✖</Text>
-                  </TouchableOpacity>
-                </View>
+        <Modal
+          visible={modalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.overlay}>
+            <LinearGradient
+              colors={["#00213F", "#002C56"]}
+              style={styles.modalContainer}
+            >
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Enter the following details</Text>
+                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                  <Text style={styles.closeBtn}>✖</Text>
+                </TouchableOpacity>
+              </View>
 
-                <View style={styles.formContainer}>
-                  {/* <View style={styles.row}>
+              <View style={styles.formContainer}>
+                {/* <View style={styles.row}>
                     <Text style={styles.label}>Enter Head:</Text>
                     <TextInput style={styles.input}
                       placeholder="Enter Head"
@@ -399,65 +424,85 @@ const Expense = () => {
                     />
                   </View> */}
 
-                  <TextInput
-                    placeholder="Head ID"
-                    value={headId}
-                    onChangeText={setHeadId}
-                    style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff" }}
-                  />
-                  <TextInput
-                    placeholder="Amount"
-                    value={amount}
-                    onChangeText={setAmount}
-                    style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff" }}
-                  />
-                  <TextInput
-                    placeholder="Remark"
-                    value={remark}
-                    onChangeText={setRemark}
-                    style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff" }}
-                  />
-                  <View style={styles.row}>
-                    <View style={styles.halfPicker}>
-                      <Text style={styles.label}>Month:</Text>
-                      <Picker
-                        selectedValue={month}
-                        onValueChange={setMonth}
-                        style={styles.picker}
-                        dropdownIconColor="#fff"
-                      >
-                        <Picker.Item label="Select" value="" />
-                        <Picker.Item label="Jan" value="0" />
-                        <Picker.Item label="Feb" value="1" />
-                        <Picker.Item label="Mar" value="2" />
-                        <Picker.Item label="Apr" value="3" />
-                        <Picker.Item label="May" value="4" />
-                        <Picker.Item label="June" value="5" />
-                        <Picker.Item label="July" value="6" />
-                        <Picker.Item label="Aug" value="7" />
-                        <Picker.Item label="Sep" value="8" />
-                        <Picker.Item label="Oct" value="9" />
-                        <Picker.Item label="Nov" value="10" />
-                        <Picker.Item label="Dec" value="11" />
-                      </Picker>
-                    </View>
-                    <View style={styles.halfPicker}>
-                      <Text style={styles.label}>Year:</Text>
-                      <Picker
-                        selectedValue={year}
-                        onValueChange={setYear}
-                        style={styles.picker}
-                        dropdownIconColor="#fff"
-                      >
-                        <Picker.Item label="Select" value="" />
-                        <Picker.Item label="2024" value="2024" />
-                        <Picker.Item label="2025" value="2025" />
-                      </Picker>
-                    </View>
+                <TextInput
+                  placeholder="Head ID"
+                  value={headId}
+                  onChangeText={setHeadId}
+                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff" , borderColor: "#fff"}}
+                   placeholderTextColor="#fff"
+                />
+                <TextInput
+                  placeholder="Amount"
+                  value={amount}
+                  onChangeText={setAmount}
+                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff" , borderColor: "#fff"}}
+                   placeholderTextColor="#fff"
+                />
+                <TextInput
+                  placeholder="Reason"
+                  value={remark}
+                  onChangeText={setRemark}
+                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff" , borderColor: "#fff"}}
+                   placeholderTextColor="#fff"
+                />
+                <View style={styles.row}>
+                  <View style={styles.halfPicker}>
+                    <Text style={styles.label}>Month:</Text>
+                    <Picker
+                      selectedValue={month}
+                      onValueChange={setMonth}
+                      style={styles.picker}
+                      dropdownIconColor="#fff"
+                    >
+                      <Picker.Item label="Select" value="" />
+                      <Picker.Item label="Jan" value="0" />
+                      <Picker.Item label="Feb" value="1" />
+                      <Picker.Item label="Mar" value="2" />
+                      <Picker.Item label="Apr" value="3" />
+                      <Picker.Item label="May" value="4" />
+                      <Picker.Item label="June" value="5" />
+                      <Picker.Item label="July" value="6" />
+                      <Picker.Item label="Aug" value="7" />
+                      <Picker.Item label="Sep" value="8" />
+                      <Picker.Item label="Oct" value="9" />
+                      <Picker.Item label="Nov" value="10" />
+                      <Picker.Item label="Dec" value="11" />
+                    </Picker>
+                  </View>
+                  <View style={styles.halfPicker}>
+                    <Text style={styles.label}>Year:</Text>
+                    <Picker
+                      selectedValue={year}
+                      onValueChange={setYear}
+                      style={styles.picker}
+                      dropdownIconColor="#fff"
+                    >
+                      <Picker.Item label="Select" value="" />
+                      <Picker.Item label="2024" value="2024" />
+                      <Picker.Item label="2025" value="2025" />
+                    </Picker>
                   </View>
 
-                  {/* Other Dropdowns */}
-                  {/* <Text style={styles.label}>Branch:</Text>
+                  
+
+                </View>
+                <Text style={styles.label}>Upload Image:</Text>
+                  <View style={styles.imageUploadContainer}>
+                    {image ? (
+                      <Image
+                        source={{ uri: image }}
+                        style={{ width: 100, height: 100, borderRadius: 8, marginBottom: 10 }}
+                      />
+                    ) : (
+                      <Text style={{ color: "#ccc", marginBottom: 10 }}>No image selected</Text>
+                    )}
+                    <TouchableOpacity style={styles.uploadBtn} onPress={pickImage}>
+                      <Text style={styles.uploadBtnText}>Choose Image</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                {/* Other Dropdowns */}
+                {/* <Text style={styles.label}>Branch:</Text>
                   <Picker
                     selectedValue={branch}
                     onValueChange={setBranch}
@@ -469,7 +514,7 @@ const Expense = () => {
                     <Picker.Item label="Mumbai" value="Mumbai" />
                   </Picker> */}
 
-                  {/* <Text style={styles.label}>Department:</Text>
+                {/* <Text style={styles.label}>Department:</Text>
                   <Picker
                     selectedValue={dept}
                     onValueChange={setDept}
@@ -481,7 +526,7 @@ const Expense = () => {
                     <Picker.Item label="Accounts" value="Accounts" />
                   </Picker> */}
 
-                  {/* <Text style={styles.label}>Designation:</Text>
+                {/* <Text style={styles.label}>Designation:</Text>
                   <Picker
                     selectedValue={designation}
                     onValueChange={setDesignation}
@@ -493,7 +538,7 @@ const Expense = () => {
                     <Picker.Item label="Executive" value="Executive" />
                   </Picker> */}
 
-                  {/* <Text style={styles.label}>HOD:</Text>
+                {/* <Text style={styles.label}>HOD:</Text>
                   <Picker
                     selectedValue={hod}
                     onValueChange={setHod}
@@ -505,16 +550,16 @@ const Expense = () => {
                     <Picker.Item label="Amit" value="Amit" />
                   </Picker> */}
 
-                  {/* <TouchableOpacity style={styles.submitBtn}>
+                {/* <TouchableOpacity style={styles.submitBtn}>
                     <Text style={styles.submitText}>SUBMIT</Text>
                   </TouchableOpacity> */}
-                  <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
-                    <Text style={styles.submitText}>SUBMIT</Text>
-                  </TouchableOpacity>
-                </View>
-              </LinearGradient>
-            </View>
-          </Modal>
+                <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
+                  <Text style={styles.submitText}>SUBMIT</Text>
+                </TouchableOpacity>
+              </View>
+            </LinearGradient>
+          </View>
+        </Modal>
       </View>
       <BottomNavigation />
     </LinearGradient>
@@ -678,6 +723,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     color: "#fff",
+    marginLeft: "-20px"
   },
   picker: {
     backgroundColor: "rgba(255,255,255,0.1)",
@@ -704,5 +750,24 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
   },
+
+  imageUploadContainer: {
+  alignItems: "center",
+  marginVertical: 15,
+},
+
+uploadBtn: {
+  backgroundColor: "#004B8D",
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  borderRadius: 10,
+},
+
+uploadBtnText: {
+  color: "#fff",
+  fontSize: 14,
+  fontWeight: "bold",
+},
+
 
 });
