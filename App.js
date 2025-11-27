@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SignUpScreen from './src/screens/SignUpScreen';
 import Dashboard from './src/screens/DashboardScreen';
-import Payslips from './src/screens/Payslips';
+import Payslips from './src/screens/Payslip/Payslips';
 import Expense from './src/screens/Expense';
 import Document_vault from './src/screens/document_vault';
 import BankDetailsForm from './src/screens/BankDetailsForm';
@@ -16,7 +16,7 @@ import Settings from './src/screens/Settings';
 import { ThemeProvider } from './src/screens/ThemeContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Advance from './src/screens/AdvanceScreen/Advance';
-
+import ViewPayslipScreen from "./src/screens/Payslip/ViewPayslipScreen";
 Ionicons.loadFont();
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +45,8 @@ function App() {
             <Stack.Screen name="Leaves" component={Leaves} options={{ headerShown: false }} />
             <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
             <Stack.Screen name="Advance" component={Advance} options={{ headerShown: false }} />
+            <Stack.Screen name="ViewPayslipScreen" component={ViewPayslipScreen} options={{ headerShown: true, title: "Payslip Details" }}
+/>
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

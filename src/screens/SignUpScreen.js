@@ -25,7 +25,7 @@ const SignUpScreen = () => {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-
+   const [userData, setUserData] = useState(null);
 //   const handleSignIn = async () => {
 
 // try{  
@@ -54,14 +54,18 @@ const handleSignIn = async () => {
     const response = await axios.post(url, data, {
       headers: { 'Content-Type': 'application/json' },
     });
-navigation.navigate('Dashboard');
+// navigation.navigate('Dashboard');
     if (response.data.status === 'success') {
       const token = response.data.token;
       const user = response.data.user;
 
+     console.log(token,"token");
      
       await AsyncStorage.setItem('authToken', token);
       await AsyncStorage.setItem('userData', JSON.stringify(user));
+      if(user){
+        setUserData(user);
+      }
       // Alert.alert("token", token );
       console.log('Token saved:', token);
       console.log('User saved:', user);

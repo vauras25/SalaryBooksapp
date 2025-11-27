@@ -11,22 +11,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import * as Progress from "react-native-progress";
 import AttendanceScreen from '../AttendanceScreen';
 import { useNavigation } from '@react-navigation/native';
-const Advance = () => {
+const Advance = ({updateTitle}) => {
     const { width } = Dimensions.get("window");
  const navigation = useNavigation();
 
       const handlePress = (item) => {
     if (item === "Attendance Management") {
-      navigation.navigate("AttendanceScreen");
+      navigation.navigate("AttendanceScreen", { title: "Attendance" });
     }
     else if (item === "Payslips") {
-      navigation.navigate("Payslips");
+      navigation.navigate("Payslips", { title: item });
     }
     else if (item === "Expense Management") {
-      navigation.navigate("Expense");
+      navigation.navigate("Expense", { title: item });
     }
     else if (item === "Advance Management") {
-      navigation.navigate("Advance");
+      navigation.navigate("Advance", { title: item });
+    }
+    else if (item === "Document Vault") {
+      navigation.navigate("document_vault", { title: item });
     }
     
   }
