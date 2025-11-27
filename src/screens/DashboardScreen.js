@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect , useState} from "react";
 import {
   View,
   Text,
@@ -27,14 +27,14 @@ const Dashboard = () => {
       BackHandler.exitApp(); 
       return true;
     };
-
+    
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       backAction
     );
     return () => backHandler.remove(); 
   }, []);
-
+  const [navbarTitle, setNavbarTitle] = useState("Attendance");
   // useFocusEffect(
   //   useCallback(() => {
   //     const backAction = () => {
@@ -54,7 +54,7 @@ const Dashboard = () => {
 
   
   return (
-
+    
     <SafeAreaView
       style={[
         styles.container,
@@ -214,7 +214,7 @@ const Dashboard = () => {
         </View>
 
         <Reimbursement />
-        <Advance />
+        <Advance/>
 
       </ScrollView>
       <BottomNavigation />

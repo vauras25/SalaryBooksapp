@@ -150,7 +150,7 @@ const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVk
   return (
     <LinearGradient colors={["#05203C", "#0A3B63"]} style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Header */}
+        
         <View style={styles.header}>
           <Text style={styles.title}>Advance Management</Text>
           <View style={styles.headerIcons}>
@@ -159,7 +159,7 @@ const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVk
           </View>
         </View>
 
-        {/* Month & Year Selector */}
+       
         <View style={styles.dropdownRow}>
           <TouchableOpacity style={styles.dropdown}>
             <Text style={styles.dropdownText}>September</Text>
@@ -171,7 +171,7 @@ const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVk
           </TouchableOpacity>
         </View>
 
-        {/* Advance Overview */}
+       
         <View style={styles.overviewBox}>
           <View style={styles.overviewHeader}>
             <Text style={styles.sectionTitle}>Advance Overview</Text>
@@ -188,11 +188,11 @@ const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVk
                 <Text style={styles.addBtnText}>+ Advance Request</Text>
               </TouchableOpacity>
 
-              {/* Modal */}
+            
               <Modal visible={modalVisible} transparent animationType="fade">
                 <View style={styles.overlay}>
                   <View style={styles.modalBox}>
-                    {/* Header */}
+                  
                     <View style={styles.header}>
                       <Text style={styles.headerTitle}>Enter the following details</Text>
                       <TouchableOpacity onPress={() => setModalVisible(false)}>
@@ -200,7 +200,7 @@ const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVk
                       </TouchableOpacity>
                     </View>
 
-                    {/* Fields */}
+                   
                     <View style={styles.field}>
                       <Text style={styles.label}>Advance Amount :</Text>
                       <TextInput
@@ -262,7 +262,7 @@ const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVk
                       </View>
                     </View>
 
-                    {/* Month & Year Row */}
+                  
                     <View style={styles.row}>
                       <View style={styles.column}>
                         <Text style={styles.label}>Month :</Text>
@@ -308,7 +308,7 @@ const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVk
                       />
                     </View>
 
-                    {/* Submit Button */}
+                  
                     <TouchableOpacity
                       style={styles.submitBtn}
                       onPress={() => {
@@ -341,7 +341,7 @@ const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVk
 
 
 
-          {/* Amounts */}
+         
           <View style={styles.amountRow}>
             {/* <Text style={styles.amountLabel}>₹20000{"\n"}<Text style={styles.amountSub}>Total Advance</Text></Text>
             <Text style={styles.amountLabel}>₹8000{"\n"}<Text style={styles.amountSub}>Remaining</Text></Text> */}
@@ -358,8 +358,7 @@ const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVk
 
           </View>
 
-          {/* <Text style={styles.emiText}>EMI: ₹2000 / month</Text>
-           */}
+         
           <Text style={styles.emiText}>
             EMI: ₹
             {currentAdvance ? (currentAdvance.advance_amount / currentAdvance.no_of_instalments).toFixed(0) : 0}
@@ -368,7 +367,7 @@ const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVk
 
         </View>
 
-        {/* Upcoming Deduction */}
+       
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Upcoming Deduction</Text>
           <View style={styles.card}>

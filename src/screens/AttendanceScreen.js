@@ -12,11 +12,12 @@ import {
 import LinearGradient from "react-native-linear-gradient";
 
 import BottomNavigation from "./BottomNavigation";
+import Navbar from "./Dashboardscreen/navbar"
 import MarkAttendance from "./AttendanceScreen/MarkAttendance";
 import AttendanceOverview from "./AttendanceScreen/AttendanceOverview";
 import OvertimeOverview from "./AttendanceScreen/OvertimeOverview";
 import HolidayList from "./AttendanceScreen/HolidayList";
-
+import { useRoute } from "@react-navigation/native";
 const AttendanceScreen = () => {
 
   const [selectedButton, setSelectedButton] = useState("Mark Attendance");
@@ -78,20 +79,21 @@ const AttendanceScreen = () => {
   //   });
   // };
 
-
+   const route = useRoute();
+  const screenTitle = route.params?.title;
 
   return (
     <LinearGradient colors={["#0B132B", "#1c68beff"]} style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View style={styles.header}>
+        {/* <View style={styles.header}>
           <Text style={styles.headerTitle}>Attendance</Text>
           <View style={styles.headerIcons}>
             <Text style={styles.icon}>🔍</Text>
             <Text style={styles.icon}>🔔</Text>
           </View>
-        </View>
-
+        </View> */}
+        <Navbar title={screenTitle}/>
         {/* Top Buttons */}
         {/* <View style={styles.topButtonRow}>
           {["Mark Attendance", "View Detailed Log", "Overtime Overview", "Holiday List"].map(
@@ -147,15 +149,15 @@ const AttendanceScreen = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 15 },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  headerTitle: { color: "#fff", fontSize: 20, fontWeight: "700" },
-  headerIcons: { flexDirection: "row", gap: 10 },
-  icon: { fontSize: 18, color: "#fff" },
+  // header: {
+  //   flexDirection: "row",
+  //   justifyContent: "space-between",
+  //   alignItems: "center",
+  //   marginBottom: 15,
+  // },
+  // headerTitle: { color: "#fff", fontSize: 20, fontWeight: "700" },
+  // headerIcons: { flexDirection: "row", gap: 10 },
+  // icon: { fontSize: 18, color: "#fff" },
   topButtonRow: {
     flexDirection: "row",
     flexWrap: "wrap",
