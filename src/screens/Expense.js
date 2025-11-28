@@ -17,7 +17,7 @@ import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from "react-native";
 import { launchImageLibrary } from "react-native-image-picker";
-
+import { API_BASE_URL } from "@env";
 const Expense = () => {
 
 
@@ -37,34 +37,34 @@ const Expense = () => {
   const [amount, setAmount] = useState('');
   const [remark, setRemark] = useState('');
   const [image, setImage] = useState(null);
+  const [token, setToken] = useState(null);
 
-  const getToken = async () => {
-    const token = await AsyncStorage.getItem('authToken');
-    console.log('Stored token:', token);
-    return token;
-  };
 
   useEffect(() => {
-    fetchClaimsData();
+    const loadToken = async () => {
+      const t = await AsyncStorage.getItem("authToken");
+      setToken(t);
+      console.log("TOKEN LOADED:", t);
+    };
+    loadToken();
   }, []);
-
   const pickImage = () => {
-  const options = {
-    mediaType: 'photo',
-    includeBase64: false,
-  };
+    const options = {
+      mediaType: 'photo',
+      includeBase64: false,
+    };
 
-  launchImageLibrary(options, (response) => {
-    if (response.didCancel) {
-      console.log('User cancelled image picker');
-    } else if (response.errorCode) {
-      console.log('Image Picker Error: ', response.errorMessage);
-    } else {
-      const uri = response.assets[0].uri;
-      setImage(uri);
-    }
-  });
-};
+    launchImageLibrary(options, (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.errorCode) {
+        console.log('Image Picker Error: ', response.errorMessage);
+      } else {
+        const uri = response.assets[0].uri;
+        setImage(uri);
+      }
+    });
+  };
 
 
 
@@ -80,9 +80,16 @@ const Expense = () => {
   };
 
 
+
+  useEffect(() => {
+    fetchClaimsData();
+  }, [token]);
+
   const fetchClaimsData = async () => {
+    console.log("Advancepage", token)
+    if (!token) return;
     try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
+      // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
       // const token =  getToken();
       // Alert.alert("token",token);
       const payload = {
@@ -90,7 +97,7 @@ const Expense = () => {
         type: 'reimbursement',
       };
       const response = await axios.post(
-        "http://10.0.2.2:8080/employee/get-extra-earning",
+        `${API_BASE_URL}employee/get-extra-earning`,
         payload,
         {
           headers: {
@@ -161,7 +168,7 @@ const Expense = () => {
 
   const handleSubmit = async () => {
     try {
-      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg';
+      // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg';
       const payload = {
         head_id: headId,
         amount: amount,
@@ -174,7 +181,7 @@ const Expense = () => {
 
 
       const response = await axios.post(
-        'http://10.0.2.2:8080/employee/add-extra-earning-data',
+        `${API_BASE_URL}employee/add-extra-earning-data`,
         payload,
         {
           headers: {
@@ -428,22 +435,22 @@ const Expense = () => {
                   placeholder="Head ID"
                   value={headId}
                   onChangeText={setHeadId}
-                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff" , borderColor: "#fff"}}
-                   placeholderTextColor="#fff"
+                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff", borderColor: "#fff" }}
+                  placeholderTextColor="#fff"
                 />
                 <TextInput
                   placeholder="Amount"
                   value={amount}
                   onChangeText={setAmount}
-                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff" , borderColor: "#fff"}}
-                   placeholderTextColor="#fff"
+                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff", borderColor: "#fff" }}
+                  placeholderTextColor="#fff"
                 />
                 <TextInput
                   placeholder="Reason"
                   value={remark}
                   onChangeText={setRemark}
-                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff" , borderColor: "#fff"}}
-                   placeholderTextColor="#fff"
+                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff", borderColor: "#fff" }}
+                  placeholderTextColor="#fff"
                 />
                 <View style={styles.row}>
                   <View style={styles.halfPicker}>
@@ -483,23 +490,23 @@ const Expense = () => {
                     </Picker>
                   </View>
 
-                  
+
 
                 </View>
                 <Text style={styles.label}>Upload Image:</Text>
-                  <View style={styles.imageUploadContainer}>
-                    {image ? (
-                      <Image
-                        source={{ uri: image }}
-                        style={{ width: 100, height: 100, borderRadius: 8, marginBottom: 10 }}
-                      />
-                    ) : (
-                      <Text style={{ color: "#ccc", marginBottom: 10 }}>No image selected</Text>
-                    )}
-                    <TouchableOpacity style={styles.uploadBtn} onPress={pickImage}>
-                      <Text style={styles.uploadBtnText}>Choose Image</Text>
-                    </TouchableOpacity>
-                  </View>
+                <View style={styles.imageUploadContainer}>
+                  {image ? (
+                    <Image
+                      source={{ uri: image }}
+                      style={{ width: 100, height: 100, borderRadius: 8, marginBottom: 10 }}
+                    />
+                  ) : (
+                    <Text style={{ color: "#ccc", marginBottom: 10 }}>No image selected</Text>
+                  )}
+                  <TouchableOpacity style={styles.uploadBtn} onPress={pickImage}>
+                    <Text style={styles.uploadBtnText}>Choose Image</Text>
+                  </TouchableOpacity>
+                </View>
 
                 {/* Other Dropdowns */}
                 {/* <Text style={styles.label}>Branch:</Text>
@@ -752,22 +759,22 @@ const styles = StyleSheet.create({
   },
 
   imageUploadContainer: {
-  alignItems: "center",
-  marginVertical: 15,
-},
+    alignItems: "center",
+    marginVertical: 15,
+  },
 
-uploadBtn: {
-  backgroundColor: "#004B8D",
-  paddingVertical: 10,
-  paddingHorizontal: 20,
-  borderRadius: 10,
-},
+  uploadBtn: {
+    backgroundColor: "#004B8D",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
 
-uploadBtnText: {
-  color: "#fff",
-  fontSize: 14,
-  fontWeight: "bold",
-},
+  uploadBtnText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
 
 
 });

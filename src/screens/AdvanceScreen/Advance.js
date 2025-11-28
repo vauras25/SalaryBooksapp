@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {
   View,
   Text,
@@ -13,8 +13,10 @@ import Icon from "react-native-vector-icons/Ionicons";
 import LinearGradient from "react-native-linear-gradient";
 import BottomNavigation from "../BottomNavigation";
 import { Picker } from "@react-native-picker/picker";
-import { useEffect } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from "axios";
+import { API_BASE_URL } from "@env";
+
 
 
 const AdvanceManagement = () => {
@@ -28,15 +30,29 @@ const AdvanceManagement = () => {
   const [year, setYear] = useState("2025");
   const [reason, setReason] = useState("");
   const [advanceList, setAdvanceList] = useState([]);
+  const [token, setToken] = useState(null);
 
 
+  useEffect(() => {
+      const loadToken = async () => {
+        const t = await AsyncStorage.getItem("authToken");
+        setToken(t);
+        console.log("TOKEN LOADED:", t);
+      };
+      loadToken();
+    }, []);
+  
   const fetchAdvanceList = async () => {
+    console.log("Advancepage",token)
+     if (!token) return;
+     console.log("Advancepage1")
     try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
+      // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
       const payload = {
         pageno: 1,
       };
-      const res = await axios.post("http://10.0.2.2:8080/employee/employee-get-advance-list",
+      // const res = await axios.post("http://10.0.2.2:8080/employee/employee-get-advance-list",
+      const res = await axios.post(`${API_BASE_URL}employee/employee-get-advance-list`,
         payload,
          {
        headers: {
@@ -56,12 +72,13 @@ const AdvanceManagement = () => {
 
   useEffect(() => {
     fetchAdvanceList();
-  }, []);
+  }, [token]);
 
   const currentAdvance = advanceList.length > 0 ? advanceList[0] : null;
 
   
   const submitAdvanceRequest = async () => {
+     if (!token) return;
   try {
     if (!advanceAmount || !installments || !frequency || !month || !year || !recoveryFrom) {
       Alert.alert("Error", "Please fill all required fields.");
@@ -113,9 +130,9 @@ const AdvanceManagement = () => {
       remarks: reason || "",
     };
 
-    console.log("Payload =>", payload);
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
-    const response = await axios.post("http://10.0.2.2:8080/employee/employee-advance-request", 
+    console.log("Payload =>", payload,"token",token);
+// const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
+    const response = await axios.post(`${API_BASE_URL}employee/employee-advance-request`, 
      payload,
         {
           headers: {
