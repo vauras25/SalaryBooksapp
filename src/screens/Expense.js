@@ -17,7 +17,7 @@ import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from "react-native";
 import { launchImageLibrary } from "react-native-image-picker";
-
+import { API_BASE_URL } from "@env";
 const Expense = () => {
 
 
@@ -28,6 +28,7 @@ const Expense = () => {
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
   const [loading, setLoading] = useState(true);
+  const [imageName, setImageName] = useState(true);
   // const [branch, setBranch] = useState("");
   // const [dept, setDept] = useState("");
   // const [designation, setDesignation] = useState("");
@@ -37,34 +38,77 @@ const Expense = () => {
   const [amount, setAmount] = useState('');
   const [remark, setRemark] = useState('');
   const [image, setImage] = useState(null);
+  const [token, setToken] = useState(null);
 
-  const getToken = async () => {
-    const token = await AsyncStorage.getItem('authToken');
-    console.log('Stored token:', token);
-    return token;
-  };
 
   useEffect(() => {
-    fetchClaimsData();
+    const loadToken = async () => {
+      const t = await AsyncStorage.getItem("authToken");
+      setToken(t);
+      console.log("TOKEN LOADED:", t);
+    };
+    loadToken();
   }, []);
+  // const pickImage = () => {
+  //   const options = {
+  //     mediaType: 'photo',
+  //     includeBase64: false,
+  //   };
+
+  //   launchImageLibrary(options, (response) => {
+  //     if (response.didCancel) {
+  //       console.log('User cancelled image picker');
+  //     } else if (response.errorCode) {
+  //       console.log('Image Picker Error: ', response.errorMessage);
+  //     } else {
+  //       const uri = response.assets[0].uri;
+  //       setImage(uri);
+  //     }
+  //   });
+  // };
+
+  // const pickImage = () => {
+  //   const options = {
+  //     mediaType: 'photo',
+  //     includeBase64: true,
+  //   };
+
+  //   launchImageLibrary(options, (response) => {
+  //     if (response.didCancel || response.errorCode) return;
+
+  //     const asset = response.assets[0];
+
+  //     setImage({
+  //       uri: asset.uri,
+  //       type: asset.type,
+  //       name: asset.fileName ?? `photo_${Date.now()}.jpg`,
+  //       base64: asset.base64,
+  //     });
+  //   });
+  // };
 
   const pickImage = () => {
-  const options = {
-    mediaType: 'photo',
-    includeBase64: false,
+    const options = {
+      mediaType: 'photo',
+      includeBase64: false,   // you don’t need base64 unless required
+    };
+
+    launchImageLibrary(options, (response) => {
+      if (response.didCancel || response.errorCode) return;
+
+      const asset = response.assets[0];
+
+      setImage({
+        uri: asset.uri,
+        type: asset.type,
+        name: asset.fileName ?? `photo_${Date.now()}.jpg`,
+      });
+    });
   };
 
-  launchImageLibrary(options, (response) => {
-    if (response.didCancel) {
-      console.log('User cancelled image picker');
-    } else if (response.errorCode) {
-      console.log('Image Picker Error: ', response.errorMessage);
-    } else {
-      const uri = response.assets[0].uri;
-      setImage(uri);
-    }
-  });
-};
+
+
+
 
 
 
@@ -80,9 +124,16 @@ const Expense = () => {
   };
 
 
+
+  useEffect(() => {
+    fetchClaimsData();
+  }, [token]);
+
   const fetchClaimsData = async () => {
+    console.log("Advancepage", token)
+    if (!token) return;
     try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
+      // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
       // const token =  getToken();
       // Alert.alert("token",token);
       const payload = {
@@ -90,7 +141,7 @@ const Expense = () => {
         type: 'reimbursement',
       };
       const response = await axios.post(
-        "http://10.0.2.2:8080/employee/get-extra-earning",
+        `${API_BASE_URL}employee/get-extra-earning`,
         payload,
         {
           headers: {
@@ -133,80 +184,55 @@ const Expense = () => {
 
 
 
-  //   const handleSubmit = async () => {
-  //     try {
-  //       Alert.alert("Start");
-  //       // const response = await fetch("https://your-api-url.com/api/claims", {
-  //       const response = await fetch("http://10.0.2.2:8080/employee/add-extra-earning-data", {
-  //         method: "POST",
+
+  // const handleSubmit = async () => {
+  //   try {
+  //     // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg';
+  //     const payload = {
+  //       head_id: headId,
+  //       amount: amount,
+  //       remark: remark,
+  //       wage_month: month,
+  //       wage_year: year,
+  //       type: 'reimbursement',
+  //     };
+
+
+
+  //     const response = await axios.post(
+  //       `${API_BASE_URL}employee/add-extra-earning-data`,
+  //       payload,
+  //       {
   //         headers: {
-  //           "Content-Type": "application/json",
+  //           'x-access-token': token,
+  //           'Content-Type': 'application/json',
   //         },
-  //         body: JSON.stringify(formData),
-  //       });
-  //  Alert.alert("Start2");
-  //       if (!response.ok) {
-  //         throw new Error("Failed to submit claim");
+  //         timeout: 10000,
   //       }
+  //     );
 
-  //       const data = await response.json();
-  //       Alert.alert("Success", "Claim submitted successfully!");
-  //       console.log("Response:", data);
-  //       setModalVisible(false);
-  //     } catch (error) {
-  //       console.error(error);
-  //       Alert.alert("Error", error.message);
+  //     console.log('API Response:', response.data);
+
+
+  //     if (response.data.status === 'success') {
+  //       Alert.alert('Success', response.data.message);
+  //       fetchClaimsData();
+  //       setModalVisible(false)
+  //     } else {
+  //       Alert.alert('Error', response.data.message);
   //     }
-  //   };
 
-  const handleSubmit = async () => {
-    try {
-      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg';
-      const payload = {
-        head_id: headId,
-        amount: amount,
-        remark: remark,
-        wage_month: month,
-        wage_year: year,
-        type: 'reimbursement',
-      };
-
-
-
-      const response = await axios.post(
-        'http://10.0.2.2:8080/employee/add-extra-earning-data',
-        payload,
-        {
-          headers: {
-            'x-access-token': token,
-            'Content-Type': 'application/json',
-          },
-          timeout: 10000,
-        }
-      );
-
-      console.log('API Response:', response.data);
-
-
-      if (response.data.status === 'success') {
-        Alert.alert('Success', response.data.message);
-        fetchClaimsData();
-        setModalVisible(false)
-      } else {
-        Alert.alert('Error', response.data.message);
-      }
-
-    } catch (error) {
-      console.error('API Error:', error);
-      if (error.response) {
-        Alert.alert('Server Error', JSON.stringify(error.response.data));
-      } else if (error.request) {
-        Alert.alert('Network Error', 'No response from backend.');
-      } else {
-        Alert.alert('Error', error.message);
-      }
-    }
-  };
+  //   } catch (error) {
+  //     console.error('API Error:', error);
+  //     if (error.response) {
+  //       Alert.alert('Server Error', JSON.stringify(error.response.data));
+  //     } else if (error.request) {
+  //       Alert.alert('Network Error', 'No response from backend.');
+  //     } else {
+  //       Alert.alert('Error', error.message);
+  //     }
+  //   }
+  // };
 
 
 
@@ -215,6 +241,60 @@ const Expense = () => {
   // const handleChange = (key, value) => {
   //   setFormData((prev) => ({ ...prev, [key]: value }));
   // };
+
+
+  const handleSubmit = async () => {
+    try {
+      if (!token) {
+        Alert.alert("Error", "Token not found");
+        return;
+      }
+
+      const formData = new FormData();
+
+      formData.append("head_id", headId);
+      formData.append("amount", amount);
+      formData.append("remark", remark);
+      formData.append("wage_month", month);
+      formData.append("wage_year", year);
+      formData.append("type", "reimbursement");
+
+      // If image selected, attach to formData
+      if (image) {
+        formData.append("extra_earnings_document", {
+          uri: image.uri,
+          name: image.name,
+          type: image.type,
+        });
+      }
+      console.log("formData", formData,"API_BASE_URL",API_BASE_URL);
+
+      const response = await axios.post(
+        `${API_BASE_URL}employee/add-extra-earning-data`,
+        formData,
+        {
+          headers: {
+            "x-access-token": token,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("API Response:", response.data);
+
+      if (response.data.status === "success") {
+        Alert.alert("Success", response.data.message);
+        setModalVisible(false);
+        fetchClaimsData();
+      } else {
+        Alert.alert("Error", response.data.message);
+      }
+
+    } catch (error) {
+      console.error("Upload Error:", error);
+      Alert.alert("Upload Failed", error.message);
+    }
+  };
 
   return (
     <LinearGradient
@@ -428,22 +508,22 @@ const Expense = () => {
                   placeholder="Head ID"
                   value={headId}
                   onChangeText={setHeadId}
-                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff" , borderColor: "#fff"}}
-                   placeholderTextColor="#fff"
+                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff", borderColor: "#fff" }}
+                  placeholderTextColor="#fff"
                 />
                 <TextInput
                   placeholder="Amount"
                   value={amount}
                   onChangeText={setAmount}
-                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff" , borderColor: "#fff"}}
-                   placeholderTextColor="#fff"
+                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff", borderColor: "#fff" }}
+                  placeholderTextColor="#fff"
                 />
                 <TextInput
                   placeholder="Reason"
                   value={remark}
                   onChangeText={setRemark}
-                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff" , borderColor: "#fff"}}
-                   placeholderTextColor="#fff"
+                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff", borderColor: "#fff" }}
+                  placeholderTextColor="#fff"
                 />
                 <View style={styles.row}>
                   <View style={styles.halfPicker}>
@@ -483,23 +563,35 @@ const Expense = () => {
                     </Picker>
                   </View>
 
-                  
+
 
                 </View>
                 <Text style={styles.label}>Upload Image:</Text>
-                  <View style={styles.imageUploadContainer}>
-                    {image ? (
-                      <Image
-                        source={{ uri: image }}
-                        style={{ width: 100, height: 100, borderRadius: 8, marginBottom: 10 }}
-                      />
-                    ) : (
-                      <Text style={{ color: "#ccc", marginBottom: 10 }}>No image selected</Text>
-                    )}
-                    <TouchableOpacity style={styles.uploadBtn} onPress={pickImage}>
-                      <Text style={styles.uploadBtnText}>Choose Image</Text>
-                    </TouchableOpacity>
-                  </View>
+                {/* <View style={styles.imageUploadContainer}>
+                  {image ? (
+                    <Image
+                      source={{ uri: image }}
+                      style={{ width: 100, height: 100, borderRadius: 8, marginBottom: 10 }}
+                    />
+                  ) : (
+                    <Text style={{ color: "#ccc", marginBottom: 10 }}>No image selected</Text>
+                  )}
+                  <TouchableOpacity style={styles.uploadBtn} onPress={pickImage}>
+                    <Text style={styles.uploadBtnText}>Choose Image</Text>
+                  </TouchableOpacity>
+                </View> */}
+
+                <View style={styles.imageUploadContainer}>
+                  <Text style={{ color: "#ccc", marginBottom: 10 }}>
+                    {image ? image.name : "No file selected"}
+                  </Text>
+
+                  <TouchableOpacity style={styles.uploadBtn} onPress={pickImage}>
+                    <Text style={styles.uploadBtnText}>Choose Image</Text>
+                  </TouchableOpacity>
+                </View>
+
+
 
                 {/* Other Dropdowns */}
                 {/* <Text style={styles.label}>Branch:</Text>
@@ -752,22 +844,22 @@ const styles = StyleSheet.create({
   },
 
   imageUploadContainer: {
-  alignItems: "center",
-  marginVertical: 15,
-},
+    alignItems: "center",
+    marginVertical: 15,
+  },
 
-uploadBtn: {
-  backgroundColor: "#004B8D",
-  paddingVertical: 10,
-  paddingHorizontal: 20,
-  borderRadius: 10,
-},
+  uploadBtn: {
+    backgroundColor: "#004B8D",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
 
-uploadBtnText: {
-  color: "#fff",
-  fontSize: 14,
-  fontWeight: "bold",
-},
+  uploadBtnText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
 
 
 });
