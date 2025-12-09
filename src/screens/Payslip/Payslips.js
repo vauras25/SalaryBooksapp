@@ -16,8 +16,8 @@ import ModalSelector from "react-native-modal-selector";
 import axios from "axios";
 import RNBlobUtil from "react-native-blob-util";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import FileViewer from "react-native-file-viewer";
-
+import Navbar from "../Dashboardscreen/navbar";
+import { useRoute } from "@react-navigation/native";
 const PayslipScreen = () => {
 
 
@@ -200,12 +200,13 @@ const PayslipScreen = () => {
 
   navigation.navigate("ViewPayslipScreen", { data: matched });
 };
-
+const route = useRoute();
+  const screenTitle = route.params?.title;
   return (
     <SafeAreaView style={styles.container}>
 
       {/* Header */}
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Icon name="logo-usd" size={24} color="#fff" />
           <Text style={styles.headerTitle}>Payslips</Text>
@@ -214,8 +215,8 @@ const PayslipScreen = () => {
           <Icon name="search-outline" size={22} color="#fff" style={styles.icon} />
           <Icon name="notifications-outline" size={22} color="#fff" />
         </View>
-      </View>
-
+      </View> */}
+       <Navbar title={screenTitle}/>
       {/* Filters */}
       <View style={styles.filterContainer}>
 
