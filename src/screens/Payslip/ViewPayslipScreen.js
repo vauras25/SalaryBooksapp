@@ -1,4 +1,3 @@
-// ViewPayslipScreen.js
 import React from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -61,7 +60,7 @@ const ViewPayslipScreen = ({ route }) => {
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Pay Slip</Text>
 
-        {/* ================= TOP TABLE ================= */}
+
         <View style={styles.table}>
           <Row left="Pay Slip Month" right={`${data.wage_month}/${data.wage_year}`} />
           <Row left="Employee Code" right={data.emp_id || "N/A"} />
@@ -94,11 +93,11 @@ const ViewPayslipScreen = ({ route }) => {
           <Row left="Arrear Period" right={data.arrear_period || "N/A"} />
         </View>
 
-        {/* ================= SALARY BREAKUP TABLE ================= */}
+
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Salary Breakup</Text>
 
-          {/* Earnings */}
+
           <View style={styles.headerRow}>
             <Text style={styles.blockTitle}>Earnings</Text>
             <Text style={styles.amountTitle}>Amount</Text>
@@ -116,7 +115,7 @@ const ViewPayslipScreen = ({ route }) => {
             </View>
           ))}
         </View>
-        {/* Deductions */}
+
         <View style={styles.card}>
           <View style={styles.headerRow}>
           <Text style={styles.blockTitle}>Deductions</Text>
@@ -129,7 +128,7 @@ const ViewPayslipScreen = ({ route }) => {
             </View>
           ))}
         </View>
-        {/* Employer Contribution */}
+
         <View style={styles.card}>
           <View style={styles.headerRow}>
           <Text style={styles.blockTitle}>Employer Contribution</Text>
@@ -143,7 +142,7 @@ const ViewPayslipScreen = ({ route }) => {
           ))}
 
         </View>
-        {/* -------- TOTAL SUMMARY ROW -------- */}
+
         <View style={styles.summaryRow}>
           <Text style={styles.col}>Gross Earning: {data.emp_data?.earning_gross_earning || "0.00"}</Text>
           <Text style={styles.col}>Net Pay: {data.emp_data?.earning_net_take_home || "0.00"}</Text>
@@ -162,7 +161,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f2f4f8",
   },
 
-  /* -------------------- PAGE TITLE -------------------- */
+
   title: {
     textAlign: "center",
     fontSize: 24,
@@ -175,7 +174,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
 
-  /* -------------------- CARD SECTION (SALARY BREAKUP) -------------------- */
+
   card: {
     backgroundColor: "#ffffff",
     padding: 20,
@@ -187,7 +186,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
 
-  /* Section title "Salary Breakup" */
   sectionTitle: {
     fontSize: 20,
     fontWeight: "800",
@@ -195,7 +193,6 @@ const styles = StyleSheet.create({
     color: "#1e293b",
   },
 
-  /* Block title like: Earnings, Deductions, Employer Contribution */
   blockTitle: {
     fontSize: 17,
     fontWeight: "700",
@@ -227,7 +224,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
 
-  /* Rows inside Salary breakup */
+ 
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -251,7 +248,7 @@ const styles = StyleSheet.create({
     width: "40%",
   },
 
-  /* -------------------- TOTAL SUMMARY BAR -------------------- */
+ 
   summaryRow: {
     flexDirection: "row",
     justifyContent: "space-between",
