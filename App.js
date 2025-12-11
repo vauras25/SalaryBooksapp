@@ -17,6 +17,7 @@ import { ThemeProvider } from './src/screens/ThemeContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Advance from './src/screens/AdvanceScreen/Advance';
 import ViewPayslipScreen from "./src/screens/Payslip/ViewPayslipScreen";
+import AdvanceInstallmentScreen from './src/screens/AdvanceScreen/AdvanceInstallmentScreen';
 
 Ionicons.loadFont();
 const Stack = createNativeStackNavigator();
@@ -47,9 +48,7 @@ function App() {
             <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
             <Stack.Screen name="Advance" component={Advance} options={{ headerShown: false }} />
             <Stack.Screen name="ViewPayslipScreen" component={ViewPayslipScreen} options={{ headerShown: true, title: "Payslip Details" }}/>
-
-
-
+            <Stack.Screen name="AdvanceInstallmentScreen" component={AdvanceInstallmentScreen} options={{ headerShown: false }}/>
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

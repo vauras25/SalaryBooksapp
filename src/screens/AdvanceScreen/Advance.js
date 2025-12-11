@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -16,11 +16,10 @@ import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from "axios";
 import { API_BASE_URL } from "@env";
-
-
+import { useNavigation } from '@react-navigation/native';
 
 const AdvanceManagement = () => {
-
+  const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [advanceAmount, setAdvanceAmount] = useState("");
   const [recoveryFrom, setRecoveryFrom] = useState("");
@@ -34,18 +33,18 @@ const AdvanceManagement = () => {
 
 
   useEffect(() => {
-      const loadToken = async () => {
-        const t = await AsyncStorage.getItem("authToken");
-        setToken(t);
-        console.log("TOKEN LOADED:", t);
-      };
-      loadToken();
-    }, []);
-  
+    const loadToken = async () => {
+      const t = await AsyncStorage.getItem("authToken");
+      setToken(t);
+      console.log("TOKEN LOADED:", t);
+    };
+    loadToken();
+  }, []);
+
   const fetchAdvanceList = async () => {
-    console.log("Advancepage",token)
-     if (!token) return;
-     console.log("Advancepage1")
+    console.log("Advancepage", token)
+    if (!token) return;
+    console.log("Advancepage1")
     try {
       // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
       const payload = {
@@ -54,12 +53,12 @@ const AdvanceManagement = () => {
       // const res = await axios.post("http://10.0.2.2:8080/employee/employee-get-advance-list",
       const res = await axios.post(`${API_BASE_URL}employee/employee-get-advance-list`,
         payload,
-         {
-       headers: {
+        {
+          headers: {
             "x-access-token": token,
             "Content-Type": "application/json",
           },
-      });
+        });
 
       if (res.data?.status === "success") {
         setAdvanceList(res.data.advance_data.docs || []);
@@ -76,64 +75,64 @@ const AdvanceManagement = () => {
 
   const currentAdvance = advanceList.length > 0 ? advanceList[0] : null;
 
-  
+
   const submitAdvanceRequest = async () => {
-     if (!token) return;
-  try {
-    if (!advanceAmount || !installments || !frequency || !month || !year || !recoveryFrom) {
-      Alert.alert("Error", "Please fill all required fields.");
-      return;
-    }
-    const monthMap = {
-      January: 1, February: 2, March: 3, April: 4,
-      May: 5, June: 6, July: 7, August: 8,
-      September: 9, October: 10, November: 11, December: 12,
-    };
-
-    const startMonthNum = monthMap[month];
-
- 
-    const emi = Number(advanceAmount) / Number(installments);
-
-    let instalment_history = [];
-    let currentMonth = startMonthNum;
-    let currentYear = Number(year);
-
-    for (let i = 0; i < Number(installments); i++) {
-      instalment_history.push({
-        advance_amount: emi.toFixed(2),
-        instalment_month: currentMonth,
-        instalment_year: currentYear,
-        payment_status: "pending",
-        recovery_from: recoveryFrom,
-        // balance_amount: emi.toFixed(2),
-        
-      });
-
-      currentMonth++;
-      if (currentMonth > 12) {
-        currentMonth = 1;
-        currentYear++;
+    if (!token) return;
+    try {
+      if (!advanceAmount || !installments || !frequency || !month || !year || !recoveryFrom) {
+        Alert.alert("Error", "Please fill all required fields.");
+        return;
       }
-    }
+      const monthMap = {
+        January: 1, February: 2, March: 3, April: 4,
+        May: 5, June: 6, July: 7, August: 8,
+        September: 9, October: 10, November: 11, December: 12,
+      };
 
- 
-    const payload = {
-      advance_amount: advanceAmount,
-      advance_outstanding: advanceAmount,
-      no_of_instalments: installments,
-      recovery_frequency: frequency,
-      recovery_from: recoveryFrom,
-      payment_start_month: startMonthNum.toString(),
-      payment_start_year: year,
-      instalment_history,
-      remarks: reason || "",
-    };
+      const startMonthNum = monthMap[month];
 
-    console.log("Payload =>", payload,"token",token);
-// const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
-    const response = await axios.post(`${API_BASE_URL}employee/employee-advance-request`, 
-     payload,
+
+      const emi = Number(advanceAmount) / Number(installments);
+
+      let instalment_history = [];
+      let currentMonth = startMonthNum;
+      let currentYear = Number(year);
+
+      for (let i = 0; i < Number(installments); i++) {
+        instalment_history.push({
+          advance_amount: emi.toFixed(2),
+          instalment_month: currentMonth,
+          instalment_year: currentYear,
+          payment_status: "pending",
+          recovery_from: recoveryFrom,
+          // balance_amount: emi.toFixed(2),
+
+        });
+
+        currentMonth++;
+        if (currentMonth > 12) {
+          currentMonth = 1;
+          currentYear++;
+        }
+      }
+
+
+      const payload = {
+        advance_amount: advanceAmount,
+        advance_outstanding: advanceAmount,
+        no_of_instalments: installments,
+        recovery_frequency: frequency,
+        recovery_from: recoveryFrom,
+        payment_start_month: startMonthNum.toString(),
+        payment_start_year: year,
+        instalment_history,
+        remarks: reason || "",
+      };
+
+      console.log("Payload =>", payload, "token", token);
+      // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
+      const response = await axios.post(`${API_BASE_URL}employee/employee-advance-request`,
+        payload,
         {
           headers: {
             "x-access-token": token,
@@ -142,24 +141,24 @@ const AdvanceManagement = () => {
         }
       );
 
-    // const data = await response.json();
-    const data = response.data;
+      // const data = await response.json();
+      const data = response.data;
 
-    console.log("API Response:", data);
+      console.log("API Response:", data);
 
-    if (data.status === "success") {
-      Alert.alert("Success", "Advance request submitted");
-      fetchAdvanceList(); 
-      setModalVisible(false);
-    } else {
-      Alert.alert("Error", data.message || "Something went wrong");
+      if (data.status === "success") {
+        Alert.alert("Success", "Advance request submitted");
+        fetchAdvanceList();
+        setModalVisible(false);
+      } else {
+        Alert.alert("Error", data.message || "Something went wrong");
+      }
+
+    } catch (err) {
+      console.log(err);
+      Alert.alert("Error", "Failed to submit advance request");
     }
-
-  } catch (err) {
-    console.log(err);
-    Alert.alert("Error", "Failed to submit advance request");
-  }
-};
+  };
 
 
 
@@ -167,7 +166,7 @@ const AdvanceManagement = () => {
   return (
     <LinearGradient colors={["#05203C", "#0A3B63"]} style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        
+
         <View style={styles.header}>
           <Text style={styles.title}>Advance Management</Text>
           <View style={styles.headerIcons}>
@@ -176,7 +175,7 @@ const AdvanceManagement = () => {
           </View>
         </View>
 
-       
+
         <View style={styles.dropdownRow}>
           <TouchableOpacity style={styles.dropdown}>
             <Text style={styles.dropdownText}>September</Text>
@@ -188,7 +187,7 @@ const AdvanceManagement = () => {
           </TouchableOpacity>
         </View>
 
-       
+
         <View style={styles.overviewBox}>
           <View style={styles.overviewHeader}>
             <Text style={styles.sectionTitle}>Advance Overview</Text>
@@ -205,11 +204,11 @@ const AdvanceManagement = () => {
                 <Text style={styles.addBtnText}>+ Advance Request</Text>
               </TouchableOpacity>
 
-            
+
               <Modal visible={modalVisible} transparent animationType="fade">
                 <View style={styles.overlay}>
                   <View style={styles.modalBox}>
-                  
+
                     <View style={styles.header}>
                       <Text style={styles.headerTitle}>Enter the following details</Text>
                       <TouchableOpacity onPress={() => setModalVisible(false)}>
@@ -217,7 +216,7 @@ const AdvanceManagement = () => {
                       </TouchableOpacity>
                     </View>
 
-                   
+
                     <View style={styles.field}>
                       <Text style={styles.label}>Advance Amount :</Text>
                       <TextInput
@@ -241,11 +240,11 @@ const AdvanceManagement = () => {
                         >
                           <Picker.Item label="Select One" value="" />
                           <Picker.Item label="Annual Earning" value="salary" />
-                          <Picker.Item label="Reimbursement" value="reimbursement" /> 
-                          <Picker.Item label="Incentive" value="incentive" /> 
-                          <Picker.Item label="Gross Earning" value="gross_earning" /> 
-                          <Picker.Item label="Bonus" value="bonus" /> 
-                         
+                          <Picker.Item label="Reimbursement" value="reimbursement" />
+                          <Picker.Item label="Incentive" value="incentive" />
+                          <Picker.Item label="Gross Earning" value="gross_earning" />
+                          <Picker.Item label="Bonus" value="bonus" />
+
                         </Picker>
                       </View>
                     </View>
@@ -274,12 +273,12 @@ const AdvanceManagement = () => {
                           <Picker.Item label="Quaterly" value="quaterly" />
                           <Picker.Item label="Half Yearly" value="halfYearly" />
                           <Picker.Item label="Annually" value="annually" />
-                          
+
                         </Picker>
                       </View>
                     </View>
 
-                  
+
                     <View style={styles.row}>
                       <View style={styles.column}>
                         <Text style={styles.label}>Month :</Text>
@@ -325,7 +324,7 @@ const AdvanceManagement = () => {
                       />
                     </View>
 
-                  
+
                     <TouchableOpacity
                       style={styles.submitBtn}
                       onPress={() => {
@@ -341,12 +340,6 @@ const AdvanceManagement = () => {
             </View>
           </View>
 
-          {/* Progress bar */}
-          {/* <Text style={styles.progressText}>75%</Text>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: "75%" }]} />
-          </View> */}
-
           <Text style={styles.progressText}>
             {currentAdvance ?
               `${Math.round((currentAdvance.advance_recovered / currentAdvance.advance_amount) * 100)}%`
@@ -356,13 +349,7 @@ const AdvanceManagement = () => {
             width: currentAdvance ? `${(currentAdvance.advance_recovered / currentAdvance.advance_amount) * 100}%` : "0%"
           }]} />
 
-
-
-         
           <View style={styles.amountRow}>
-            {/* <Text style={styles.amountLabel}>₹20000{"\n"}<Text style={styles.amountSub}>Total Advance</Text></Text>
-            <Text style={styles.amountLabel}>₹8000{"\n"}<Text style={styles.amountSub}>Remaining</Text></Text> */}
-
             <Text style={styles.amountLabel}>
               ₹{currentAdvance?.advance_amount || 0}{"\n"}
               <Text style={styles.amountSub}>Total Advance</Text>
@@ -372,10 +359,9 @@ const AdvanceManagement = () => {
               ₹{currentAdvance?.advance_outstanding || 0}{"\n"}
               <Text style={styles.amountSub}>Remaining</Text>
             </Text>
-
           </View>
 
-         
+
           <Text style={styles.emiText}>
             EMI: ₹
             {currentAdvance ? (currentAdvance.advance_amount / currentAdvance.no_of_instalments).toFixed(0) : 0}
@@ -384,7 +370,7 @@ const AdvanceManagement = () => {
 
         </View>
 
-       
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Upcoming Deduction</Text>
           <View style={styles.card}>
@@ -393,27 +379,9 @@ const AdvanceManagement = () => {
           </View>
         </View>
 
-        {/* Advance History */}
+
+
         {/* <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Advance History</Text>
-          <View style={styles.card}>
-            <Text style={styles.cardDate}>April 15</Text>
-            <View style={styles.cardRight}>
-              <Text style={styles.cardAmount}>₹2000</Text>
-              <Text style={[styles.status, { color: "#FF4D4D" }]}>Active</Text>
-            </View>
-          </View>
-
-          <View style={styles.card}>
-            <Text style={styles.cardDate}>Jan 23</Text>
-            <View style={styles.cardRight}>
-              <Text style={styles.cardAmount}>₹2000</Text>
-              <Text style={[styles.status, { color: "#2ECC71" }]}>Completed</Text>
-            </View>
-          </View>
-        </View> */}
-
-        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Advance History</Text>
 
           {advanceList.map((item) => (
@@ -435,7 +403,36 @@ const AdvanceManagement = () => {
               </View>
             </View>
           ))}
+        </View> */}
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Advance History</Text>
+
+          {advanceList.map((item) => (
+            <TouchableOpacity
+              key={item._id}
+              onPress={() => navigation.navigate("AdvanceInstallmentScreen", { data: item })}
+              style={styles.card}
+            >
+              <Text style={styles.cardDate}>
+                {new Date(item.created_at).toDateString().slice(4, 10)}
+              </Text>
+
+              <View style={styles.cardRight}>
+                <Text style={styles.cardAmount}>₹{item.advance_amount}</Text>
+                <Text
+                  style={[
+                    styles.status,
+                    { color: item.status === "active" ? "#FF4D4D" : "#2ECC71" },
+                  ]}
+                >
+                  {item.status}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
         </View>
+
 
       </ScrollView>
       <BottomNavigation />
