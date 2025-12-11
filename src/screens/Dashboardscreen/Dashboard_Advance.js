@@ -36,7 +36,7 @@ const Advance = ({updateTitle}) => {
 
     return (
 
-        <View >
+        <View style={styles.container}>
             {/* Advance */}
             <View style={styles.card}>
                 <Text style={styles.sectionTitle}>Advance</Text>
@@ -64,7 +64,9 @@ const Advance = ({updateTitle}) => {
 };
 
 const styles = StyleSheet.create({
-
+    container:{
+        marginTop:-40
+    },
     card: {
         backgroundColor: "#1C2541",
         borderRadius: 20,

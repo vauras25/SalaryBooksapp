@@ -18,6 +18,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from "react-native";
 import { launchImageLibrary } from "react-native-image-picker";
 import { API_BASE_URL } from "@env";
+import { useRoute } from "@react-navigation/native";
+import Navbar from "./Dashboardscreen/navbar";
 const Expense = () => {
 
 
@@ -295,7 +297,8 @@ const Expense = () => {
       Alert.alert("Upload Failed", error.message);
     }
   };
-
+  const route = useRoute();
+  const screenTitle = route.params?.title;
   return (
     <LinearGradient
       colors={["#001B3A", "#003366"]}
@@ -307,7 +310,8 @@ const Expense = () => {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Icon name="wallet-outline" size={22} color="#fff" />
-          <Text style={styles.headerText}>Expense Management</Text>
+          {/* <Text style={styles.headerText}>Expense Management</Text> */}
+          <Navbar style={styles.headerText} title={screenTitle}/>
         </View>
         <View style={styles.headerRight}>
           <Icon name="search-outline" size={22} color="#fff" style={styles.icon} />

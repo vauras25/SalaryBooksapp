@@ -18,6 +18,7 @@ import RNBlobUtil from "react-native-blob-util";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from "../Dashboardscreen/navbar";
 import { useRoute } from "@react-navigation/native";
+import { API_BASE_URL } from "@env";
 const PayslipScreen = () => {
 
 
@@ -91,7 +92,7 @@ const PayslipScreen = () => {
       console.log("Calling API for:", selectedMonth, selectedYear);
 
       const response = await axios.post(
-        "http://10.0.2.2:8080/employee/get-generated-payslip-data",
+        `${API_BASE_URL}employee/get-generated-payslip-data`,
         payload,
         {
           headers: {
@@ -157,7 +158,7 @@ const PayslipScreen = () => {
         overwrite: true,
       }).fetch(
         "POST",
-        "http://10.0.2.2:8080/employee/download-payslip-data",
+        `${API_BASE_URL}employee/download-payslip-data`,
         {
           "Content-Type": "application/json",
           "x-access-token": token,
@@ -246,7 +247,7 @@ const route = useRoute();
 
       </View>
 
-      {/* Month List */}
+
       <ScrollView showsVerticalScrollIndicator={false}>
         {monthsToShow.map((month) => (
           <TouchableOpacity
@@ -288,7 +289,6 @@ const route = useRoute();
 
 export default PayslipScreen;
 
-/* ================  STYLES  ================== */
 
 const styles = StyleSheet.create({
   container: {

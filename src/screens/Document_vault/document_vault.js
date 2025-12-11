@@ -28,6 +28,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Pdf from "react-native-pdf";
 import axios from "axios";
 import RNFS from "react-native-fs";
+import { API_BASE_URL } from "@env";
 const { width } = Dimensions.get("window");
 
 const DocumentVaultScreen = () => {
@@ -179,6 +180,8 @@ const DocumentVaultScreen = () => {
 
 
   const uploadFileToServer = async (file, field) => {
+    console.log(API_BASE_URL,"API_BASE_URL");
+    
     setUploading(true);
     try {
       const formData = new FormData();
@@ -193,7 +196,7 @@ const DocumentVaultScreen = () => {
       });
 
       const response = await axios.post(
-        "http://10.0.2.2:8080/employee/upload-employee-documents",
+        `${API_BASE_URL}employee/upload-employee-documents`,
         formData,
         {
           headers: {
@@ -222,7 +225,7 @@ const DocumentVaultScreen = () => {
   const fetchUploadedDocs = async (employeeId, token) => {
     try {
       const response = await axios.post(
-        "http://10.0.2.2:8080/employee/get-employee-documents",
+        `${API_BASE_URL}employee/get-employee-documents`,
         { employee_id: employeeId },
         { headers: { "x-access-token": token } }
       );
@@ -244,7 +247,7 @@ const DocumentVaultScreen = () => {
 
 
   const buildFileUri = (filePath) => {
-    return `http://10.0.2.2:8080/${filePath.replace(/\\/g, "/")}`;
+    return `${API_BASE_URL}${filePath.replace(/\\/g, "/")}`;
   };
   const getMimeType = (uri) => {
   if (!uri) return "application/octet-stream";
@@ -402,7 +405,7 @@ const DocumentVaultScreen = () => {
       }
 
       const response = await axios.post(
-        "http://10.0.2.2:8080/employee/rename-employee-document",
+        `${API_BASE_URL}employee/rename-employee-document`,
         {
           employee_id: userData._id,
           document_id: document_id,
@@ -442,7 +445,7 @@ const DocumentVaultScreen = () => {
 
     try {
       const response = await axios.post(
-        "http://10.0.2.2:8080/employee/delete-employee-document",
+        `${API_BASE_URL}employee/delete-employee-document`,
         {
           employee_id: userData._id,
           document_id: docId,

@@ -82,9 +82,11 @@ const handleSignIn = async () => {
 
   return (
     <LinearGradient
-      colors={['#000000ff', '#004080']}
-      style={styles.gradientBackground}
-    >
+        colors={["#0B132B", "#1c68beff"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{ flex: 1 }}
+      >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <Image
