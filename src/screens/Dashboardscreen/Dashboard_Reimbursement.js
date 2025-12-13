@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     ScrollView,
 } from "react-native";
+import LinearGradient from 'react-native-linear-gradient';
 import { BarChart } from "react-native-gifted-charts";
 import { PieChart } from "react-native-gifted-charts";
 import { useNavigation } from '@react-navigation/native';
@@ -34,8 +35,13 @@ const Reimbursement = () => {
         <View >
 
             <View style={styles.row}>
+                <LinearGradient
+                    colors={["#07162cff", "#23568fff"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.card}
+                >
 
-                <View style={styles.card}>
                     <Text style={styles.title}>Reimbursement</Text>
 
                     <View style={styles.chartRow}>
@@ -45,7 +51,7 @@ const Reimbursement = () => {
                                 radius={30}
                                 innerRadius={15}
                                 data={data}
-                                backgroundColor="#1C2541"
+                                backgroundColor="#0b244bff"
                             // centerLabelComponent={() => (
                             //     <Text style={{ color: "#fff", fontSize: 12, fontWeight: "600" }}>
                             //         {Math.round((approved / total) * 100)}%
@@ -87,11 +93,16 @@ const Reimbursement = () => {
                     >
                         <Text style={styles.buttonText}>Apply Claim</Text>
                     </TouchableOpacity>
-                </View>
 
+                </LinearGradient>
 
+                <LinearGradient
+                    colors={["#07162cff", "#23568fff"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.card2}
+                >
 
-                <View style={styles.card2}>
                     <Text style={styles.title2}>Leave Balance</Text>
 
                     {/* <BarChart
@@ -153,69 +164,75 @@ const Reimbursement = () => {
                     /> */}
                     <View style={styles.barchart}>
                         <BarChart
-                        
-                        stackData={[
-                            {
-                                label: "Paid",
-                                stacks: [
-                                    { value: 3, color: "#55d7f1ff" },
-                                    { value: 7, color: "#0532b9ff" },
-                                ],
-                            },
-                            {
-                                label: "Casual",
-                                stacks: [
-                                    { value: 6, color: "#55d7f1ff" },
-                                    { value: 6, color: "#c50909ff" },
-                                ],
-                            },
-                            {
-                                label: "Sick",
-                                stacks: [
-                                    { value: 4, color: "#55d7f1ff" },
-                                    { value: 4, color: "#29a179ff" },
-                                ],
-                            },
-                        ]}
-                        horizontal
-                        height={100}
-                        width={width * 0.4}
-                        barWidth={18}
-                        hideRules
-                        noOfSections={5}
-                        isAnimated
-                        animationDuration={800}
-                        // barBorderRadius={6}
-                        showValuesAsTopLabel
-                        topLabelComponent={(item) => {
-                            const total = item.stacks.reduce((sum, s) => sum + s.value, 0);
-                            return (
-                                <Text style={{ color: "#fff", fontSize: 12, marginLeft: 5 }}>
-                                    {total}
-                                </Text>
-                            );
-                        }}
-                        labelTextStyle={{
-                            color: "#fff",
-                            fontSize: 12,
-                            width: 55,
-                            textAlign: "right",
-                            marginRight: 10,
-                        }}
-                        
-                        xAxisLabelTextStyle={{
-                            color: "#fff",
-                            fontSize: 9,
-                        }}
-                       
-                    />
+
+                            stackData={[
+                                {
+                                    label: "Paid",
+                                    stacks: [
+                                        { value: 3, color: "#55d7f1ff" },
+                                        { value: 7, color: "#0532b9ff" },
+                                    ],
+                                },
+                                {
+                                    label: "Casual",
+                                    stacks: [
+                                        { value: 6, color: "#55d7f1ff" },
+                                        { value: 6, color: "#c50909ff" },
+                                    ],
+                                },
+                                {
+                                    label: "Sick",
+                                    stacks: [
+                                        { value: 4, color: "#55d7f1ff" },
+                                        { value: 4, color: "#29a179ff" },
+                                    ],
+                                },
+                            ]}
+                            horizontal
+                            height={100}
+                            width={width * 0.35}
+                            barWidth={18}
+                            hideRules
+                            noOfSections={4}
+                            // initialSpacing={0}     // ✅ TOP FIX
+                            // endSpacing={0}         // ✅ TOP FIX
+                            spacing={14}
+                            // xAxisThickness={0}        // ✅ removes bottom axis
+                            xAxisLabelHeight={0}      // ✅ removes reserved label space
+                            // yAxisExtraHeight={0}
+                            isAnimated
+                            animationDuration={800}
+                            // barBorderRadius={6}
+                            showValuesAsTopLabel
+                            topLabelComponent={(item) => {
+                                const total = item.stacks.reduce((sum, s) => sum + s.value, 0);
+                                return (
+                                    <Text style={{ color: "#fff", fontSize: 12, marginLeft: 5 }}>
+                                        {total}
+                                    </Text>
+                                );
+                            }}
+                            labelTextStyle={{
+                                color: "#fff",
+                                fontSize: 12,
+                                width: 50,
+                                textAlign: "right",
+                                marginRight: 10,
+                            }}
+
+                            xAxisLabelTextStyle={{
+                                color: "#fff",
+                                fontSize: 9,
+                            }}
+
+                        />
                     </View>
-                    
+
                     <TouchableOpacity style={styles.button2}>
                         <Text style={styles.buttonText2}>Apply Leave</Text>
                     </TouchableOpacity>
-                </View>
 
+                </LinearGradient>
 
             </View>
         </View>
@@ -229,13 +246,15 @@ const styles = StyleSheet.create({
         //  transform: [{ scaleY: .65 }],
     },
     card: {
-        width: width * 0.45,
+        flex: 1,
+        width: width * 0.48,
         backgroundColor: "#1C2541",
         borderRadius: 20,
         padding: 10,
         marginHorizontal: 5,
         marginVertical: 5,
-        marginBottom: 50
+        marginBottom: 50,
+        marginLeft: -1
     },
     title: {
         color: "#FFFFFF",
@@ -298,7 +317,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#005C99",
         borderRadius: 15,
         paddingVertical: 6,
-        marginTop: 15,
+        marginTop: 19,
         alignItems: "center",
     },
     buttonText: {
@@ -309,13 +328,14 @@ const styles = StyleSheet.create({
 
 
     card2: {
-        width: width * 0.45,
+        width: width * 0.48,
         backgroundColor: "#1C2541",
         borderRadius: 20,
         padding: 10,
-        marginHorizontal: 5,
+        marginHorizontal: 1,
         marginVertical: 5,
-        marginBottom: 50
+        marginBottom: 50,
+        marginLeft: 1
     },
     title2: {
         color: "#FFFFFF",
@@ -324,17 +344,17 @@ const styles = StyleSheet.create({
         marginBottom: -10,
         textAlign: "center",
     },
-    barchart:{
-        marginTop:-20,
-        marginLeft:-40,
-        margin:-20,
-        
+    barchart: {
+        marginTop: -29,
+        marginLeft: -40,
+        margin: -20,
+
     },
     button2: {
         backgroundColor: "#005C99",
         borderRadius: 15,
         paddingVertical: 6,
-        marginTop: 15,
+        marginTop: 50,
         alignItems: "center",
     },
     buttonText2: {

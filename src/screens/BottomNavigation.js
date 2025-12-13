@@ -60,7 +60,7 @@ const BottomNavigation = () => {
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom || 10 }]}>
       {/* Bottom Nav Items */}
-      <View style={[styles.bottomNav, { backgroundColor: isDarkMode ? '#1c1c1c' : '#ececec' }]}>
+      <View style={[styles.bottomNav, { backgroundColor: isDarkMode ? '#1c1c1c' : '#003057ff' }]}>
         {navItems.map((item, index) => (
           <TouchableOpacity
             key={index}

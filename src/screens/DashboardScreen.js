@@ -77,7 +77,7 @@ const Dashboard = () => {
 
 
 
-        <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
+        <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 50 }}>
           {/* Header */}
           <View style={styles.headerRow}>
             <Image
@@ -88,7 +88,7 @@ const Dashboard = () => {
           </View>
 
           <LinearGradient
-            colors={["#0B132B", "#202c4eff"]}
+            colors={["#0B132B", "#173d68ff"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.attendanceCard}
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 5,
-    marginBottom: 10,
+    marginBottom: 8,
     alignItems: 'flex-start',
     gap: 16,
   },
@@ -728,9 +728,9 @@ const styles = StyleSheet.create({
   },
 
   markBtn: {
-    width: "100%",
+    width: "110%",
     backgroundColor: "#1565c0",
-    paddingVertical: 10,
+    paddingVertical: 7,
     paddingHorizontal: 18,
     borderRadius: 18,
     alignItems: "center",

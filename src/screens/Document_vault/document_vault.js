@@ -493,7 +493,12 @@ const DocumentVaultScreen = () => {
 
   return (
     <TouchableWithoutFeedback onPress={() => setMenuIndex(null)}>
-      <LinearGradient colors={["#0B132B", "#1c68beff"]} style={styles.gradient}>
+      <LinearGradient
+            colors={["#000000ff", "#1c68beff"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ flex: 1 }}
+          >
         <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
 
           <Navbar title={screenTitle} />
