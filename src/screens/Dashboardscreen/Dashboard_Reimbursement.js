@@ -97,7 +97,7 @@ const Reimbursement = () => {
                 </LinearGradient>
 
                 <LinearGradient
-                    colors={["#07162cff", "#23568fff"]}
+                    colors={["#0e264bff", "#23568fff"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.card2}
