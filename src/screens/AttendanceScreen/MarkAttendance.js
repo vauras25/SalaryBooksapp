@@ -18,7 +18,7 @@ import Geolocation from '@react-native-community/geolocation';
 
 import { launchCamera } from 'react-native-image-picker';
 import { Image } from 'react-native';
-
+import { ActivityIndicator } from "react-native";
 
 const MarkAttendance = () => {
   const [inTime, setInTime] = useState("--:--");
@@ -26,6 +26,7 @@ const MarkAttendance = () => {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [faceImage, setFaceImage] = useState(null);
+  const [loadingLocation, setLoadingLocation] = useState(false);
 
 
   navigator.geolocation = Geolocation;
@@ -70,25 +71,28 @@ const MarkAttendance = () => {
   // };
 
 
-  async function requestLocationPermission() {
+  async function requestPermission() {
     try {
       if (Platform.OS === 'android') {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: "Location Permission",
+            message: "App needs access to your GPS location",
+            buttonNeutral: "Ask Me Later",
+            buttonNegative: "Cancel",
+            buttonPositive: "OK"
+          }
         );
 
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log("Location permission granted");
-          return true;
-        } else {
-          console.log("Location permission denied");
-          return false;
-        }
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
       }
     } catch (err) {
       console.warn(err);
     }
+    return false;
   }
+
   //   const validateLocation = async () => {
   //     console.warn("1")
   //     try {
@@ -138,40 +142,50 @@ const MarkAttendance = () => {
 
 
   async function getLocation() {
-    const hasPermission = await requestLocationPermission();
-    if (!hasPermission) return;
+    const hasPermission = await requestPermission();
+    if (!hasPermission) return false;
 
-    Geolocation.getCurrentPosition(
-      (pos) => {
-        console.log("POSITION:", pos);
-        // Alert.alert("Location", JSON.stringify(pos));
-        // Alert.alert("Location latitude", JSON.stringify(pos.coords.latitude));
-        // Alert.alert("Location longitude", JSON.stringify(pos.coords.longitude));
-        setLatitude(pos.coords.latitude);
-        setLongitude(pos.coords.longitude);
-      },
-      (error) => {
-        console.log("LOCATION ERROR:", error);
-        Alert.alert("Error", error.message);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
-      },
-    );
+    setLoadingLocation(true);
+
+    return new Promise((resolve) => {
+      Geolocation.getCurrentPosition(
+        (pos) => {
+          console.log("POSITION:", pos);
+
+          setLatitude(pos.coords.latitude);
+          setLongitude(pos.coords.longitude);
+
+          setLoadingLocation(false);
+          resolve(true); // ✅ return success
+        },
+        (error) => {
+          console.log("LOCATION ERROR:", error);
+          Alert.alert("Error", error.message);
+
+          setLoadingLocation(false);
+          resolve(false); // ✅ return failure
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 40000,
+          maximumAge: 0,
+        }
+      );
+    });
   }
+
 
   const handleCheckIn = async () => {
     // const isInside = await validateLocation();
     const isInside = await getLocation();
+    console.log("Date and time:", isInside);
     if (isInside) {
       const now = new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       });
       setInTime(now);
-      Alert.alert("Checked In", `You checked in at ${now}`);
+      console.log("Date and time:", now);
     }
   };
 
@@ -187,6 +201,41 @@ const MarkAttendance = () => {
       setOutTime(now);
       Alert.alert("Checked Out", `You checked out at ${now}`);
     }
+  };
+
+
+  async function requestCameraPermission() {
+    if (Platform.OS === "android") {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: "Camera Permission",
+            message: "App needs camera access to capture your face.",
+            buttonNegative: "Cancel",
+            buttonPositive: "OK"
+          }
+        );
+
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+
+      } catch (err) {
+        console.warn(err);
+        return false;
+      }
+    }
+
+    return true; // iOS auto grants
+  }
+  const handleFaceRecognition = async () => {
+    const permission = await requestCameraPermission();
+
+    if (!permission) {
+      Alert.alert("Permission Denied", "Camera permission is required.");
+      return;
+    }
+
+    openCamera();  // ← now call your camera code safely
   };
 
   const openCamera = async () => {
@@ -209,6 +258,8 @@ const MarkAttendance = () => {
       }
     });
   };
+
+
 
 
 
@@ -254,6 +305,14 @@ const MarkAttendance = () => {
         </TouchableOpacity>
       </View>
 
+      {loadingLocation && (
+        <View style={{ marginTop: 10, alignItems: "center" }}>
+          <Text style={{ color: "#fff", marginBottom: 5 }}>Fetching Location...</Text>
+          <ActivityIndicator size="large" color="#00FFB3" />
+        </View>
+      )}
+
+
 
       <View style={styles.timeRow}>
         <View style={styles.timeBox}>
@@ -266,7 +325,7 @@ const MarkAttendance = () => {
 
       <TouchableOpacity
         style={styles.faceBtn}
-        onPress={openCamera}
+        onPress={handleFaceRecognition}
       >
         <Text style={{ color: "#fff", fontWeight: "700" }}>Face Recognition</Text>
       </TouchableOpacity>
@@ -345,13 +404,13 @@ const styles = StyleSheet.create({
   },
   statusText: { color: "#00FFB3", fontSize: 14, fontWeight: "600" },
   faceBtn: {
-  backgroundColor: "#3B82F6",
-  paddingVertical: 8,
-  paddingHorizontal: 15,
-  borderRadius: 8,
-  marginTop: 10,
-  alignItems: "center",
-},
+    backgroundColor: "#3B82F6",
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    marginTop: 10,
+    alignItems: "center",
+  },
 
 
 
