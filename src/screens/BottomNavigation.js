@@ -60,7 +60,7 @@ const BottomNavigation = () => {
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom || 10 }]}>
       {/* Bottom Nav Items */}
-      <View style={[styles.bottomNav, { backgroundColor: isDarkMode ? '#1c1c1c' : '#003057ff' }]}>
+      <View style={[styles.bottomNav, { backgroundColor: isDarkMode ? '#1c1c1c' : '#092338ff' }]}>
         {navItems.map((item, index) => (
           <TouchableOpacity
             key={index}
@@ -71,10 +71,10 @@ const BottomNavigation = () => {
               source={item.icon}
               style={[
                 styles.navIconImage,
-                { tintColor: isDarkMode ? '#ececec' : '#000' }
+                { tintColor: isDarkMode ? '#ececec' : '#ffffffff' }
               ]}
             />
-            <Text style={[styles.navLabel, { color: isDarkMode ? '#ececec' : '#000' }]}>
+            <Text style={[styles.navLabel, { color: isDarkMode ? '#ececec' : '#ffffffff' }]}>
               {item.label}
             </Text>
           </TouchableOpacity>
@@ -92,12 +92,12 @@ const BottomNavigation = () => {
         {...panResponder.panHandlers}
       >
         <TouchableOpacity onPress={handleHomePress}>
-          <View style={[styles.homeButton, { backgroundColor: isDarkMode ? '#1c1c1c' : '#ececec' }]}>
+          <View style={[styles.homeButton, { backgroundColor: isDarkMode ? '#1c1c1c' : '#092338ff' }]}>
             <Image
-              source={require('../assets/settings.png')}
+              source={require('../assets/home_main.png')}
               style={[
                 styles.homeIcon,
-                { tintColor: isDarkMode ? '#ececec' : '#000' }
+                { tintColor: isDarkMode ? '#ececec' : '#ffffffff' }
               ]}
             />
           </View>
