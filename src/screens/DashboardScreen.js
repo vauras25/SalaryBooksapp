@@ -17,6 +17,8 @@ import Advance from "./Dashboardscreen/Dashboard_Advance";
 import { BackHandler, ToastAndroid } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import { useFocusEffect } from "@react-navigation/native";
+import axios from "axios";
+import { API_BASE_URL } from "@env";
 
 const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -24,6 +26,15 @@ const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
+  const [token, setToken] = useState(null);
+  const [empData, setEmpData] = useState(null);
+
+  const loadToken = async () => {
+    const t = await AsyncStorage.getItem("authToken");
+    setToken(t);
+    console.log("TOKEN LOADED:", t);
+  };
+
   useEffect(() => {
     const backAction = () => {
       BackHandler.exitApp();
@@ -33,36 +44,59 @@ const Dashboard = () => {
       try {
         const userData = JSON.parse(await AsyncStorage.getItem("userData"));
         setUserData(userData);
-        console.log(userData.emp_first_name, "userData1234");
+        console.log(userData, "userData1234");
       } catch (error) {
         console.log("Error loading userData:", error);
       }
     };
 
     loadData();
+    loadToken();
+    fetchAdvanceList();
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       backAction
     );
     return () => backHandler.remove();
-  }, []);
-  const [navbarTitle, setNavbarTitle] = useState("Attendance");
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const backAction = () => {
-  //       BackHandler.exitApp(); 
-  //       return true; 
-  //     };
+  }, [token]);
 
-  //     const backHandler = BackHandler.addEventListener(
-  //       "hardwareBackPress",
-  //       backAction
-  //     );
+  const fetchAdvanceList = async () => {
+    console.log("Advancepage", token)
+    if (!token) return;
+    try {
+      // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
+      const payload = {
+        pageno: 1,
+      };
+      // const res = await axios.post("http://10.0.2.2:8080/employee/employee-get-advance-list",
+      const res = await axios.post(`${API_BASE_URL}employee/get-account`,
+        payload,
+        {
+          headers: {
+            "x-access-token": token,
+            "Content-Type": "application/json",
+          },
+        });
 
-  //     // Cleanup when screen is unfocused
-  //     return () => backHandler.remove();
-  //   }, [])
-  // );
+      if (res.data?.status === "success") {
+        setEmpData(res.data?.employee_data);
+        console.log("employee data", empData,res.data?.employee_data.profile_pic,API_BASE_URL);
+
+      }
+    } catch (error) {
+      console.log("Advance list error:", error);
+    }
+  };
+
+// console.log("empData?.profile_pic",empData[0].profile_pic);
+
+const profilePic = empData?.[0]?.profile_pic;
+
+const imageUrl = profilePic
+  ? `${API_BASE_URL}${profilePic.replace(/\\/g, "/")}`
+  : null;
+
+    
 
 
   return (
@@ -80,8 +114,16 @@ const Dashboard = () => {
         <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 50 }}>
           {/* Header */}
           <View style={styles.headerRow}>
+            {/* <Image
+              source={require('${empData.profile_pic}')}
+              style={styles.profileImage}
+            /> */}
             <Image
-              source={require('../assets/photo.jpg')}
+              source={
+                imageUrl
+                  ? { uri: imageUrl }
+                  : require("../assets/photo.jpg")
+              }
               style={styles.profileImage}
             />
             <Text style={styles.greeting}>Hello, {userData ? `${userData.emp_first_name} ${userData.emp_last_name}` : "User"}</Text>

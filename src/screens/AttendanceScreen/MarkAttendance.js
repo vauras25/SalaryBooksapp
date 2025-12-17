@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -19,10 +19,13 @@ import Geolocation from '@react-native-community/geolocation';
 import { launchCamera } from 'react-native-image-picker';
 import { Image } from 'react-native';
 import { ActivityIndicator } from "react-native";
+import { API_BASE_URL } from "@env";
+import axios from "axios";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MarkAttendance = () => {
-  const [inTime, setInTime] = useState("--:--");
-  const [outTime, setOutTime] = useState("--:--");
+  const [inTime, setInTime] = useState("");
+  const [outTime, setOutTime] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [faceImage, setFaceImage] = useState(null);
@@ -156,7 +159,10 @@ const MarkAttendance = () => {
           setLongitude(pos.coords.longitude);
 
           setLoadingLocation(false);
-          resolve(true); // ✅ return success
+          resolve({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+          });
         },
         (error) => {
           console.log("LOCATION ERROR:", error);
@@ -175,31 +181,179 @@ const MarkAttendance = () => {
   }
 
 
-  const handleCheckIn = async () => {
-    // const isInside = await validateLocation();
-    const isInside = await getLocation();
-    console.log("Date and time:", isInside);
-    if (isInside) {
-      const now = new Date().toLocaleTimeString([], {
+  // const handleCheckIn = async () => {
+  //   // const isInside = await validateLocation();
+  //   const isInside = await getLocation();
+  //   console.log("Date and time:", isInside);
+  //   if (isInside) {
+  //     const now = new Date().toLocaleTimeString([], {
+  //       hour: "2-digit",
+  //       minute: "2-digit",
+  //     });
+  //     setInTime(now);
+  //     console.log("Date and time:", now);
+  //   }
+  // };
+
+  // const handleCheckIn = async () => {
+
+  //   const isInside = await getLocation();
+  //   if (!isInside) return;
+
+  //   // if (!faceImage) {
+  //   //   Alert.alert("Face Required", "Please capture your face first.");
+  //   //   return;
+  //   // }
+  //   const token = await AsyncStorage.getItem("authToken");
+
+  //   console.log("API_BASE_URL", API_BASE_URL, "token", token);
+  //   console.log("isInside", isInside);
+
+  //   const now = new Date();
+  //   const timeStr = now.toLocaleTimeString([], {
+  //     hour: "2-digit",
+  //     minute: "2-digit",
+  //   });
+
+  //   setInTime(timeStr);
+
+  //   const payload = {
+  //     attendance_month: now.getMonth(), // 0-11
+  //     attendance_year: now.getFullYear(),
+  //     register_type: "time",
+  //     // emp_id: "021", // ← get from logged-in user
+  //     login_time: timeStr,
+  //     logout_time: "",
+  //   };
+  //   console.log("payload", payload);
+
+  //   try {
+  //     const response = await axios.post(`${API_BASE_URL}employee/add-time-attendance`, payload, {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "x-access-token": token,
+  //       },
+  //     });
+
+  //     if (response.data.status === "success") {
+  //       Alert.alert("Success", "Check-in marked successfully");
+  //     } else {
+  //       Alert.alert("Error", response.data.message);
+  //     }
+  //   } catch (err) {
+  //     console.log("API ERROR:", err);
+  //     Alert.alert("Error", "Failed to mark attendance");
+  //   }
+  // };
+
+  const handleCheckInCheckout = async () => {
+    const location = await getLocation();
+
+    if (!location) {
+      setLoading(false);
+      Alert.alert("Error", "Unable to fetch location");
+      return;
+    }
+    const token = await AsyncStorage.getItem("authToken");
+    if (!token) {
+      Alert.alert("Error", "User not authenticated");
+      return;
+    }
+
+    const now = new Date();
+
+    const payload = {
+      latitude: location.latitude.toString(),
+      longitude: location.longitude.toString(),
+      attendance_date: now.toISOString().split("T")[0],
+      attendance_stat: 'P',
+      login_time: now.toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
-      });
-      setInTime(now);
-      console.log("Date and time:", now);
+        second: "2-digit",
+      }), // HH:mm:ss
+    };
+
+    console.log("CHECK IN PAYLOAD:", payload);
+
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}employee/check-in-check-out`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": token, // or Authorization: Bearer token
+          },
+        }
+      );
+
+      if (response.data.status === "success") {
+
+        const timeStr = now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        if (!inTime) {
+
+          setInTime(timeStr);
+        } else {
+
+          setOutTime(timeStr);
+        }
+        Alert.alert("Success", response.data.message);
+      } else {
+        Alert.alert("Error", response.data.message);
+      }
+    } catch (error) {
+      console.log("API ERROR:", error);
+      Alert.alert("Error", "Something went wrong");
     }
   };
 
 
+  // const handleCheckOut = async () => {
+  //   const isInside = await getLocation();
+  //   if (isInside) {
+  //     const now = new Date().toLocaleTimeString([], {
+  //       hour: "2-digit",
+  //       minute: "2-digit",
+  //     });
+  //     setOutTime(now);
+
+  //   }
+  // };
+
   const handleCheckOut = async () => {
-    // const isInside = await validateLocation();
     const isInside = await getLocation();
-    if (isInside) {
-      const now = new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
+    if (!isInside) return;
+
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    setOutTime(timeStr);
+
+    const payload = {
+      attendance_month: now.getMonth(),
+      attendance_year: now.getFullYear(),
+      register_type: "time",
+      emp_id: "021",
+      login_time: inTime,
+      logout_time: timeStr,
+    };
+
+    try {
+      await axios.post(API_URL, payload, {
+        headers: {
+          Authorization: `Bearer YOUR_TOKEN_HERE`,
+        },
       });
-      setOutTime(now);
-      Alert.alert("Checked Out", `You checked out at ${now}`);
+      Alert.alert("Success", "Check-out marked");
+    } catch (e) {
+      Alert.alert("Error", "Checkout failed");
     }
   };
 
@@ -259,6 +413,12 @@ const MarkAttendance = () => {
     });
   };
 
+  // useEffect(() => {
+
+  //   setInTime("")
+  //   console.log("Intime",inTime);
+    
+  // }, []);
 
 
 
@@ -293,13 +453,13 @@ const MarkAttendance = () => {
       <View style={styles.checkButtons}>
         <TouchableOpacity
           style={[styles.checkButton, styles.checkIn]}
-          onPress={handleCheckIn}
+          onPress={handleCheckInCheckout}
         >
           <Text style={styles.checkText}>CHECK IN</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.checkButton, styles.checkOut]}
-          onPress={handleCheckOut}
+          onPress={handleCheckInCheckout}
         >
           <Text style={styles.checkText}>CHECK OUT</Text>
         </TouchableOpacity>
@@ -354,7 +514,7 @@ const MarkAttendance = () => {
       <View style={styles.statusBox}>
         <Text style={styles.statusText}>
           Today's Status :{" "}
-          {inTime !== "--:--" ? `PRESENT at ${inTime}` : "Not Marked"}
+          {inTime !== "" ? `PRESENT at ${inTime}` : "Not Marked"}
         </Text>
       </View>
     </View>
