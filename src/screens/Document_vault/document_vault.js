@@ -223,6 +223,8 @@ const DocumentVaultScreen = () => {
   };
 
   const fetchUploadedDocs = async (employeeId, token) => {
+    console.log(API_BASE_URL,"API");
+    
     try {
       const response = await axios.post(
         `${API_BASE_URL}employee/get-employee-documents`,
@@ -368,7 +370,7 @@ const DocumentVaultScreen = () => {
         safeName = (fileName || ("doc_" + Date.now())) + ".pdf"; 
       }
     }
-
+    
     const localPath = `${downloadDir}/${safeName}`;
 
     console.log("Downloading to:", localPath);
@@ -801,11 +803,11 @@ const styles = StyleSheet.create({
   tabRow: {
     flexDirection: "row",
     backgroundColor: "#0f1b33",
-    borderRadius: 25,
+    borderRadius: 15,
     marginTop: -450,
     zIndex: 50,
     elevation: 6,
-    padding: 4,
+    padding: 10,
   },
   tabButton: { flex: 1, paddingVertical: 10, alignItems: "center", borderRadius: 20 },
   tabButtonActive: { backgroundColor: "#1c68be", borderRadius: 20 },

@@ -194,11 +194,11 @@ const Reimbursement = () => {
                             barWidth={18}
                             hideRules
                             noOfSections={4}
-                            // initialSpacing={0}     // ✅ TOP FIX
-                            // endSpacing={0}         // ✅ TOP FIX
+                            // initialSpacing={0}   
+                            // endSpacing={0}        
                             spacing={14}
-                            // xAxisThickness={0}        // ✅ removes bottom axis
-                            xAxisLabelHeight={0}      // ✅ removes reserved label space
+                            // xAxisThickness={0}  
+                            xAxisLabelHeight={0}
                             // yAxisExtraHeight={0}
                             isAnimated
                             animationDuration={800}
@@ -224,7 +224,11 @@ const Reimbursement = () => {
                                 color: "#fff",
                                 fontSize: 9,
                             }}
-
+                            yAxisTextStyle={{
+                                color: "#fff",
+                                fontSize: 11,
+                                top:-5
+                            }}
                         />
                     </View>
 

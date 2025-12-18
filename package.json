@@ -21,6 +21,7 @@
     "axios": "^1.9.0",
     "crypto-js": "^4.2.0",
     "expo-file-system": "^18.1.10",
+    "expo-modules-core": "^3.0.29",
     "install": "^0.13.0",
     "invariant": "^2.2.4",
     "npm": "^10.9.4",

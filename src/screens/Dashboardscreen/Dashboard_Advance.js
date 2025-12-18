@@ -119,6 +119,7 @@ const styles = StyleSheet.create({
 
     },
     advance_card: {
+        marginTop:5,
         flexDirection: "column"
     },
     sectionTitle: {
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
         right: 30
     },
     advanceText: {
-        top: -10,
+        top: -8,
         // marginLeft:-30,
         right: 18,
         backgroundColor: "#144770ff",

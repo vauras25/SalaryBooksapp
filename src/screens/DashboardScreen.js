@@ -700,6 +700,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     alignItems: 'flex-start',
     gap: 16,
+    height:170
   },
 
   calendarSection: {
@@ -709,10 +710,11 @@ const styles = StyleSheet.create({
 
   monthText: {
     color: "#fff",
-    fontSize: 14,
+    // fontSize: 15,
     fontWeight: "600",
     textAlign: "center",
     marginBottom: 10,
+    marginTop:5
   },
 
   calendarGrid: {
@@ -754,7 +756,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     paddingTop: 0,
-    width: "50%"
+    width: "50%",
+    marginTop:5
   },
 
   sectionTitle: {
