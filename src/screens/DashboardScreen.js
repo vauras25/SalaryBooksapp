@@ -28,6 +28,9 @@ const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [token, setToken] = useState(null);
   const [empData, setEmpData] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [attendenceImageUrl, setAttendenceImageUrl] = useState(null);
+
 
   const loadToken = async () => {
     const t = await AsyncStorage.getItem("authToken");
@@ -35,30 +38,7 @@ const Dashboard = () => {
     console.log("TOKEN LOADED:", t);
   };
 
-  useEffect(() => {
-    const backAction = () => {
-      BackHandler.exitApp();
-      return true;
-    };
-    const loadData = async () => {
-      try {
-        const userData = JSON.parse(await AsyncStorage.getItem("userData"));
-        setUserData(userData);
-        console.log(userData, "userData1234");
-      } catch (error) {
-        console.log("Error loading userData:", error);
-      }
-    };
 
-    loadData();
-    loadToken();
-    fetchAdvanceList();
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-    return () => backHandler.remove();
-  }, [token]);
 
   const fetchAdvanceList = async () => {
     console.log("Advancepage", token)
@@ -78,25 +58,84 @@ const Dashboard = () => {
           },
         });
 
+      // if (res.data?.status === "success") {
+      //   setEmpData(res.data?.employee_data);
+      //   console.log("employee data", empData,res.data?.employee_data.profile_pic,API_BASE_URL);
+      //   saveImageUrl();
+      // }
       if (res.data?.status === "success") {
-        setEmpData(res.data?.employee_data);
-        console.log("employee data", empData,res.data?.employee_data.profile_pic,API_BASE_URL);
+        const employeeData = res.data.employee_data;
+        console.log("employeeData",employeeData);
+        
+        setEmpData(employeeData);
 
+        const profilePic = employeeData?.[0]?.profile_pic;
+        saveImageUrl(profilePic);
+        const attendencePic = employeeData?.[0]?.attendence_pic;
+        saveAttendenceImageUrl(attendencePic);
       }
+
     } catch (error) {
       console.log("Advance list error:", error);
     }
   };
 
-// console.log("empData?.profile_pic",empData[0].profile_pic);
+  // console.log("empData?.profile_pic",empData[0].profile_pic);
 
-const profilePic = empData?.[0]?.profile_pic;
+  // const saveImageUrl = async () => {
+  // const profilePic = empData?.[0]?.profile_pic;
 
-const imageUrl = profilePic
-  ? `${API_BASE_URL}${profilePic.replace(/\\/g, "/")}`
-  : null;
 
-    
+  // const imageUrl = profilePic
+  //   ? `${API_BASE_URL}${profilePic.replace(/\\/g, "/")}`
+  //   : null;
+
+  //  await AsyncStorage.setItem("imageUrl", imageUrl);
+  //  };
+
+  const saveImageUrl = async (profilePic) => {
+    const url = profilePic
+      ? `${API_BASE_URL}${profilePic.replace(/\\/g, "/")}`
+      : null;
+
+    setImageUrl(url); 
+    await AsyncStorage.setItem("imageUrl", url);
+  };
+  const saveAttendenceImageUrl = async (profilePic) => {
+    const url = profilePic
+      ? `${API_BASE_URL}${profilePic.replace(/\\/g, "/")}`
+      : null;
+
+    setAttendenceImageUrl(url); 
+    await AsyncStorage.setItem("attendenceimageUrl", url);
+  };
+
+
+  useEffect(() => {
+    const backAction = () => {
+      BackHandler.exitApp();
+      return true;
+    };
+    const loadData = async () => {
+      try {
+        const userData = JSON.parse(await AsyncStorage.getItem("userData"));
+        setUserData(userData);
+        console.log(userData, "userData1234");
+      } catch (error) {
+        console.log("Error loading userData:", error);
+      }
+    };
+
+    loadData();
+    loadToken();
+
+    fetchAdvanceList();
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+    return () => backHandler.remove();
+  }, [token, imageUrl]);
 
 
   return (

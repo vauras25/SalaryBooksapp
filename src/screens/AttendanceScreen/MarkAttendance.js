@@ -413,13 +413,21 @@ const MarkAttendance = () => {
     });
   };
 
-  // useEffect(() => {
 
-  //   setInTime("")
-  //   console.log("Intime",inTime);
-    
-  // }, []);
+  const loadAttendanceImage = async () => {
+  const attendenceimageUrl = await AsyncStorage.getItem("attendenceimageUrl");
+  console.log("attendenceimageUrl", attendenceimageUrl);
+};
 
+  useEffect(() => {
+    const imageUrl = AsyncStorage.getItem("imageUrl");
+    console.log("imageUrl124", imageUrl);
+    loadAttendanceImage();
+ 
+    // setInTime("")
+    // console.log("Intime",inTime);
+
+  }, []);
 
 
 
