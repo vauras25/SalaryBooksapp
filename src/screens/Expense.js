@@ -20,6 +20,8 @@ import { launchImageLibrary } from "react-native-image-picker";
 import { API_BASE_URL } from "@env";
 import { useRoute } from "@react-navigation/native";
 import Navbar from "./Dashboardscreen/navbar";
+import { NativeModules } from "react-native";
+const { PdfPicker } = NativeModules;
 const Expense = () => {
 
 
@@ -41,7 +43,7 @@ const Expense = () => {
   const [remark, setRemark] = useState('');
   const [image, setImage] = useState(null);
   const [token, setToken] = useState(null);
-
+  const [file, setFile] = useState(false);
 
   useEffect(() => {
     const loadToken = async () => {
@@ -89,26 +91,47 @@ const Expense = () => {
   //   });
   // };
 
-  const pickImage = () => {
-    const options = {
-      mediaType: 'photo',
-      includeBase64: false,   // you don’t need base64 unless required
-    };
+  // const pickImage = () => {
+  //   const options = {
+  //     mediaType: 'photo',
+  //     includeBase64: false,   // you don’t need base64 unless required
+  //   };
 
-    launchImageLibrary(options, (response) => {
-      if (response.didCancel || response.errorCode) return;
+  //   launchImageLibrary(options, (response) => {
+  //     if (response.didCancel || response.errorCode) return;
 
-      const asset = response.assets[0];
+  //     const asset = response.assets[0];
 
-      setImage({
-        uri: asset.uri,
-        type: asset.type,
-        name: asset.fileName ?? `photo_${Date.now()}.jpg`,
-      });
-    });
+  //     setImage({
+  //       uri: asset.uri,
+  //       type: asset.type,
+  //       name: asset.fileName ?? `photo_${Date.now()}.jpg`,
+  //     });
+  //   });
+  // };
+
+  const pickDocument = async () => {
+    // console.log(field,"field");
+
+    try {
+      const file = await PdfPicker.pickFile();
+      let extractedName = "Unknown File";
+      if (file.uri) {
+        const parts = file.uri.split("/");
+        extractedName = parts[parts.length - 1];
+      }
+      const fileObj = {
+        name: extractedName,
+        uri: file.uri,
+        type: file.type,
+        size: file.size,
+      };
+      setFile(fileObj);
+
+    } catch (error) {
+      console.log("File picking cancelled or failed", error);
+    }
   };
-
-
 
 
 
@@ -260,14 +283,15 @@ const Expense = () => {
       formData.append("wage_month", month);
       formData.append("wage_year", year);
       formData.append("type", "reimbursement");
-
       // If image selected, attach to formData
-      if (image) {
-        formData.append("extra_earnings_document", {
-          uri: image.uri,
-          name: image.name,
-          type: image.type,
-        });
+      // console.log(file,"file");
+      
+      if (file) {
+         formData.append("expense_document", {
+        uri: file.uri,
+        name: file.name,
+        type: file.type || "application/octet-stream",
+      });
       }
       console.log("formData", formData,"API_BASE_URL",API_BASE_URL);
 
@@ -590,7 +614,7 @@ const Expense = () => {
                     {image ? image.name : "No file selected"}
                   </Text>
 
-                  <TouchableOpacity style={styles.uploadBtn} onPress={pickImage}>
+                  <TouchableOpacity style={styles.uploadBtn} onPress={pickDocument}>
                     <Text style={styles.uploadBtnText}>Choose Image</Text>
                   </TouchableOpacity>
                 </View>

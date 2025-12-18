@@ -127,8 +127,10 @@ const styles = StyleSheet.create({
     borderTopWidth: 0.5,
     borderColor: '#333',
     zIndex: 2,
+    // top:-10
   },
   navItem: {
+    marginTop:-8,
     alignItems: 'center',
     width: width / 5,
   },

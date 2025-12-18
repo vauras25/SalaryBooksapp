@@ -8,6 +8,7 @@ import {
   Modal,
   Alert,
   ScrollView,
+  ActivityIndicator
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import LinearGradient from "react-native-linear-gradient";
@@ -17,7 +18,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from "axios";
 import { API_BASE_URL } from "@env";
 import { useNavigation } from '@react-navigation/native';
-
+import { NativeModules } from "react-native";
+const { PdfPicker } = NativeModules;
 const AdvanceManagement = () => {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
@@ -30,7 +32,8 @@ const AdvanceManagement = () => {
   const [reason, setReason] = useState("");
   const [advanceList, setAdvanceList] = useState([]);
   const [token, setToken] = useState(null);
-
+  const [uploading, setUploading] = useState(false);
+  const [file, setFile] = useState(false);
 
   useEffect(() => {
     const loadToken = async () => {
@@ -75,6 +78,28 @@ const AdvanceManagement = () => {
 
   const currentAdvance = advanceList.length > 0 ? advanceList[0] : null;
 
+  const pickDocument = async () => {
+    // console.log(field,"field");
+
+    try {
+      const file = await PdfPicker.pickFile();
+      let extractedName = "Unknown File";
+      if (file.uri) {
+        const parts = file.uri.split("/");
+        extractedName = parts[parts.length - 1];
+      }
+      const fileObj = {
+        name: extractedName,
+        uri: file.uri,
+        type: file.type,
+        size: file.size,
+      };
+      setFile(fileObj);
+
+    } catch (error) {
+      console.log("File picking cancelled or failed", error);
+    }
+  };
 
   const submitAdvanceRequest = async () => {
     if (!token) return;
@@ -117,26 +142,52 @@ const AdvanceManagement = () => {
       }
 
 
-      const payload = {
-        advance_amount: advanceAmount,
-        advance_outstanding: advanceAmount,
-        no_of_instalments: installments,
-        recovery_frequency: frequency,
-        recovery_from: recoveryFrom,
-        payment_start_month: startMonthNum.toString(),
-        payment_start_year: year,
-        instalment_history,
-        remarks: reason || "",
-      };
+      // const payload = {
+      //   advance_amount: advanceAmount,
+      //   advance_outstanding: advanceAmount,
+      //   no_of_instalments: installments,
+      //   recovery_frequency: frequency,
+      //   recovery_from: recoveryFrom,
+      //   payment_start_month: startMonthNum.toString(),
+      //   payment_start_year: year,
+      //   upload_file:file,
+      //   instalment_history,
+      //   remarks: reason || "",
+      // };
+      // console.log(API_BASE_URL,"API_BASE_URL");
+      
+      // console.log("Payload =>", payload, "token", token);
+      const formData = new FormData();
 
-      console.log("Payload =>", payload, "token", token);
+    formData.append("advance_amount", advanceAmount);
+    formData.append("advance_outstanding", advanceAmount);
+    formData.append("no_of_instalments", installments);
+    formData.append("recovery_frequency", frequency);
+    formData.append("recovery_from", recoveryFrom);
+    formData.append("payment_start_month", startMonthNum.toString());
+    formData.append("payment_start_year", year);
+    formData.append("remarks", reason || "");
+    formData.append(
+      "instalment_history",
+      JSON.stringify(instalment_history)
+    );
+
+    if (file) {
+      formData.append("upload_file", {
+        uri: file.uri,
+        name: file.name,
+        type: file.type,
+      });
+    }
+    // console.log(formData,"formdata");
+    
       // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
       const response = await axios.post(`${API_BASE_URL}employee/employee-advance-request`,
-        payload,
+        formData,
         {
           headers: {
             "x-access-token": token,
-            "Content-Type": "application/json",
+            "Content-Type":  "multipart/form-data",
           },
         }
       );
@@ -311,7 +362,19 @@ const AdvanceManagement = () => {
                         </View>
                       </View>
                     </View>
-
+                    <View style={styles.titleRow}>
+                                <Text style={styles.sectionTitle}>Uploaded Document</Text>
+                    
+                                <TouchableOpacity style={styles.uploadBtn} onPress={() => pickDocument()}>
+                                  <Text style={styles.uploadText}>Upload File</Text>
+                                </TouchableOpacity>
+                              </View>
+                              {uploading && (
+                                <View style={styles.loaderOverlay}>
+                                  <ActivityIndicator size="large" color="#fff" />
+                                  <Text style={{ color: "white", marginTop: 5 }}>Uploading...</Text>
+                                </View>
+                              )}
                     <View style={styles.field}>
                       <Text style={styles.label}>Reason :</Text>
                       <TextInput
@@ -630,6 +693,23 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   submitText: { color: "#001f3f", fontWeight: "700" },
+    titleRow: {
+    marginTop: 12,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    zIndex: 40,
+    elevation: 4,
+  },
+  sectionTitle: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  uploadBtn: {
+    backgroundColor: "#1c68be",
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  uploadText: { color: "#fff", fontSize: 13, fontWeight: "600" },
+
 });
 
 export default AdvanceManagement;
