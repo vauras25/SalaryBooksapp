@@ -11,7 +11,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { BarChart } from "react-native-gifted-charts";
 import { PieChart } from "react-native-gifted-charts";
 import { useNavigation } from '@react-navigation/native';
-
+import LeaveManagement from '../Dashboardscreen/leave_balance'
 const { width } = Dimensions.get("window");
 
 const Reimbursement = () => {
@@ -162,7 +162,7 @@ const Reimbursement = () => {
                             color: "#fff",  
                         }}
                     /> */}
-                    <View style={styles.barchart}>
+                    {/* <View style={styles.barchart}>
                         <BarChart
 
                             stackData={[
@@ -230,8 +230,93 @@ const Reimbursement = () => {
                                 top:-5
                             }}
                         />
-                    </View>
+                    </View> */}
+                    {/* <View style={styles.barchart}>
+                        <BarChart
+                            stackData={[
+                                {
+                                    label: "Paid",
+                                    stacks: [
+                                        { value: 7, color: "#00d9ff" }, 
+                                    ],
+                                },
+                                {
+                                    label: "",
+                                    stacks: [
+                                        { value: 10, color: "#000000" }, 
+                                    ],
+                                },
+                                {
+                                    label: "Casual",
+                                    stacks: [
+                                        { value: 6, color: "#00d9ff" },
+                                        // { value: 6, color: "#6EE7F9" },
+                                    ],
+                                },
+                                {
+                                    label: "",
+                                    stacks: [
+                                        // { value: 6, color: "#B11212" },
+                                        { value: 9, color: "#000000" },
+                                    ],
+                                },
+                                {
+                                    label: "Sick",
+                                    stacks: [
+                                        { value: 4, color: "#00d9ff" },
+                                        // { value: 4, color: "#6EE7F9" },
+                                    ],
+                                },
+                                {
+                                    label: "",
+                                    stacks: [
+                                        // { value: 4, color: "#2E8B57" },
+                                        { value: 11, color: "#000000" },
+                                    ],
+                                },
+                            ]}
+                            horizontal
+                            height={110}
+                            width={width * 0.38}
+                            barWidth={16}
+                            spacing={3}
 
+                          
+                            maxValue={14}           
+                            noOfSections={7}        
+                            stepValue={2}
+
+                            hideRules
+                            yAxisThickness={0}
+                            xAxisThickness={0}
+
+                            xAxisLabelTextStyle={{
+                                color: "#AFC3D6",
+                                fontSize: 9,
+                                left:0
+                            }}
+
+                            labelTextStyle={{
+                                color: "#FFFFFF",
+                                fontSize: 12,
+                                width: 48,
+                                textAlign: "right",
+                                marginRight: 8,
+                            }}
+
+                            yAxisTextStyle={{
+                                color: "#AFC3D6",
+                                fontSize: 10,
+                            }}
+
+                            isAnimated
+                            animationDuration={700}
+                        />
+
+                    </View> */}
+                    <View style={styles.barchart}>
+                    <LeaveManagement  />
+                    </View>
                     <TouchableOpacity style={styles.button2}>
                         <Text style={styles.buttonText2}>Apply Leave</Text>
                     </TouchableOpacity>
@@ -348,7 +433,7 @@ const styles = StyleSheet.create({
         marginBottom: -10,
         textAlign: "center",
     },
-    barchart: {
+      barchart: {
         marginTop: -29,
         marginLeft: -40,
         margin: -20,
@@ -358,7 +443,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#005C99",
         borderRadius: 15,
         paddingVertical: 6,
-        marginTop: 47,
+        marginTop: 35,
         alignItems: "center",
     },
     buttonText2: {

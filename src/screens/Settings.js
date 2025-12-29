@@ -8,11 +8,16 @@ import {
   ScrollView,
   Alert,
   Switch,
+  
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from './ThemeContext';
 import BottomNavigation from './BottomNavigation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LinearGradient from 'react-native-linear-gradient';
+import { useRoute } from "@react-navigation/native";
+import Navbar from "./Dashboardscreen/navbar"
+
 
 const Settings = ({ navigation }) => {
   const { isDarkMode, toggleDarkMode } = useTheme();
@@ -77,8 +82,17 @@ const Settings = ({ navigation }) => {
   }
 };
 
+  
+    const route = useRoute();
+    const screenTitle = route.params?.title;
   return (
-    <View
+    <LinearGradient
+              colors={["#000000ff", "#1c68beff"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.container}
+            >
+    {/* <View
       style={[
         styles.container,
         {
@@ -86,10 +100,10 @@ const Settings = ({ navigation }) => {
           paddingTop: insets.top,
         },
       ]}
-    >
+    > */}
       {/* Full Width Header */}
-      <View style={[styles.fullWidthHeader, { backgroundColor: themeColors.bcolor }]}>
-        <Text style={[styles.title, { color: themeColors.colr }]}>Settings</Text>
+      <View style={styles.header}>
+        <Navbar title={screenTitle} />
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
@@ -157,7 +171,8 @@ const Settings = ({ navigation }) => {
       </ScrollView>
 
       <BottomNavigation />
-    </View>
+    {/* </View> */}
+    </LinearGradient>
   );
 };
 
@@ -166,6 +181,12 @@ export default Settings;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
   },
   contentPadding: {
     paddingHorizontal: 16,

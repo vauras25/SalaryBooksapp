@@ -84,27 +84,17 @@ const AttendanceScreen = () => {
 
   return (
     <LinearGradient colors={["#0B132B", "#1c68beff"]} style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        {/* <View style={styles.header}>
-          <Text style={styles.headerTitle}>Attendance</Text>
-          <View style={styles.headerIcons}>
-            <Text style={styles.icon}>🔍</Text>
-            <Text style={styles.icon}>🔔</Text>
-          </View>
-        </View> */}
-        <Navbar title={screenTitle}/>
-        {/* Top Buttons */}
-        {/* <View style={styles.topButtonRow}>
-          {["Mark Attendance", "View Detailed Log", "Overtime Overview", "Holiday List"].map(
-            (item, index) => (
-              <TouchableOpacity key={index} style={styles.topButton}>
-                <Text style={styles.topButtonText}>{item}</Text>
-              </TouchableOpacity>
-            )
-          )}
-        </View> */}
-
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.header}>
+          {/* <Text style={styles.headerText}>Leave Management</Text> */}
+          <Navbar title={screenTitle}/>
+          {/* <View style={styles.icons}>
+            <Text style={{ color: "#fff", fontSize: 20 }}>🔍</Text>
+            <Text style={{ color: "#fff", fontSize: 20, marginLeft: 18 }}>
+              🔔
+            </Text>
+          </View> */}
+        </View>
         <View style={styles.topButtonRow}>
           {["Mark Attendance", "Attendence Overview", "Overtime Overview", "Holiday List"].map(
             (item, index) => (
@@ -148,7 +138,21 @@ const AttendanceScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 15 },
+   container: {
+    flex: 1,
+    padding: 10,
+  },
+  scrollContainer: {
+    // padding: 5,
+    // top:5,
+    paddingBottom: 60,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
   // header: {
   //   flexDirection: "row",
   //   justifyContent: "space-between",
