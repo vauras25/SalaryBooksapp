@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -25,68 +25,102 @@ const SignUpScreen = () => {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-   const [userData, setUserData] = useState(null);
-//   const handleSignIn = async () => {
+  const [userData, setUserData] = useState(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
-// try{  
-//       // const url = 'https://api.vauras.cloud/api/employee_signin';
-//       const url = 'https://back.finalpayroll.in/employee_signin';
-//       navigation.navigate('Dashboard'); 
-//       const data = { corporate_id: corporateId, userid: userId, password };
-//       const response = await axios.post(url, data, {
-//         headers: { 'Content-Type': 'application/json' },
-//       });
+  //   const handleSignIn = async () => {
 
-//       if (response.data.status === 'success') {
-//         navigation.navigate('Dashboard');
-//       }
-//     } catch (error) {
-//       console.error('Login Failed:', error.response?.data || error.message);
-//     }
-//   };
+  // try{  
+  //       // const url = 'https://api.vauras.cloud/api/employee_signin';
+  //       const url = 'https://back.finalpayroll.in/employee_signin';
+  //       navigation.navigate('Dashboard'); 
+  //       const data = { corporate_id: corporateId, userid: userId, password };
+  //       const response = await axios.post(url, data, {
+  //         headers: { 'Content-Type': 'application/json' },
+  //       });
 
-const handleSignIn = async () => {
-  try {
-    const url = 'https://back.finalpayroll.in/employee_signin';
-    // const url = 'http://10.0.2.2:8080/employee_signin';
-    const data = { corporate_id: corporateId, userid: userId, password };
+  //       if (response.data.status === 'success') {
+  //         navigation.navigate('Dashboard');
+  //       }
+  //     } catch (error) {
+  //       console.error('Login Failed:', error.response?.data || error.message);
+  //     }
+  //   };
 
-    const response = await axios.post(url, data, {
-      headers: { 'Content-Type': 'application/json' },
-    });
-// navigation.navigate('Dashboard');
-    if (response.data.status === 'success') {
-      const token = response.data.token;
-      const user = response.data.user;
 
-     console.log(token,"token");
-     
-      await AsyncStorage.setItem('authToken', token);
-      await AsyncStorage.setItem('userData', JSON.stringify(user));
-      if(user){
-        setUserData(user);
+  useEffect(() => {
+    const checkLogin = async () => {
+      try {
+        const token = await AsyncStorage.getItem('authToken');
+        const user = await AsyncStorage.getItem('userData');
+
+        if (token && user) {
+          navigation.replace('Dashboard');
+        }
+      } catch (error) {
+        console.log('Auto login check failed', error);
       }
-      // Alert.alert("token", token );
-      console.log('Token saved:', token);
-      console.log('User saved:', user);
+      finally {
+        setCheckingAuth(false); // ✅ allow render only after check
+      }
+    };
 
-      navigation.navigate('Dashboard');
-    } else {
-      Alert.alert(response.data.message || 'Login failed');
+    checkLogin();
+  }, []);
+
+
+  const handleSignIn = async () => {
+    try {
+      const url = 'https://back.finalpayroll.in/employee_signin';
+      // const url = 'http://10.0.2.2:8080/employee_signin';
+      const data = { corporate_id: corporateId, userid: userId, password };
+
+      const response = await axios.post(url, data, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      // navigation.navigate('Dashboard');
+      if (response.data.status === 'success') {
+        const token = response.data.token;
+        const user = response.data.user;
+
+        console.log(token, "token");
+
+        await AsyncStorage.setItem('authToken', token);
+        await AsyncStorage.setItem('userData', JSON.stringify(user));
+        if (user) {
+          setUserData(user);
+        }
+        // Alert.alert("token", token );
+        console.log('Token saved:', token);
+        console.log('User saved:', user);
+
+        navigation.navigate('Dashboard');
+      } else {
+        Alert.alert(response.data.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login Failed:', error.response?.data || error.message);
+      Alert.alert('Something went wrong. Please try again.');
     }
-  } catch (error) {
-    console.error('Login Failed:', error.response?.data || error.message);
-    Alert.alert('Something went wrong. Please try again.');
+  };
+
+
+  if (checkingAuth) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ color: '#fff' }}>Loading...</Text>
+      </View>
+    );
   }
-};
+
 
   return (
     <LinearGradient
-          colors={["#000000ff", "#1c68beff"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={{ flex: 1 }}
-        >
+      colors={["#000000ff", "#1c68beff"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{ flex: 1 }}
+    >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <Image
@@ -121,14 +155,14 @@ const handleSignIn = async () => {
               onChangeText={setPassword}
             />
 
-            <View style={styles.checkboxContainer}>
+            {/* <View style={styles.checkboxContainer}>
               <CheckBox
                 value={rememberMe}
                 onValueChange={setRememberMe}
                 tintColors={{ true: '#007bff', false: '#aaa' }}
               />
               <Text style={styles.checkboxLabel}>Remember Me</Text>
-            </View>
+            </View> */}
 
             <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
               <Text style={styles.signInText}>Sign In ➜</Text>

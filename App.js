@@ -21,9 +21,35 @@ import AdvanceInstallmentScreen from './src/screens/AdvanceScreen/AdvanceInstall
 import Leave_Management from './src/screens/Leave Management/Leave_Management'
 Ionicons.loadFont();
 const Stack = createNativeStackNavigator();
+import { BackHandler } from "react-native";
+import { useEffect } from "react";
+import { navigationRef } from "./NavigationRef";
+
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
+
+useEffect(() => {
+  const backAction = () => {
+    const route = navigationRef.current?.getCurrentRoute();
+
+    if (route?.name === "Dashboard") {
+      BackHandler.exitApp();
+      return true;
+    }
+
+    // navigationRef.current?.navigate("Dashboard");
+    return false;
+  };
+
+  const backHandler = BackHandler.addEventListener(
+    "hardwareBackPress",
+    backAction
+  );
+
+  return () => backHandler.remove();
+}, []);
+
 
   return (
     <ThemeProvider>
@@ -32,7 +58,8 @@ function App() {
           barStyle={isDarkMode ? 'light-content' : 'dark-content'}
           backgroundColor={isDarkMode ? '#000' : '#fff'}
         />
-        <NavigationContainer>
+        {/* <NavigationContainer> */}
+        <NavigationContainer ref={navigationRef}>
           <Stack.Navigator initialRouteName="SignUpScreen" >
             <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
             <Stack.Screen name="AttendanceScreen" component={AttendanceScreen} options={{ headerShown: false }} />

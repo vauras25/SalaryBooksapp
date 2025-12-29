@@ -40,8 +40,7 @@ const Dashboard = () => {
 
 
 
-  const fetchAdvanceList = async () => {
-    console.log("Advancepage", token)
+  const fetchemployeedata = async () => {
     if (!token) return;
     try {
       // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
@@ -65,7 +64,7 @@ const Dashboard = () => {
       // }
       if (res.data?.status === "success") {
         const employeeData = res.data.employee_data;
-        console.log("employeeData",employeeData);
+        console.log("employeeData",employeeData,"API_BASE_URL",API_BASE_URL);
         
         setEmpData(employeeData);
 
@@ -112,15 +111,15 @@ const Dashboard = () => {
 
 
   useEffect(() => {
-    const backAction = () => {
-      BackHandler.exitApp();
-      return true;
-    };
+    // const backAction = () => {
+    //   BackHandler.exitApp();
+    //   return true;
+    // };
     const loadData = async () => {
       try {
         const userData = JSON.parse(await AsyncStorage.getItem("userData"));
         setUserData(userData);
-        console.log(userData, "userData1234");
+        console.log(userData, "userData1234",API_BASE_URL);
       } catch (error) {
         console.log("Error loading userData:", error);
       }
@@ -129,12 +128,12 @@ const Dashboard = () => {
     loadData();
     loadToken();
 
-    fetchAdvanceList();
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-    return () => backHandler.remove();
+    fetchemployeedata();
+    // const backHandler = BackHandler.addEventListener(
+    //   "hardwareBackPress",
+    //   backAction
+    // );
+    // return () => backHandler.remove();
   }, [token, imageUrl]);
 
 

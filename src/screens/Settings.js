@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from './ThemeContext';
 import BottomNavigation from './BottomNavigation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Settings = ({ navigation }) => {
   const { isDarkMode, toggleDarkMode } = useTheme();
@@ -30,21 +31,51 @@ const Settings = ({ navigation }) => {
 
   const HorizontalLine = () => <View style={styles.line} />;
 
+  // const handleLogout = () => {
+  //   Alert.alert('Logout', 'Do you want to logout?', [
+  //     {
+  //       text: 'Cancel',
+  //       onPress: () => null,
+  //       style: 'cancel',
+  //     },
+  //     {
+  //       text: 'Yes',
+  //       // onPress: () => {
+  //       //   navigation.replace('SignUpScreen');
+  //       // },
+  //       onPress: confirmLogout, 
+  //     },
+  //   ]);
+  // };
+
   const handleLogout = () => {
-    Alert.alert('Logout', 'Do you want to logout?', [
+  Alert.alert(
+    'Logout',
+    'Do you want to logout?',
+    [
       {
         text: 'Cancel',
-        onPress: () => null,
         style: 'cancel',
       },
       {
         text: 'Yes',
-        onPress: () => {
-          navigation.replace('SignUpScreen');
-        },
+        onPress: confirmLogout, 
       },
-    ]);
-  };
+    ],
+    { cancelable: true }
+  );
+};
+
+  const confirmLogout = async () => {
+  try {
+    await AsyncStorage.removeItem('authToken');
+    await AsyncStorage.removeItem('userData');
+    await AsyncStorage.clear();
+    navigation.replace('SignUpScreen'); 
+  } catch (error) {
+    console.log('Logout error:', error);
+  }
+};
 
   return (
     <View

@@ -29,6 +29,7 @@ const MarkAttendance = () => {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [faceImage, setFaceImage] = useState(null);
+  const [faceImage2, setFaceImage2] = useState(null);
   const [loadingLocation, setLoadingLocation] = useState(false);
 
 
@@ -247,6 +248,16 @@ const MarkAttendance = () => {
   // };
 
   const handleCheckInCheckout = async () => {
+
+    const isFaceMatched = await verifyFace();
+
+    // if (!isFaceMatched) {
+    //   Alert.alert("Face Mismatch", "Face verification failed");
+    //   return;
+    // }
+    // if (isFaceMatched) {
+    //   Alert.alert("Face Match", "Face verification failed");
+    // }
     const location = await getLocation();
 
     if (!location) {
@@ -389,41 +400,89 @@ const MarkAttendance = () => {
       return;
     }
 
-    openCamera();  // ← now call your camera code safely
+    openCamera();  
   };
+
+  // const openCamera = async () => {
+  //   const options = {
+  //     mediaType: 'photo',
+  //     saveToPhotos: false,
+  //     includeBase64: true,
+  //   };
+
+  //   launchCamera(options, (response) => {
+  //     if (response.didCancel) {
+  //       console.log("User cancelled camera");
+  //     } else if (response.errorMessage) {
+  //       console.log("Camera Error: ", response.errorMessage);
+  //       Alert.alert("Camera Error", response.errorMessage);
+  //     } else {
+  //       const photo = response.assets[0];
+  //       setFaceImage(photo.uri);
+  //       Alert.alert("Face Captured", "Your attendance photo is recorded.");
+  //     }
+  //   });
+  // };
+
 
   const openCamera = async () => {
     const options = {
       mediaType: 'photo',
-      saveToPhotos: false,
       includeBase64: true,
+      saveToPhotos: false,
     };
 
     launchCamera(options, (response) => {
-      if (response.didCancel) {
-        console.log("User cancelled camera");
-      } else if (response.errorMessage) {
-        console.log("Camera Error: ", response.errorMessage);
-        Alert.alert("Camera Error", response.errorMessage);
-      } else {
+      if (!response.didCancel && !response.errorMessage) {
         const photo = response.assets[0];
-        setFaceImage(photo.uri);
-        Alert.alert("Face Captured", "Your attendance photo is recorded.");
+        setFaceImage(photo.base64); // ✅ store base64
+        setFaceImage2(photo.uri);
+        Alert.alert("Face Captured");
       }
     });
+
+
   };
 
 
-  const loadAttendanceImage = async () => {
-  const attendenceimageUrl = await AsyncStorage.getItem("attendenceimageUrl");
-  console.log("attendenceimageUrl", attendenceimageUrl);
-};
+  const verifyFace = async () => {
+    const attendenceimageUrl = await AsyncStorage.getItem("attendenceimageUrl");
+
+    if (!attendenceimageUrl || !faceImage) {
+      Alert.alert("Error", "Face data missing");
+      return false;
+    }
+
+    try {
+      const res = await axios.post(
+        `${API_BASE_URL}employee/compare-face`,
+        {
+          registeredImageUrl: attendenceimageUrl,
+          capturedImageBase64: faceImage,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      return res.data.match === true;
+    } catch (err) {
+      console.log("Face compare error", err);
+      return false;
+    }
+  };
+
+
+  //   const loadAttendanceImage = async () => {
+  //   const attendenceimageUrl = await AsyncStorage.getItem("attendenceimageUrl");
+  //   console.log("attendenceimageUrl", attendenceimageUrl);
+  // };
 
   useEffect(() => {
-    const imageUrl = AsyncStorage.getItem("imageUrl");
-    console.log("imageUrl124", imageUrl);
-    loadAttendanceImage();
- 
+    const imageUrl = AsyncStorage.getItem("attendenceimageUrl");
+    console.log("attendenceimageUrl", imageUrl);
+    // loadAttendanceImage();
+
     // setInTime("")
     // console.log("Intime",inTime);
 
@@ -498,11 +557,11 @@ const MarkAttendance = () => {
         <Text style={{ color: "#fff", fontWeight: "700" }}>Face Recognition</Text>
       </TouchableOpacity>
 
-      {faceImage && (
+      {faceImage2 && (
         <View style={{ alignItems: "center", marginTop: 20 }}>
           <Text style={{ color: "#fff", marginBottom: 10 }}>Captured Face:</Text>
           <Image
-            source={{ uri: faceImage }}
+            source={{ uri: faceImage2 }}
             style={{ width: 120, height: 120, borderRadius: 10 }}
           />
         </View>
