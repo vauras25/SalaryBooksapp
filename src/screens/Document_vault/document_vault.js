@@ -804,7 +804,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#0f1b33",
     borderRadius: 15,
-    marginTop: -450,
+    // marginTop: -450,
     zIndex: 50,
     elevation: 6,
     padding: 10,

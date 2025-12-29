@@ -155,14 +155,14 @@ const SignUpScreen = () => {
               onChangeText={setPassword}
             />
 
-            {/* <View style={styles.checkboxContainer}>
+            <View style={styles.checkboxContainer}>
               <CheckBox
                 value={rememberMe}
                 onValueChange={setRememberMe}
                 tintColors={{ true: '#007bff', false: '#aaa' }}
               />
               <Text style={styles.checkboxLabel}>Remember Me</Text>
-            </View> */}
+            </View>
 
             <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
               <Text style={styles.signInText}>Sign In ➜</Text>

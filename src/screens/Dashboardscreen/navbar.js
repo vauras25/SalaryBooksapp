@@ -10,7 +10,6 @@ const Navbar = ({ title }) => {
       <View style={styles.headerIcons}>
         <Image source={search} style={styles.imageIcon} />
         <Image source={notification} style={styles.imageIcon} />
-        {/* <Text style={styles.bellIcon}>🔔</Text> */}
       </View>
     </View>
   );
@@ -19,7 +18,7 @@ const Navbar = ({ title }) => {
 export default Navbar;
 const styles = StyleSheet.create({
   header: {
-    height: 52,                 // 👈 reduced height
+    height: 52,                 
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -28,7 +27,7 @@ const styles = StyleSheet.create({
 
   headerTitle: {
     color: "#fff",
-    fontSize: 17,               // 👈 smaller but readable
+    fontSize: 17,               
     fontWeight: "600",
   },
 
@@ -43,7 +42,7 @@ const styles = StyleSheet.create({
     height: 30,
     resizeMode: "contain",
     tintColor: "#fff",
-    left:100
+    // left:100
   },
 
   bellIcon: {
