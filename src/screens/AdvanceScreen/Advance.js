@@ -10,6 +10,8 @@ import {
   ScrollView,
   ActivityIndicator
 } from "react-native";
+import { useRoute } from "@react-navigation/native";
+import Navbar from "../Dashboardscreen/navbar"
 import Icon from "react-native-vector-icons/Ionicons";
 import LinearGradient from "react-native-linear-gradient";
 import BottomNavigation from "../BottomNavigation";
@@ -212,21 +214,31 @@ const AdvanceManagement = () => {
   };
 
 
-
+    const route = useRoute();
+      const screenTitle = route.params?.title;
 
   return (
     <LinearGradient colors={["#05203C", "#0A3B63"]} style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
 
-        <View style={styles.header}>
+        {/* <View style={styles.header}>
           <Text style={styles.title}>Advance Management</Text>
           <View style={styles.headerIcons}>
             <Icon name="search-outline" size={22} color="#fff" style={styles.icon} />
             <Icon name="notifications-outline" size={22} color="#fff" />
           </View>
+        </View> */}
+
+          <View style={styles.header}>
+          {/* <Text style={styles.headerText}>Leave Management</Text> */}
+          <Navbar title={screenTitle}/>
+          {/* <View style={styles.icons}>
+            <Text style={{ color: "#fff", fontSize: 20 }}>🔍</Text>
+            <Text style={{ color: "#fff", fontSize: 20, marginLeft: 18 }}>
+              🔔
+            </Text>
+          </View> */}
         </View>
-
-
         <View style={styles.dropdownRow}>
           <TouchableOpacity style={styles.dropdown}>
             <Text style={styles.dropdownText}>September</Text>
@@ -504,30 +516,33 @@ const AdvanceManagement = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+   container: {
     flex: 1,
+    padding: 10,
   },
   scrollContainer: {
-    padding: 20,
+    // padding: 5,
+    top:15,
     paddingBottom: 60,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 16,
   },
-  headerIcons: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  icon: {
-    marginRight: 15,
-  },
-  title: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "700",
-  },
+  // headerIcons: {
+  //   flexDirection: "row",
+  //   alignItems: "center",
+  // },
+  // icon: {
+  //   marginRight: 15,
+  // },
+  // title: {
+  //   color: "#fff",
+  //   fontSize: 20,
+  //   fontWeight: "700",
+  // },
   dropdownRow: {
     flexDirection: "row",
     justifyContent: "space-between",
