@@ -5,32 +5,71 @@ import {
     StyleSheet,
     Dimensions,
     TouchableOpacity,
+    Alert,
 } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 const { width } = Dimensions.get("window");
 
-const Advance = ({ updateTitle }) => {
+const Advance = ({ rights }) => {
     const navigation = useNavigation();
-    const progress = 0.75; // 75%
+    const progress = 0.75;
+    console.log("rights22", rights);
+
+    if (!rights) return null;
+    const canApplyAttendance = rights.apply?.includes("attendance");
+    const canApplyleave = rights.apply?.includes("leave");
+    const canApplyadvance = rights.apply?.includes("advance");
+    const canApplyreimburdement = rights.apply?.includes("reimburdement");
+    console.log("canApplyAttendance", canApplyAttendance);
+
 
     const handlePress = (item) => {
+
         if (item === "Attendance Management") {
+            if (!canApplyAttendance) {
+                Alert.alert(
+                    "Permission Denied",
+                    "you don't have This functionality"
+                );
+                return;
+            }
             navigation.navigate("AttendanceScreen", { title: "Attendance" });
         }
         else if (item === "Payslips") {
             navigation.navigate("Payslips", { title: item });
         }
         else if (item === "Expense Management") {
+             if (!canApplyreimburdement) {
+                Alert.alert(
+                    "Permission Denied",
+                    "you don't have This functionality"
+                );
+                return;
+            }
             navigation.navigate("Expense", { title: item });
         }
         else if (item === "Advance Management") {
+             if (!canApplyadvance) {
+                Alert.alert(
+                    "Permission Denied",
+                    "you don't have This functionality"
+                );
+                return;
+            }
             navigation.navigate("Advance", { title: item });
         }
         else if (item === "Document Vault") {
             navigation.navigate("document_vault", { title: item });
         }
         else if (item === "Leave Management") {
+             if (!canApplyleave) {
+                Alert.alert(
+                    "Permission Denied",
+                    "you don't have This functionality"
+                );
+                return;
+            }
             navigation.navigate("Leave_Management", { title: item });
         }
     }
@@ -119,7 +158,7 @@ const styles = StyleSheet.create({
 
     },
     advance_card: {
-        marginTop:5,
+        marginTop: 5,
         flexDirection: "column"
     },
     sectionTitle: {

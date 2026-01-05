@@ -24,7 +24,7 @@ const SignUpScreen = () => {
   const [corporateId, setCorporateId] = useState('');
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [userData, setUserData] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
@@ -50,12 +50,25 @@ const SignUpScreen = () => {
 
   useEffect(() => {
     const checkLogin = async () => {
-      try {
-        const token = await AsyncStorage.getItem('authToken');
-        const user = await AsyncStorage.getItem('userData');
+      // const storagerememberMe = await AsyncStorage.getItem('rememberMe');
+      // console.log("storagerememberMe when fetch", storagerememberMe);
 
-        if (token && user) {
-          navigation.replace('Dashboard');
+      try {
+        const storedRememberMe = await AsyncStorage.getItem('rememberMe');
+        const rememberstorage = JSON.parse(storedRememberMe);
+        console.log("rememberMe fetched:", rememberstorage);
+        if (rememberstorage) {
+          const token = await AsyncStorage.getItem('authToken');
+          const user = await AsyncStorage.getItem('userData');
+
+          if (token && user) {
+            navigation.replace('Dashboard');
+          }
+        }
+        else {
+          await AsyncStorage.removeItem('authToken');
+          await AsyncStorage.removeItem('userData');
+          await AsyncStorage.clear();
         }
       } catch (error) {
         console.log('Auto login check failed', error);
@@ -66,11 +79,12 @@ const SignUpScreen = () => {
     };
 
     checkLogin();
-  }, []);
+  }, [rememberMe]);
 
 
   const handleSignIn = async () => {
     try {
+      await AsyncStorage.setItem('rememberMe', JSON.stringify(rememberMe));
       const url = 'https://back.finalpayroll.in/employee_signin';
       // const url = 'http://10.0.2.2:8080/employee_signin';
       const data = { corporate_id: corporateId, userid: userId, password };
@@ -103,13 +117,33 @@ const SignUpScreen = () => {
       Alert.alert('Something went wrong. Please try again.');
     }
   };
+  // const handleRememberMe = async () => {
+  //   setRememberMe(!rememberMe);
+  //   await AsyncStorage.setItem('rememberMe', rememberMe);
+  //   console.log("storagerememberMe save",rememberMe);
+
+  // }
+
+  const handleRememberMe = async (newValue) => {
+    setRememberMe(newValue);
+    await AsyncStorage.setItem('rememberMe', JSON.stringify(newValue));
+    console.log("rememberMe saved:", newValue);
+  };
+
 
 
   if (checkingAuth) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ color: '#fff' }}>Loading...</Text>
-      </View>
+      <LinearGradient
+        colors={["#000000ff", "#1c68beff"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{ flex: 1 }}
+      >
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ color: '#ffffffff' }}>Loading...</Text>
+        </View>
+      </LinearGradient>
     );
   }
 
@@ -121,6 +155,7 @@ const SignUpScreen = () => {
       end={{ x: 1, y: 1 }}
       style={{ flex: 1 }}
     >
+
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <Image
@@ -158,7 +193,7 @@ const SignUpScreen = () => {
             <View style={styles.checkboxContainer}>
               <CheckBox
                 value={rememberMe}
-                onValueChange={setRememberMe}
+                onValueChange={handleRememberMe}
                 tintColors={{ true: '#007bff', false: '#aaa' }}
               />
               <Text style={styles.checkboxLabel}>Remember Me</Text>

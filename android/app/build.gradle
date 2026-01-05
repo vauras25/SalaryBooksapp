@@ -70,7 +70,9 @@ def enableProguardInReleaseBuilds = false
  * give correct results when using with locales other than en-US. Note that
  * this variant is about 6MiB larger per architecture than default.
  */
-def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
+// def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
+def hermesEnabled = true
+
 
 android {
     ndkVersion rootProject.ext.ndkVersion
@@ -84,6 +86,10 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+
+         ndk {
+        abiFilters "x86_64"
+    }
     }
     signingConfigs {
         debug {
@@ -93,6 +99,14 @@ android {
             keyPassword 'android'
         }
     }
+    // splits {
+    //     abi {
+    //         enable true
+    //         reset()
+    //         include "armeabi-v7a", "arm64-v8a"
+    //         universalApk false
+    //     }
+    // }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
@@ -102,8 +116,8 @@ android {
             // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.debug
             // minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-
+            // proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             shrinkResources true
             minifyEnabled true
         }
@@ -113,6 +127,7 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    implementation "com.google.android.gms:play-services-location"
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
