@@ -64,8 +64,9 @@ const Dashboard = () => {
       // }
       if (res.data?.status === "success") {
         const employeeData = res.data.employee_data;
-        console.log("employeeData",employeeData,"API_BASE_URL",API_BASE_URL);
-        
+        // console.log("employeeData",employeeData,"API_BASE_URL",API_BASE_URL);
+        // console.log("employeeData",employeeData[0].employee_details.employee_id,"API_BASE_URL",API_BASE_URL);
+          await AsyncStorage.setItem("employee_id", employeeData[0].employee_details.employee_id);
         setEmpData(employeeData);
 
         const profilePic = employeeData?.[0]?.profile_pic;

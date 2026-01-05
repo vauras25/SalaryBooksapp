@@ -39,6 +39,7 @@ export default function LeaveManagementScreen() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userData, setuserData] = useState(null);
   const [Leavedata, setLeavedata] = useState(null);
+  const [employee_id, setemployee_id] = useState(null);
   // useEffect(() => {
   //   const loadToken = async () => {
   //     const t = await AsyncStorage.getItem("authToken");
@@ -51,11 +52,14 @@ export default function LeaveManagementScreen() {
     const loadTokenAndFetch = async () => {
       const t = await AsyncStorage.getItem("authToken");
       const stored = await AsyncStorage.getItem("userData");
+      setemployee_id(await AsyncStorage.getItem("employee_id"));
+      
+      
       if (stored) {
         const parsedUser = JSON.parse(stored);
         setuserData(parsedUser);
         // console.log(setuserData,'id');
-
+        // console.log(employee_id,"employee_id");
       }
       setToken(t);
       console.log("TOKEN LOADED:", t);
@@ -135,7 +139,8 @@ export default function LeaveManagementScreen() {
 
 
     if (!token) return;
-
+    console.log(API_BASE_URL,"API_BASE_URL");
+    
     try {
       const payload = {}
       const response = await axios.post(
@@ -224,8 +229,11 @@ export default function LeaveManagementScreen() {
     }
 
     try {
+    
+      
       const formData = new FormData();
       formData.append("leave_head", selectedLeave.abbreviation);
+      formData.append("employee_id", employee_id);
       formData.append("from_date", fromDate.toISOString());
       formData.append("to_date", toDate.toISOString());
       formData.append("no_of_days", noOfDays);
@@ -244,6 +252,7 @@ export default function LeaveManagementScreen() {
           },
         }
       );
+// console.log("1");
 
       if (response.data.status === "success") {
         Alert.alert("Success", "Leave request submitted");
@@ -253,6 +262,8 @@ export default function LeaveManagementScreen() {
         Alert.alert("Error", response.data.message);
       }
     } catch (err) {
+      // console.log(err,"err");
+      
       Alert.alert("Error", "Failed to submit Leave request");
     }
   };
@@ -300,7 +311,8 @@ export default function LeaveManagementScreen() {
     ((totalBalance - totalAvailable) / totalBalance) * 100
   );
 };
-
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   
   return (
     <LinearGradient
@@ -318,7 +330,7 @@ export default function LeaveManagementScreen() {
           {/* <View style={styles.icons}>
             <Text style={{ color: "#fff", fontSize: 20 }}>🔍</Text>
             <Text style={{ color: "#fff", fontSize: 20, marginLeft: 18 }}>
-              🔔
+              
             </Text>
           </View> */}
         </View>
@@ -496,30 +508,6 @@ export default function LeaveManagementScreen() {
 
         </LinearGradient>
         <View>
-          {/* <Modal
-                  visible={modalVisible}
-                  transparent
-                  animationType="fade"
-                  onRequestClose={() => setModalVisible(false)}
-                >
-                  <View style={styles.overlay}>
-                    <LinearGradient
-                      colors={["#00213F", "#002C56"]}
-                      style={styles.modalContainer}
-                    >
-                      <View style={styles.modalHeader}>
-                        <Text style={styles.modalTitle}>Enter the following details</Text>
-                        <TouchableOpacity onPress={() => setModalVisible(false)}>
-                          <Text style={styles.closeBtn}>✖</Text>
-                        </TouchableOpacity>
-                      </View>
-        
-                      <View style={styles.formContainer}>
-                        
-                      </View>
-                    </LinearGradient>
-                  </View>
-                </Modal> */}
 
           <Modal
             visible={modalVisible}
@@ -600,7 +588,6 @@ export default function LeaveManagementScreen() {
                     )}
                   </View>
 
-                  {/* Date Range */}
                   <View style={styles.dateRow}>
                     <View style={styles.dateInputContainer}>
                       <Text style={styles.labelColumn}>From:</Text>
@@ -629,7 +616,6 @@ export default function LeaveManagementScreen() {
                     </View>
                   </View>
 
-                  {/* Date Picker Modals */}
                   <DatePicker
                     modal
                     mode="date"
@@ -650,15 +636,15 @@ export default function LeaveManagementScreen() {
                     mode="date"
                     open={openToDate}
                     date={toDate}
+                    minimumDate={fromDate}  
                     onConfirm={(date) => {
                       setOpenToDate(false);
                       setToDate(date);
                     }}
-                    onCancel={() => {
-                      setOpenToDate(false);
-                    }}
+                    onCancel={() => setOpenToDate(false)}
                     theme="dark"
                   />
+
 
                   <View style={styles.rowContainer}>
                     <Text style={styles.labelRow}>No. of Days:</Text>
@@ -706,7 +692,15 @@ export default function LeaveManagementScreen() {
         <Text style={styles.sectionTitle}>Leave Status</Text>
 
         {Leavedata
-          ?.filter(item => item.leave_approval_status === "pending")
+          ?.filter(item => {
+            const toDate = new Date(item.leave_to_date);
+            toDate.setHours(0, 0, 0, 0);
+
+            return (
+              item.leave_approval_status === "pending" ||
+              (item.leave_approval_status === "approved" && toDate >= today)
+            );
+          })
           ?.map(item => (
             <View style={styles.upcomingCard} key={item._id}>
               <Text style={styles.upcomingDate}>
@@ -718,32 +712,63 @@ export default function LeaveManagementScreen() {
                   {item.leave_head}
                 </Text>
               </View>
-              <View style={styles.upcomingStatusBox}>
+
+              <View style={[styles.upcomingStatusBox,{
+                    backgroundColor:
+                      item.leave_approval_status === "approved"
+                        ? "#04520aff"
+                        : item.leave_approval_status === "rejected"
+                          ? "#d11a2a"
+                          : "#f7e331ff"
+                  }]}>
                 <Text style={styles.upcomingStatusText}>
                   {item.leave_approval_status}
                 </Text>
               </View>
-
             </View>
           ))}
 
 
+
         <Text style={styles.sectionTitle}>Leave History</Text>
 
-        {[
-          { date: "Aug 05 - Aug 09", status: "Approved", color: "#04520aff" },
-          { date: "Sept 21 - Sept 24", status: "Pending", color: "#4a9cf9ff" },
-          { date: "Sept 03 - Sept 15", status: "Rejected", color: "#4da0c7ff" },
-        ].map((item, index) => (
-          <View style={styles.historyCard} key={index}>
-            <Text style={styles.historyDate}>{item.date}</Text>
-            <View
-              style={[styles.historyStatusBox, { backgroundColor: item.color }]}
-            >
-              <Text style={styles.historyStatusText}>{item.status}</Text>
+        {Leavedata
+          ?.filter(item => {
+            const toDate = new Date(item.leave_to_date);
+            toDate.setHours(0, 0, 0, 0);
+
+            return toDate < today;
+          })
+          ?.map(item => (
+            <View style={styles.historyCard} key={item._id}>
+              <Text style={styles.historyDate}>
+                {formatDateRange(item.leave_from_date, item.leave_to_date)}
+              </Text>
+              <View style={styles.upcomingStatusBox}>
+                <Text style={styles.upcomingStatusText}>
+                  {item.leave_head}
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.historyStatusBox,
+                  {
+                    backgroundColor:
+                      item.leave_approval_status === "approved"
+                        ? "#04520aff"
+                        : item.leave_approval_status === "rejected"
+                          ? "#d11a2a"
+                          : "#4a9cf9ff"
+                  }
+                ]}
+              >
+                <Text style={styles.historyStatusText}>
+                  {item.leave_approval_status}
+                </Text>
+              </View>
             </View>
-          </View>
-        ))}
+          ))}
+
       </ScrollView>
       <BottomNavigation />
     </LinearGradient>
@@ -897,7 +922,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f7e331ff",
     paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: 10,
+    borderRadius: 13,
   },
   upcomingStatusText: {
     color: "#000000ff",

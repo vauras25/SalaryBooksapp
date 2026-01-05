@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState,useEffect} from 'react';
 import {
   View,
   Text,
@@ -22,7 +22,8 @@ import Navbar from "./Dashboardscreen/navbar"
 const Settings = ({ navigation }) => {
   const { isDarkMode, toggleDarkMode } = useTheme();
   const insets = useSafeAreaInsets();
-
+  const [userData, setUserData] = useState(null);
+  
   const themeColors = {
     background: isDarkMode ? '#000' : '#fff',
     card: isDarkMode ? '#1c1c1e' : '#f4f4f4',
@@ -35,7 +36,22 @@ const Settings = ({ navigation }) => {
   };
 
   const HorizontalLine = () => <View style={styles.line} />;
+    useEffect(() => {
+    const loadData = async () => {
+      try {
+        const userData = JSON.parse(await AsyncStorage.getItem("userData"));
+        
+        if(userData){
+          // console.log(userData,"userData");
+        setUserData(userData);
+        }
+      } catch (error) {
+        console.log("Error loading userData:", error);
+      }
+    };
 
+    loadData();
+  }, []);
   // const handleLogout = () => {
   //   Alert.alert('Logout', 'Do you want to logout?', [
   //     {
@@ -54,34 +70,33 @@ const Settings = ({ navigation }) => {
   // };
 
   const handleLogout = () => {
-  Alert.alert(
-    'Logout',
-    'Do you want to logout?',
-    [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-      },
-      {
-        text: 'Yes',
-        onPress: confirmLogout, 
-      },
-    ],
-    { cancelable: true }
-  );
-};
+    Alert.alert(
+      'Logout',
+      'Do you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: confirmLogout,
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   const confirmLogout = async () => {
-  try {
-    await AsyncStorage.removeItem('authToken');
-    await AsyncStorage.removeItem('userData');
-    await AsyncStorage.clear();
-    navigation.replace('SignUpScreen'); 
-  } catch (error) {
-    console.log('Logout error:', error);
-  }
-};
-
+    try {
+      await AsyncStorage.removeItem('authToken');
+      await AsyncStorage.removeItem('userData');
+      await AsyncStorage.clear();
+      navigation.replace('SignUpScreen');
+    } catch (error) {
+      console.log('Logout error:', error);
+    }
+  };
   
     const route = useRoute();
     const screenTitle = route.params?.title;
@@ -109,7 +124,13 @@ const Settings = ({ navigation }) => {
       <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
         <View style={styles.contentPadding}>
           {/* Profile section */}
-          <View style={[styles.profileCard, { backgroundColor: themeColors.card }]}>
+          <LinearGradient
+                      colors={["#0b132bff", "#173d68ff"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={[styles.profileCard, { backgroundColor: themeColors.card }]}
+                    >
+          {/* <View style={[styles.profileCard, { backgroundColor: themeColors.card }]}> */}
             <Image source={require('../assets/photo.jpg')} style={styles.avatar} />
             <TouchableOpacity style={styles.editIcon}>
               <Image
@@ -118,55 +139,69 @@ const Settings = ({ navigation }) => {
               />
             </TouchableOpacity>
             <View style={styles.profileText}>
-              <Text style={[styles.nameText, { color: themeColors.text }]}>Employee{"\n"}Name</Text>
-              <Text style={[styles.codeText, { color: themeColors.label }]}>AXIHYJ8090</Text>
-            </View>
-          </View>
+              <Text style={[styles.nameText, { color: "#fff" }]}>{userData?.emp_first_name}{"\n"}{userData?.emp_last_name}</Text>
+              <Text style={[styles.codeText, { color: "#fff" }]}>{userData?.emp_id}</Text>
+              <Text style={[styles.emailText, { color: "#fff" }]}>{userData?.email_id}</Text>
 
-          {/* Dark Mode Toggle */}
-          <View style={[styles.infoBlock, { borderColor: themeColors.border, backgroundColor: themeColors.card }]}>
+            </View>
+          {/* </View> */}
+          </LinearGradient>
+
+          {/* <View style={[styles.infoBlock, { borderColor: themeColors.border, backgroundColor: themeColors.card }]}>
             <View style={styles.infoRow}>
               <Text style={[styles.label, { color: themeColors.label }]}>DarkMode</Text>
               <Switch value={isDarkMode} onValueChange={toggleDarkMode} />
             </View>
-          </View>
+          </View> */}
+          <LinearGradient
+            colors={["#07162cff", "#23568fff"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.infoBlock}
+          >
+            <View style={styles.infoRow}>
+              <Text style={[styles.label, { color: "#fff" }]}>E-mail</Text>
+              <Text style={[styles.value, { color: "#fff"}]}>{userData?.email_id}</Text>
+            </View>
 
-          {/* Info block */}
-          <View style={[styles.infoBlock, { borderColor: themeColors.border, backgroundColor: themeColors.card }]}>
             <View style={styles.infoRow}>
-              <Text style={[styles.label, { color: themeColors.label }]}>E-mail</Text>
-              <Text style={[styles.value, { color: themeColors.text }]}>sadgywwduq@gmail.com</Text>
+              <Text style={[styles.label, { color: "#fff" }]}>Phone</Text>
+              <Text style={[styles.value, { color: "#fff" }]}>{userData?.mobile_no}</Text>
             </View>
-            <HorizontalLine />
             <View style={styles.infoRow}>
-              <Text style={[styles.label, { color: themeColors.label }]}>Phone</Text>
-              <Text style={[styles.value, { color: themeColors.text }]}>9837432797</Text>
+              <Text style={[styles.label, { color: "#fff"}]}>PAN</Text>
+              <Text style={[styles.value, { color: "#fff" }]}>{userData?.pan_no}</Text>
             </View>
-            <HorizontalLine />
+          </LinearGradient>
+          <LinearGradient
+              colors={["#122441ff", "#0c3058ff"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.card}
+          >
+            <Text style={[styles.label_bank, { color:  "#fff"  }]}>Bank Accounts</Text>
             <View style={styles.infoRow}>
-              <Text style={[styles.label, { color: themeColors.label }]}>PAN</Text>
-              <Text style={[styles.value, { color: themeColors.text }]}>FSGDC5745K</Text>
+              <Text style={[styles.value, { color:  "#fff"  }]}>HDFC Bank</Text>
+              <Text style={[styles.value, { color:  "#fff" }]}>*7636</Text>
             </View>
-          </View>
-
-          {/* Bank Accounts */}
-          <View style={[styles.card, { backgroundColor: themeColors.card }]}>
-            <Text style={[styles.label, { color: themeColors.label }]}>Bank Accounts</Text>
-            <HorizontalLine />
-            <View style={styles.infoRow}>
-              <Text style={[styles.value, { color: themeColors.text }]}>HDFC Bank</Text>
-              <Text style={[styles.value, { color: themeColors.text }]}>*7636</Text>
-            </View>
-          </View>
-
-          {/* Support and Logout */}
-          <View style={[styles.card, { backgroundColor: themeColors.card }]}>
-            <Text style={[styles.value, { color: themeColors.text }]}>SUPPORT</Text>
-            <HorizontalLine />
+          </LinearGradient>
+          <LinearGradient
+              colors={["#122441ff", "#0c3058ff"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.card}
+          >
+          {/* <View style={[styles.card, { backgroundColor: themeColors.card }]}> */}
+          {/* <View style={styles.support}>
+            <Text style={[styles.value, { color: "#fff" }]}>SUPPORT</Text>
+            </View> */}
+            <View style={styles.support}>
             <TouchableOpacity onPress={handleLogout}>
-              <Text style={[styles.value, { color: themeColors.text }]}>LOGOUT</Text>
+              <Text style={[styles.value, { color: "#fff"  }]}>LOGOUT</Text>
             </TouchableOpacity>
-          </View>
+            </View>
+          {/* </View> */}
+          </LinearGradient>
         </View>
       </ScrollView>
 
@@ -236,30 +271,43 @@ const styles = StyleSheet.create({
   codeText: {
     fontSize: 12,
     marginTop: 4,
-    marginLeft: 155,
+    marginLeft: 163,
+  },
+  emailText: {
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 125,
   },
   infoBlock: {
-    borderWidth: 1,
+    // borderWidth: 1,
     borderRadius: 10,
     padding: 12,
     marginBottom: 12,
   },
   infoRow: {
+    backgroundColor:"#103a61ff",
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 10,
+    padding:12,
+    borderRadius:12
   },
   label: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  label_bank: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom:10
   },
   value: {
     fontSize: 14,
     fontWeight: '500',
   },
   card: {
-    padding: 14,
-    borderRadius: 10,
+    padding: 12,
+    borderRadius: 15,
     marginBottom: 12,
   },
   line: {
@@ -267,4 +315,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     marginVertical: 10,
   },
+  support:{
+     backgroundColor:"#103a61ff",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    padding:12,
+    borderRadius:12
+  }
 });

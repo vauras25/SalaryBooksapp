@@ -61,7 +61,7 @@ const SignUpScreen = () => {
         console.log('Auto login check failed', error);
       }
       finally {
-        setCheckingAuth(false); // ✅ allow render only after check
+        setCheckingAuth(false); 
       }
     };
 
