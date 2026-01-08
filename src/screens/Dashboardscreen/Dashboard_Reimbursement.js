@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -12,16 +12,112 @@ import { BarChart } from "react-native-gifted-charts";
 import { PieChart } from "react-native-gifted-charts";
 import { useNavigation } from '@react-navigation/native';
 import LeaveManagement from '../Dashboardscreen/leave_balance'
+import { API_BASE_URL } from "@env";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
+import axios from 'axios';
 const { width } = Dimensions.get("window");
 
 const Reimbursement = () => {
     const navigation = useNavigation();
+    const [token, setToken] = useState(null);
+    const [claimsData, setClaimsData] = useState([]);
+    const [approved, setApproved] = useState(0);
+    const [pending, setPending] = useState(0);
+    const [rejected, setRejected] = useState(0);
+    const [latestClaim, setLatestClaim] = useState(null);
+    useEffect(() => {
+        const loadToken = async () => {
+            const t = await AsyncStorage.getItem("authToken");
+            setToken(t);
+            console.log("TOKEN LOADEDaa:", t);
+        };
+        loadToken();
+    }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            if (token) {
+                fetchClaimsData();
+            }
+        }, [token])
+    );
+
+    const fetchClaimsData = async () => {
+        console.log("Expense", token)
+        if (!token) return;
+        try {
+            // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
+            // const token =  getToken();
+            // Alert.alert("token",token);
+            const payload = {
+                pageno: 1,
+                type: 'reimbursement',
+            };
+            const response = await axios.post(
+                `${API_BASE_URL}employee/get-extra-earning`,
+                payload,
+                {
+                    headers: {
+                        "x-access-token": token,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            if (response.data.status === "success") {
+                const docs = response.data.data.docs || [];
+                console.log("docsexpense", docs);
+
+                // const formattedData = docs.map((item) => ({
+                //     id: item._id,
+                //     date: formatDate(item.created_at),
+                //     type: item.head_id || "N/A",
+                //     amount: `${item.amount}`,
+                //     status: capitalize(item.status),
+                // }));
+
+                // setClaimsData(formattedData);
+                setLatestClaim(docs[0]);
+                let approvedCount = 0;
+                let pendingCount = 0;
+                let rejectedCount = 0;
+
+                docs.forEach(item => {
+                    if (item.status === "active") approvedCount++;
+                    else if (item.status === "pending") pendingCount++;
+                    else if (item.status === "rejected") rejectedCount++;
+                });
+
+                setApproved(approvedCount);
+                setPending(pendingCount);
+                setRejected(rejectedCount);
+
+                console.log("latestClaim", latestClaim);
+
+                setClaimsData(docs);
+            } else {
+                Alert.alert("Error", response.data.message || "Failed to load data");
+            }
+        } catch (error) {
+            Alert.alert("Error", token);
+            console.error("API Error:", error);
+            if (error.response) {
+                Alert.alert("Server Error", JSON.stringify(error.response.data));
+            } else if (error.request) {
+                Alert.alert("Network Error", "No response from backend.");
+            } else {
+                Alert.alert("Error", error.message);
+            }
+        }
+    };
 
 
 
-    const approved = 5;
-    const pending = 2;
-    const rejected = 2;
+    // const approved = 5;
+    // const pending = 2;
+    // const rejected = 2;
 
     const total = approved + pending + rejected;
 
@@ -77,10 +173,16 @@ const Reimbursement = () => {
 
                     <View style={styles.latestClaims}>
                         <Text style={styles.latestTitle}>Latest Claims</Text>
-                        <View style={styles.claimRow}>
-                            <Text style={styles.claimType}>Travel</Text>
-                            <Text style={styles.claimAmount}>₹1200</Text>
-                        </View>
+                        {latestClaim ? (
+                            <View style={styles.claimRow}>
+                                <Text style={styles.claimType}>  {latestClaim?.head_id || "N/A"} </Text>
+                                <Text style={styles.claimAmount}>  ₹{latestClaim?.amount || 0}</Text>
+                            </View>
+                        ) : (
+                            <Text style={{ color: "#9AA5C4", fontSize: 11, textAlign: "center" }}>
+                                No claims available
+                            </Text>
+                        )}
                     </View>
 
                     {/* <TouchableOpacity style={styles.button}>
@@ -315,7 +417,7 @@ const Reimbursement = () => {
 
                     </View> */}
                     <View style={styles.barchart}>
-                    <LeaveManagement  />
+                        <LeaveManagement />
                     </View>
                     <TouchableOpacity style={styles.button2}>
                         <Text style={styles.buttonText2}>Apply Leave</Text>
@@ -433,7 +535,7 @@ const styles = StyleSheet.create({
         marginBottom: -10,
         textAlign: "center",
     },
-      barchart: {
+    barchart: {
         marginTop: -29,
         marginLeft: -40,
         margin: -20,
