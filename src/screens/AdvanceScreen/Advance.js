@@ -8,6 +8,7 @@ import {
   Modal,
   Alert,
   ScrollView,
+  Dimensions,
   ActivityIndicator
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
@@ -22,7 +23,9 @@ import { API_BASE_URL } from "@env";
 import { useNavigation } from '@react-navigation/native';
 import { NativeModules } from "react-native";
 const { PdfPicker } = NativeModules;
+const { width } = Dimensions.get("window");
 const AdvanceManagement = () => {
+  const progress = 0.75;
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [advanceAmount, setAdvanceAmount] = useState("");
@@ -157,39 +160,39 @@ const AdvanceManagement = () => {
       //   remarks: reason || "",
       // };
       // console.log(API_BASE_URL,"API_BASE_URL");
-      
+
       // console.log("Payload =>", payload, "token", token);
       const formData = new FormData();
 
-    formData.append("advance_amount", advanceAmount);
-    formData.append("advance_outstanding", advanceAmount);
-    formData.append("no_of_instalments", installments);
-    formData.append("recovery_frequency", frequency);
-    formData.append("recovery_from", recoveryFrom);
-    formData.append("payment_start_month", startMonthNum.toString());
-    formData.append("payment_start_year", year);
-    formData.append("remarks", reason || "");
-    formData.append(
-      "instalment_history",
-      JSON.stringify(instalment_history)
-    );
+      formData.append("advance_amount", advanceAmount);
+      formData.append("advance_outstanding", advanceAmount);
+      formData.append("no_of_instalments", installments);
+      formData.append("recovery_frequency", frequency);
+      formData.append("recovery_from", recoveryFrom);
+      formData.append("payment_start_month", startMonthNum.toString());
+      formData.append("payment_start_year", year);
+      formData.append("remarks", reason || "");
+      formData.append(
+        "instalment_history",
+        JSON.stringify(instalment_history)
+      );
 
-    if (file) {
-      formData.append("upload_file", {
-        uri: file.uri,
-        name: file.name,
-        type: file.type,
-      });
-    }
-    // console.log(formData,"formdata");
-    
+      if (file) {
+        formData.append("upload_file", {
+          uri: file.uri,
+          name: file.name,
+          type: file.type,
+        });
+      }
+      // console.log(formData,"formdata");
+
       // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
       const response = await axios.post(`${API_BASE_URL}employee/employee-advance-request`,
         formData,
         {
           headers: {
             "x-access-token": token,
-            "Content-Type":  "multipart/form-data",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -214,30 +217,20 @@ const AdvanceManagement = () => {
   };
 
 
-    const route = useRoute();
-      const screenTitle = route.params?.title;
+  const route = useRoute();
+  const screenTitle = route.params?.title;
 
   return (
-    <LinearGradient colors={["#05203C", "#0A3B63"]} style={styles.container}>
+    <LinearGradient
+                colors={["#000000ff", "#1c68beff"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.container}
+              >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
 
-        {/* <View style={styles.header}>
-          <Text style={styles.title}>Advance Management</Text>
-          <View style={styles.headerIcons}>
-            <Icon name="search-outline" size={22} color="#fff" style={styles.icon} />
-            <Icon name="notifications-outline" size={22} color="#fff" />
-          </View>
-        </View> */}
-
-          <View style={styles.header}>
-          {/* <Text style={styles.headerText}>Leave Management</Text> */}
-          <Navbar title={screenTitle}/>
-          {/* <View style={styles.icons}>
-            <Text style={{ color: "#fff", fontSize: 20 }}>🔍</Text>
-            <Text style={{ color: "#fff", fontSize: 20, marginLeft: 18 }}>
-              🔔
-            </Text>
-          </View> */}
+        <View style={styles.header}>
+          <Navbar title={screenTitle} />
         </View>
         <View style={styles.dropdownRow}>
           <TouchableOpacity style={styles.dropdown}>
@@ -250,187 +243,191 @@ const AdvanceManagement = () => {
           </TouchableOpacity>
         </View>
 
-
-        <View style={styles.overviewBox}>
-          <View style={styles.overviewHeader}>
-            <Text style={styles.sectionTitle}>Advance Overview</Text>
-            {/* <TouchableOpacity style={styles.addBtn}>
+        <View style={styles.overviewHeader}>
+          <Text style={styles.sectionTitle}>Advance Overview</Text>
+          <View style={styles.container1}>
+            <TouchableOpacity
+              style={styles.addBtn}
+              onPress={() => setModalVisible(true)}
+            >
               <Text style={styles.addBtnText}>+ Advance Request</Text>
-            </TouchableOpacity> */}
-
-            <View style={styles.container1}>
-              {/* + Advance Request button */}
-              <TouchableOpacity
-                style={styles.addBtn}
-                onPress={() => setModalVisible(true)}
-              >
-                <Text style={styles.addBtnText}>+ Advance Request</Text>
-              </TouchableOpacity>
+            </TouchableOpacity>
 
 
-              <Modal visible={modalVisible} transparent animationType="fade">
-                <View style={styles.overlay}>
-                  <View style={styles.modalBox}>
+            <Modal visible={modalVisible} transparent animationType="fade">
+              <View style={styles.overlay}>
+                <View style={styles.modalBox}>
 
-                    <View style={styles.header}>
-                      <Text style={styles.headerTitle}>Enter the following details</Text>
-                      <TouchableOpacity onPress={() => setModalVisible(false)}>
-                        <Text style={styles.closeBtn}>✕</Text>
-                      </TouchableOpacity>
-                    </View>
-
-
-                    <View style={styles.field}>
-                      <Text style={styles.label}>Advance Amount :</Text>
-                      <TextInput
-                        style={styles.input}
-                        placeholder="Enter amount"
-                        placeholderTextColor="#ccc"
-                        keyboardType="numeric"
-                        value={advanceAmount}
-                        onChangeText={setAdvanceAmount}
-                      />
-                    </View>
-
-                    <View style={styles.field}>
-                      <Text style={styles.label}>Recovery From :</Text>
-                      <View style={styles.pickerWrapper}>
-                        <Picker
-                          selectedValue={recoveryFrom}
-                          onValueChange={setRecoveryFrom}
-                          dropdownIconColor="#fff"
-                          style={styles.picker}
-                        >
-                          <Picker.Item label="Select One" value="" />
-                          <Picker.Item label="Annual Earning" value="salary" />
-                          <Picker.Item label="Reimbursement" value="reimbursement" />
-                          <Picker.Item label="Incentive" value="incentive" />
-                          <Picker.Item label="Gross Earning" value="gross_earning" />
-                          <Picker.Item label="Bonus" value="bonus" />
-
-                        </Picker>
-                      </View>
-                    </View>
-
-                    <View style={styles.field}>
-                      <Text style={styles.label}>No. of Installments :</Text>
-                      <TextInput
-                        style={styles.input}
-                        keyboardType="numeric"
-                        value={installments}
-                        onChangeText={setInstallments}
-                      />
-                    </View>
-
-                    <View style={styles.field}>
-                      <Text style={styles.label}>Recovery Frequency :</Text>
-                      <View style={styles.pickerWrapper}>
-                        <Picker
-                          selectedValue={frequency}
-                          onValueChange={setFrequency}
-                          dropdownIconColor="#fff"
-                          style={styles.picker}
-                        >
-                          <Picker.Item label="Select One" value="" />
-                          <Picker.Item label="Monthly" value="monthly" />
-                          <Picker.Item label="Quaterly" value="quaterly" />
-                          <Picker.Item label="Half Yearly" value="halfYearly" />
-                          <Picker.Item label="Annually" value="annually" />
-
-                        </Picker>
-                      </View>
-                    </View>
-
-
-                    <View style={styles.row}>
-                      <View style={styles.column}>
-                        <Text style={styles.label}>Month :</Text>
-                        <View style={styles.pickerWrapper}>
-                          <Picker
-                            selectedValue={month}
-                            onValueChange={setMonth}
-                            dropdownIconColor="#fff"
-                            style={styles.picker}
-                          >
-                            <Picker.Item label="September" value="September" />
-                            <Picker.Item label="October" value="October" />
-                            <Picker.Item label="November" value="November" />
-                          </Picker>
-                        </View>
-                      </View>
-
-                      <View style={styles.column}>
-                        <Text style={styles.label}>Year :</Text>
-                        <View style={styles.pickerWrapper}>
-                          <Picker
-                            selectedValue={year}
-                            onValueChange={setYear}
-                            dropdownIconColor="#fff"
-                            style={styles.picker}
-                          >
-                            <Picker.Item label="2025" value="2025" />
-                            <Picker.Item label="2026" value="2026" />
-                          </Picker>
-                        </View>
-                      </View>
-                    </View>
-                    <View style={styles.titleRow}>
-                                <Text style={styles.sectionTitle}>Uploaded Document</Text>
-                    
-                                <TouchableOpacity style={styles.uploadBtn} onPress={() => pickDocument()}>
-                                  <Text style={styles.uploadText}>Upload File</Text>
-                                </TouchableOpacity>
-                              </View>
-                              {uploading && (
-                                <View style={styles.loaderOverlay}>
-                                  <ActivityIndicator size="large" color="#fff" />
-                                  <Text style={{ color: "white", marginTop: 5 }}>Uploading...</Text>
-                                </View>
-                              )}
-                    <View style={styles.field}>
-                      <Text style={styles.label}>Reason :</Text>
-                      <TextInput
-                        style={[styles.input, { height: 80, textAlignVertical: "top" }]}
-                        multiline
-                        placeholder="Enter reason"
-                        placeholderTextColor="#ccc"
-                        value={reason}
-                        onChangeText={setReason}
-                      />
-                    </View>
-
-
-                    <TouchableOpacity
-                      style={styles.submitBtn}
-                      onPress={() => {
-                        setModalVisible(false);
-                        submitAdvanceRequest();
-                      }}
-                    >
-                      <Text style={styles.submitText}>SUBMIT</Text>
+                  <View style={styles.header}>
+                    <Text style={styles.headerTitle}>Enter the following details</Text>
+                    <TouchableOpacity onPress={() => setModalVisible(false)}>
+                      <Text style={styles.closeBtn}>✕</Text>
                     </TouchableOpacity>
                   </View>
-                </View>
-              </Modal>
-            </View>
-          </View>
 
-          <Text style={styles.progressText}>
-            {currentAdvance ?
-              `${Math.round((currentAdvance.advance_recovered / currentAdvance.advance_amount) * 100)}%`
-              : "0%"}
-          </Text>
+
+                  <View style={styles.field}>
+                    <Text style={styles.label}>Advance Amount :</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter amount"
+                      placeholderTextColor="#ccc"
+                      keyboardType="numeric"
+                      value={advanceAmount}
+                      onChangeText={setAdvanceAmount}
+                    />
+                  </View>
+
+                  <View style={styles.field}>
+                    <Text style={styles.label}>Recovery From :</Text>
+                    <View style={styles.pickerWrapper}>
+                      <Picker
+                        selectedValue={recoveryFrom}
+                        onValueChange={setRecoveryFrom}
+                        dropdownIconColor="#fff"
+                        style={styles.picker}
+                      >
+                        <Picker.Item label="Select One" value="" />
+                        <Picker.Item label="Annual Earning" value="salary" />
+                        <Picker.Item label="Reimbursement" value="reimbursement" />
+                        <Picker.Item label="Incentive" value="incentive" />
+                        <Picker.Item label="Gross Earning" value="gross_earning" />
+                        <Picker.Item label="Bonus" value="bonus" />
+
+                      </Picker>
+                    </View>
+                  </View>
+
+                  <View style={styles.field}>
+                    <Text style={styles.label}>No. of Installments :</Text>
+                    <TextInput
+                      style={styles.input}
+                      keyboardType="numeric"
+                      value={installments}
+                      onChangeText={setInstallments}
+                    />
+                  </View>
+
+                  <View style={styles.field}>
+                    <Text style={styles.label}>Recovery Frequency :</Text>
+                    <View style={styles.pickerWrapper}>
+                      <Picker
+                        selectedValue={frequency}
+                        onValueChange={setFrequency}
+                        dropdownIconColor="#fff"
+                        style={styles.picker}
+                      >
+                        <Picker.Item label="Select One" value="" />
+                        <Picker.Item label="Monthly" value="monthly" />
+                        <Picker.Item label="Quaterly" value="quaterly" />
+                        <Picker.Item label="Half Yearly" value="halfYearly" />
+                        <Picker.Item label="Annually" value="annually" />
+
+                      </Picker>
+                    </View>
+                  </View>
+
+
+                  <View style={styles.row}>
+                    <View style={styles.column}>
+                      <Text style={styles.label}>Month :</Text>
+                      <View style={styles.pickerWrapper}>
+                        <Picker
+                          selectedValue={month}
+                          onValueChange={setMonth}
+                          dropdownIconColor="#fff"
+                          style={styles.picker}
+                        >
+                          <Picker.Item label="September" value="September" />
+                          <Picker.Item label="October" value="October" />
+                          <Picker.Item label="November" value="November" />
+                        </Picker>
+                      </View>
+                    </View>
+
+                    <View style={styles.column}>
+                      <Text style={styles.label}>Year :</Text>
+                      <View style={styles.pickerWrapper}>
+                        <Picker
+                          selectedValue={year}
+                          onValueChange={setYear}
+                          dropdownIconColor="#fff"
+                          style={styles.picker}
+                        >
+                          <Picker.Item label="2025" value="2025" />
+                          <Picker.Item label="2026" value="2026" />
+                        </Picker>
+                      </View>
+                    </View>
+                  </View>
+                  <View style={styles.titleRow}>
+                    <Text style={styles.sectionTitle}>Uploaded Document</Text>
+
+                    <TouchableOpacity style={styles.uploadBtn} onPress={() => pickDocument()}>
+                      <Text style={styles.uploadText}>Upload File</Text>
+                    </TouchableOpacity>
+                  </View>
+                  {uploading && (
+                    <View style={styles.loaderOverlay}>
+                      <ActivityIndicator size="large" color="#fff" />
+                      <Text style={{ color: "white", marginTop: 5 }}>Uploading...</Text>
+                    </View>
+                  )}
+                  <View style={styles.field}>
+                    <Text style={styles.label}>Reason :</Text>
+                    <TextInput
+                      style={[styles.input, { height: 80, textAlignVertical: "top" }]}
+                      multiline
+                      placeholder="Enter reason"
+                      placeholderTextColor="#ccc"
+                      value={reason}
+                      onChangeText={setReason}
+                    />
+                  </View>
+
+
+                  <TouchableOpacity
+                    style={styles.submitBtn}
+                    onPress={() => {
+                      setModalVisible(false);
+                      submitAdvanceRequest();
+                    }}
+                  >
+                    <Text style={styles.submitText}>SUBMIT</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          </View>
+        </View>
+        <View style={styles.overviewBox}>
+          <Text style={styles.percentage}>75%</Text>
+          <View style={styles.progressRow}>
+            
+            <View style={styles.progressBarContainer}>
+              <View style={styles.progressBarBackground}>
+                <View
+                  style={[
+                    styles.progressBarFill,
+                    { width: `${progress * 100}%` }
+                  ]}
+                />
+              </View>
+            </View>
+
+            
+          </View>
           <View style={[styles.progressFill, {
             width: currentAdvance ? `${(currentAdvance.advance_recovered / currentAdvance.advance_amount) * 100}%` : "0%"
           }]} />
 
           <View style={styles.amountRow}>
-            <Text style={styles.amountLabel}>
+            <Text style={styles.amountLabel1}>
               ₹{currentAdvance?.advance_amount || 0}{"\n"}
               <Text style={styles.amountSub}>Total Advance</Text>
             </Text>
 
-            <Text style={styles.amountLabel}>
+            <Text style={styles.amountLabel2}>
               ₹{currentAdvance?.advance_outstanding || 0}{"\n"}
               <Text style={styles.amountSub}>Remaining</Text>
             </Text>
@@ -447,38 +444,15 @@ const AdvanceManagement = () => {
 
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Upcoming Deduction</Text>
+          <Text style={styles.sectionTitle1}>Upcoming Deduction</Text>
           <View style={styles.card}>
+          <View style={styles.card_inner}>
             <Text style={styles.cardDate}>Oct 01</Text>
             <Text style={styles.cardAmount}>₹2000 due</Text>
           </View>
+          </View>
         </View>
 
-
-
-        {/* <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Advance History</Text>
-
-          {advanceList.map((item) => (
-            <View key={item._id} style={styles.card}>
-              <Text style={styles.cardDate}>
-                {new Date(item.created_at).toDateString().slice(4, 10)}
-              </Text>
-
-              <View style={styles.cardRight}>
-                <Text style={styles.cardAmount}>₹{item.advance_amount}</Text>
-                <Text
-                  style={[
-                    styles.status,
-                    { color: item.status === "active" ? "#FF4D4D" : "#2ECC71" },
-                  ]}
-                >
-                  {item.status}
-                </Text>
-              </View>
-            </View>
-          ))}
-        </View> */}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Advance History</Text>
@@ -516,13 +490,13 @@ const AdvanceManagement = () => {
 };
 
 const styles = StyleSheet.create({
-   container: {
+  container: {
     flex: 1,
-    padding: 10,
+    padding: 15,
   },
   scrollContainer: {
     // padding: 5,
-    top:15,
+    top: 15,
     paddingBottom: 60,
   },
   header: {
@@ -546,7 +520,7 @@ const styles = StyleSheet.create({
   dropdownRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
+    marginTop: 10,
   },
   dropdown: {
     backgroundColor: "rgba(255,255,255,0.1)",
@@ -565,22 +539,57 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.08)",
     borderRadius: 12,
     padding: 16,
-    marginTop: 20,
+    // marginTop:0,
   },
   overviewHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    margin:"auto"
   },
+     progressRow: {
+      // display:"flex",
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: 16,
+        width: width *.85
+    },
+    progressBarContainer: {
+        flex: 1,
+        marginRight: 16,
+    },
+    progressBarBackground: {
+        width: "100%",
+        height: 8,
+        backgroundColor: "#0a1929",
+        borderRadius: 4,
+        overflow: "hidden",
+    },
+    progressBarFill: {
+        height: "100%",
+        backgroundColor: "#00d9ff",
+        borderRadius: 4,
+    },
+    percentage: {
+        color: "#ffffff",
+        fontSize: 15,
+        fontWeight: "500",
+        minWidth: 50,
+        textAlign: "left",
+        marginBottom:10
+        // right: 30
+    },
   addBtn: {
-    backgroundColor: "#414141ff",
-    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 12,
+    paddingHorizontal: 16,
     paddingVertical: 6,
-    paddingHorizontal: 12,
+    left: 20
   },
   addBtnText: {
     color: "#fff",
     fontWeight: "600",
+    textAlign: "right"
   },
   progressText: {
     color: "#fff",
@@ -601,9 +610,16 @@ const styles = StyleSheet.create({
   amountRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
+    marginTop: 2,
   },
-  amountLabel: {
+  amountLabel1: {
+    textAlign:"left",
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  amountLabel2: {
+    textAlign:"right",
     color: "#fff",
     fontWeight: "700",
     fontSize: 16,
@@ -615,16 +631,22 @@ const styles = StyleSheet.create({
   },
   emiText: {
     backgroundColor: "rgba(255,255,255,0.1)",
-    color: "#B0C4DE",
+    color: "#fff",
     borderRadius: 8,
     padding: 8,
-    textAlign: "center",
+    textAlign: "left",
     marginTop: 10,
   },
   section: {
-    marginTop: 25,
+    marginTop: 10,
   },
   sectionTitle: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+    // marginBottom: 10,
+  },
+  sectionTitle1: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "700",
@@ -633,11 +655,20 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "rgba(255,255,255,0.1)",
     borderRadius: 10,
-    padding: 12,
+    padding: 8,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 5,
+  },
+  card_inner:{
+    backgroundColor:"rgba(255,255,255,0.1)",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding:14,
+    marginLeft:4,
+    borderRadius:12,
+    width:width * .85
   },
   cardDate: {
     color: "#fff",
@@ -657,13 +688,13 @@ const styles = StyleSheet.create({
   },
 
   container1: { flex: 1, padding: 20 },
-  addBtn: {
-    backgroundColor: "#3a8fff",
-    borderRadius: 10,
-    alignSelf: "flex-end",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-  },
+  // addBtn: {
+  //   backgroundColor: "#3a8fff",
+  //   borderRadius: 10,
+  //   alignSelf: "flex-end",
+  //   paddingVertical: 8,
+  //   paddingHorizontal: 16,
+  // },
   addBtnText: { color: "#fff", fontWeight: "bold" },
   overlay: {
     flex: 1,
@@ -708,15 +739,20 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   submitText: { color: "#001f3f", fontWeight: "700" },
-    titleRow: {
-    marginTop: 12,
+  titleRow: {
+    marginTop: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     zIndex: 40,
     elevation: 4,
   },
-  sectionTitle: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  // sectionTitle: { 
+  //   color: "#fff",
+  //   fontSize: 16,
+  //   fontWeight: "700" ,
+  //   marginBottom:10
+  // },
   uploadBtn: {
     backgroundColor: "#1c68be",
     paddingHorizontal: 15,

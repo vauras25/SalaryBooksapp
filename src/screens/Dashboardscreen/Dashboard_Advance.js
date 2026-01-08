@@ -97,7 +97,6 @@ const Advance = ({ rights }) => {
                             </View>
                         </View>
 
-                        {/* Percentage */}
                         <Text style={styles.percentage}>75%</Text>
                     </View>
                 </View>

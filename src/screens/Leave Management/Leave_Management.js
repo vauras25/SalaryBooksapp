@@ -8,6 +8,7 @@ import {
   ScrollView,
   Modal,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -40,6 +41,8 @@ export default function LeaveManagementScreen() {
   const [userData, setuserData] = useState(null);
   const [Leavedata, setLeavedata] = useState(null);
   const [employee_id, setemployee_id] = useState(null);
+  const [loading, setloading] = useState(false);
+
   // useEffect(() => {
   //   const loadToken = async () => {
   //     const t = await AsyncStorage.getItem("authToken");
@@ -53,8 +56,8 @@ export default function LeaveManagementScreen() {
       const t = await AsyncStorage.getItem("authToken");
       const stored = await AsyncStorage.getItem("userData");
       setemployee_id(await AsyncStorage.getItem("employee_id"));
-      
-      
+
+
       if (stored) {
         const parsedUser = JSON.parse(stored);
         setuserData(parsedUser);
@@ -139,8 +142,8 @@ export default function LeaveManagementScreen() {
 
 
     if (!token) return;
-    console.log(API_BASE_URL,"API_BASE_URL");
-    
+    console.log(API_BASE_URL, "API_BASE_URL");
+
     try {
       const payload = {}
       const response = await axios.post(
@@ -157,6 +160,7 @@ export default function LeaveManagementScreen() {
       console.log("API Response:", response.data);
       if (response.data.status === "success") {
         setLeaveList(response.data);
+        // await AsyncStorage.setItem('Leavelist',response.data)
         setRemainingLeaves(response.data.leave_type[0].available);
       } else {
         Alert.alert("Error", "Unable to load payslip data");
@@ -229,8 +233,8 @@ export default function LeaveManagementScreen() {
     }
 
     try {
-    
-      
+
+
       const formData = new FormData();
       formData.append("leave_head", selectedLeave.abbreviation);
       formData.append("employee_id", employee_id);
@@ -252,7 +256,7 @@ export default function LeaveManagementScreen() {
           },
         }
       );
-// console.log("1");
+      // console.log("1");
 
       if (response.data.status === "success") {
         Alert.alert("Success", "Leave request submitted");
@@ -263,7 +267,7 @@ export default function LeaveManagementScreen() {
       }
     } catch (err) {
       // console.log(err,"err");
-      
+
       Alert.alert("Error", "Failed to submit Leave request");
     }
   };
@@ -271,6 +275,7 @@ export default function LeaveManagementScreen() {
 
   const fetch_applied_leave_data = async () => {
     //  console.log(userData,"hi i am abir");
+    setloading(true);
     try {
       const response = await axios.post(
         `${API_BASE_URL}employee/fetch_applied_leave_data`,
@@ -280,40 +285,61 @@ export default function LeaveManagementScreen() {
 
       if (response.data.success) {
         setLeavedata(response.data.data)
-        console.log(Leavedata, "response.data");
+        // console.log(Leavedata.length, "response.data");
 
       }
     } catch (error) {
       console.log("Fetch Docs Error:", error.response?.data || error);
+    } finally {
+      setloading(false);
     }
   }
   const route = useRoute();
   const screenTitle = route.params?.title;
   const getUsedLeavePercentage = () => {
-  const leaveStats = LeaveList?.leave_type || [];
+    const leaveStats = LeaveList?.leave_type || [];
 
-  const totalBalance = leaveStats.reduce(
-    (sum, item) => sum + Number(item.total_balance || 0),
-    0
-  );
+    const totalBalance = leaveStats.reduce(
+      (sum, item) => sum + Number(item.total_balance || 0),
+      0
+    );
 
-  const totalAvailable = leaveStats.reduce(
-    (sum, item) => sum + Number(item.available || 0),
-    0
-  );
+    const totalAvailable = leaveStats.reduce(
+      (sum, item) => sum + Number(item.available || 0),
+      0
+    );
 
-  if (totalBalance === 0) return 0;
-  console.log(Math.round(
-    ((totalBalance - totalAvailable) / totalBalance) * 100
-  ),"total");
-  
-  return Math.round(
-    ((totalBalance - totalAvailable) / totalBalance) * 100
-  );
-};
+    if (totalBalance === 0) return 0;
+    console.log(Math.round(
+      ((totalBalance - totalAvailable) / totalBalance) * 100
+    ), "total");
+
+    return Math.round(
+      ((totalBalance - totalAvailable) / totalBalance) * 100
+    );
+  };
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+  const historyData = Leavedata?.filter(item => {
+    const toDate = new Date(item.leave_to_date);
+    toDate.setHours(0, 0, 0, 0);
+
+    return (
+      toDate < today &&
+      item.leave_approval_status !== "pending"
+    );
+  });
+  const statusData = Leavedata?.filter(item => {
+    const toDate = new Date(item.leave_to_date);
+    toDate.setHours(0, 0, 0, 0);
+
+    return (
+      item.leave_approval_status === "pending" ||
+      (item.leave_approval_status === "approved" && toDate >= today)
+    );
+  });
+
+
   return (
     <LinearGradient
       colors={["#000000ff", "#1c68beff"]}
@@ -325,14 +351,7 @@ export default function LeaveManagementScreen() {
 
         {/* Header */}
         <View style={styles.header}>
-          {/* <Text style={styles.headerText}>Leave Management</Text> */}
           <Navbar title={screenTitle} />
-          {/* <View style={styles.icons}>
-            <Text style={{ color: "#fff", fontSize: 20 }}>🔍</Text>
-            <Text style={{ color: "#fff", fontSize: 20, marginLeft: 18 }}>
-              
-            </Text>
-          </View> */}
         </View>
 
         {/* Month Selector */}
@@ -346,65 +365,6 @@ export default function LeaveManagementScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Leave Summary Card */}
-        {/* <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Leave Summary</Text>
-
-            <TouchableOpacity style={styles.leaveButton}
-              onPress={() => setModalVisible(true)}
-            >
-              <Text style={styles.leaveBtnText}>+ Leave Request</Text>
-
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.summaryRow}>
-            
-            <View style={{ position: "relative", alignItems: "center", justifyContent: "center", marginLeft: -30 }}>
-              <Progress.Circle
-                size={70}
-                progress={0.88}
-                color="#22b0dbff"
-                thickness={8}
-                borderWidth={0}
-                unfilledColor="#000000ff"
-                strokeCap="round"
-                showsText={false}
-              />
-
-             
-              <Text style={{ position: "absolute", color: "#ffffff", fontSize: 14, fontWeight: "600" }}>
-                88%
-              </Text>
-            </View>
-
-           
-            <View style={{ flex: 1, paddingLeft: 10 }}>
-              <BarItem label="Paid" value={6} total={14} color="#2bbaf5" />
-              <BarItem label="Casual" value={8} total={14} color="#60d0ff" />
-              <BarItem label="Sick" value={4} total={14} color="#1f9dd6" />
-
-              <View style={styles.leaveCountRow}>
-                <Text style={styles.leaveCountText}>Paid</Text>
-                <Text style={styles.leaveCountValue}>7 left</Text>
-              </View>
-
-              <View style={styles.leaveCountRow}>
-                <Text style={styles.leaveCountText}>Casual</Text>
-                <Text style={styles.leaveCountValue}>8 left</Text>
-              </View>
-
-              <View style={styles.leaveCountRow}>
-                <Text style={styles.leaveCountText}>Sick</Text>
-                <Text style={styles.leaveCountValue}>4 left</Text>
-              </View>
-            </View>
-          </View>
-
-
-          
-        </View> */}
         <LinearGradient
           colors={["#07162cff", "#23568fff"]}
           start={{ x: 0, y: 0 }}
@@ -444,50 +404,11 @@ export default function LeaveManagementScreen() {
             {/* Bars + counts */}
             <View style={styles.barSection}>
 
-              {/* <View style={styles.barRow}>
-            <Text style={styles.barLabel}>Paid</Text>
-            <View style={styles.barTrack}>
-              <View style={[styles.barFill, { width: "30%" }]} />
-            </View>
-            <Text style={styles.barValue}>3</Text>
-          </View>
-
-
-          <View style={styles.barRow}>
-            <Text style={styles.barLabel}>Casual</Text>
-            <View style={styles.barTrack}>
-              <View style={[styles.barFill, { width: "43%" }]} />
-            </View>
-            <Text style={styles.barValue}>6</Text>
-          </View>
-
-
-          <View style={styles.barRow}>
-            <Text style={styles.barLabel}>Sick</Text>
-            <View style={styles.barTrack}>
-              <View style={[styles.barFill, { width: "50%" }]} />
-            </View>
-            <Text style={styles.barValue}>4</Text>
-          </View> */}
 
               <View style={styles.barchart}>
                 <LeaveManagement />
               </View>
 
-              {/* <View style={styles.leaveList}>
-                <View style={styles.leaveCountRow}>
-                  <Text style={styles.leaveCountText}>Paid</Text>
-                  <Text style={styles.leaveCountValue}>7 left</Text>
-                </View>
-                <View style={styles.leaveCountRow}>
-                  <Text style={styles.leaveCountText}>Casual</Text>
-                  <Text style={styles.leaveCountValue}>8 left</Text>
-                </View>
-                <View style={styles.leaveCountRow}>
-                  <Text style={styles.leaveCountText}>Sick</Text>
-                  <Text style={styles.leaveCountValue}>4 left</Text>
-                </View>
-              </View> */}
 
               <View style={styles.leaveList}>
                 {LeaveList?.leave_type?.map((item) => (
@@ -529,22 +450,6 @@ export default function LeaveManagementScreen() {
 
                 <ScrollView style={styles.formContainer}>
 
-                  {/* <View style={styles.rowContainer}>
-                    <Text style={styles.labelRow}>Select Leave Type:</Text>
-                    <View style={styles.pickerContainer}>
-                      <Picker
-                        selectedValue={leaveType}
-                        onValueChange={(itemValue) => setLeaveType(itemValue)}
-                        style={styles.picker}
-                        dropdownIconColor="#fff"
-                      >
-                        <Picker.Item label="Select One" value="" />
-                        <Picker.Item label="Paid Leave" value="paid" />
-                        <Picker.Item label="Casual Leave" value="casual" />
-                        <Picker.Item label="Sick Leave" value="sick" />
-                      </Picker>
-                    </View>
-                  </View> */}
 
                   <View style={styles.rowContainer}>
                     <Text style={styles.labelRow}>Select Leave Type:</Text>
@@ -636,7 +541,7 @@ export default function LeaveManagementScreen() {
                     mode="date"
                     open={openToDate}
                     date={toDate}
-                    minimumDate={fromDate}  
+                    minimumDate={fromDate}
                     onConfirm={(date) => {
                       setOpenToDate(false);
                       setToDate(date);
@@ -691,83 +596,119 @@ export default function LeaveManagementScreen() {
 
         <Text style={styles.sectionTitle}>Leave Status</Text>
 
-        {Leavedata
-          ?.filter(item => {
-            const toDate = new Date(item.leave_to_date);
-            toDate.setHours(0, 0, 0, 0);
+        {loading && (
+          <View style={styles.loaderOverlay}>
+            <ActivityIndicator size="large" color="#fff" />
+            <Text style={{ color: "white", marginTop: 5 ,margin:"auto"}}>Loading...</Text>
+          </View>
+        )}
+        {!loading && statusData?.length === 0 && (
+          <View style={styles.centerBox}>
+            <Text style={styles.noDataText}>No status found</Text>
+          </View>
+        )}
 
-            return (
-              item.leave_approval_status === "pending" ||
-              (item.leave_approval_status === "approved" && toDate >= today)
-            );
-          })
-          ?.map(item => (
-            <View style={styles.upcomingCard} key={item._id}>
+        {!loading && statusData?.map(item => (
+          <LinearGradient
+            colors={["#173e58ff", "#285879ff"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.upcomingCard}
+            key={item._id}
+          >
+            <LinearGradient
+              colors={["#1c4968ff", "#2b678fff"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.status_card}
+            >
               <Text style={styles.upcomingDate}>
                 {formatDateRange(item.leave_from_date, item.leave_to_date)}
               </Text>
 
-              <View style={styles.upcomingStatusBox}>
+              <View style={styles.leave_head}>
                 <Text style={styles.upcomingStatusText}>
                   {item.leave_head}
                 </Text>
               </View>
 
-              <View style={[styles.upcomingStatusBox,{
-                    backgroundColor:
-                      item.leave_approval_status === "approved"
-                        ? "#04520aff"
-                        : item.leave_approval_status === "rejected"
-                          ? "#d11a2a"
-                          : "#f7e331ff"
-                  }]}>
-                <Text style={styles.upcomingStatusText}>
-                  {item.leave_approval_status}
+              <View style={styles.upcomingStatusBox}>
+                <Text
+                  style={[
+                    styles.upcomingStatusText,
+                    {
+                      color:
+                        item.leave_approval_status === "approved"
+                          ? "#08d319ff"
+                          : item.leave_approval_status === "rejected"
+                            ? "#d11a2a"
+                            : "#e8ec00ff",
+                    },
+                  ]}
+                >
+                  {item.leave_approval_status?.charAt(0).toUpperCase() +
+                    item.leave_approval_status?.slice(1)}
                 </Text>
               </View>
-            </View>
-          ))}
+            </LinearGradient>
+          </LinearGradient>
+        ))}
+
 
 
 
         <Text style={styles.sectionTitle}>Leave History</Text>
 
-        {Leavedata
-          ?.filter(item => {
-            const toDate = new Date(item.leave_to_date);
-            toDate.setHours(0, 0, 0, 0);
-
-            return toDate < today;
-          })
-          ?.map(item => (
-            <View style={styles.historyCard} key={item._id}>
-              <Text style={styles.historyDate}>
-                {formatDateRange(item.leave_from_date, item.leave_to_date)}
-              </Text>
-              <View style={styles.upcomingStatusBox}>
-                <Text style={styles.upcomingStatusText}>
-                  {item.leave_head}
-                </Text>
-              </View>
-              <View
-                style={[
-                  styles.historyStatusBox,
-                  {
-                    backgroundColor:
-                      item.leave_approval_status === "approved"
-                        ? "#04520aff"
-                        : item.leave_approval_status === "rejected"
-                          ? "#d11a2a"
-                          : "#4a9cf9ff"
-                  }
-                ]}
+        {historyData?.length > 0 ? (
+          historyData.map(item => (
+            <LinearGradient
+              colors={["#173e58ff", "#285879ff"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.upcomingCard}
+              key={item._id}
+            >
+              <LinearGradient
+                colors={["#1c4968ff", "#2b678fff"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.status_card}
               >
-                <Text style={styles.historyStatusText}>
-                  {item.leave_approval_status}
+                <Text style={styles.upcomingDate}>
+                  {formatDateRange(item.leave_from_date, item.leave_to_date)}
                 </Text>
-              </View>
-            </View>
-          ))}
+
+                <View style={styles.leave_head}>
+                  <Text style={styles.upcomingStatusText}>
+                    {item.leave_head}
+                  </Text>
+                </View>
+
+                <View style={styles.upcomingStatusBox}>
+                  <Text
+                    style={[
+                      styles.upcomingStatusText,
+                      {
+                        color:
+                          item.leave_approval_status === "approved"
+                            ? "#08d319ff"
+                            : item.leave_approval_status === "rejected"
+                              ? "#d11a2a"
+                              : "#e8ec00ff",
+                      },
+                    ]}
+                  >
+                    {item.leave_approval_status?.charAt(0).toUpperCase() +
+                      item.leave_approval_status?.slice(1)}
+                  </Text>
+                </View>
+              </LinearGradient>
+            </LinearGradient>
+          ))
+        ) : (
+          <Text style={styles.noDataText}>No history found</Text>
+        )}
+
 
       </ScrollView>
       <BottomNavigation />
@@ -905,28 +846,65 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 10,
   },
+  centerBox: {
+    paddingVertical: 15,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+
+  noDataText: {
+    color: "#ccc",
+    fontSize: 16,
+    margin: "auto",
+    marginBottom: 30
+  },
 
   upcomingCard: {
-    backgroundColor: "#1b2d4f",
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 25,
+    padding: 14,
+    paddingVertical: 8,
+    borderRadius: 15,
+    marginBottom: 12,
+    backgroundColor: "#194a7ea2",
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  status_card: {
+    backgroundColor: "#0b3863ff",
+    flexDirection: 'row',
+    gap: 13,
+    // justifyContent: 'space-between',
+    marginBottom: 0,
+    marginLeft: -5,
+    padding: 12,
+    borderRadius: 12,
+    paddingHorizontal: 10
+  },
   upcomingDate: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 14,
+    margin: "auto",
   },
-  upcomingStatusBox: {
-    backgroundColor: "#f7e331ff",
+  leave_head: {
+    backgroundColor: "#2c4e64ff",
     paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: 13,
+    borderRadius: 8,
+    marginLeft: 10,
+    width: 50
+  },
+  upcomingStatusBox: {
+    backgroundColor: "#2c4f70ff",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginLeft: 10,
+    width: 100
   },
   upcomingStatusText: {
-    color: "#000000ff",
+    color: "#fff",
     fontWeight: "600",
+    textAlign: "right"
   },
 
   historyCard: {

@@ -5,11 +5,13 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  SafeAreaView,
   Modal,
   TextInput,
   Alert,
   ScrollView,
 } from "react-native";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from "react-native-linear-gradient";
 import Icon from "react-native-vector-icons/Ionicons";
 import BottomNavigation from "./BottomNavigation";
@@ -23,9 +25,7 @@ import Navbar from "./Dashboardscreen/navbar";
 import { NativeModules } from "react-native";
 const { PdfPicker } = NativeModules;
 const Expense = () => {
-
-
-
+  const insets = useSafeAreaInsets();
   const [claimsData, setClaimsData] = useState([]);
   const [activeTab, setActiveTab] = useState("previous");
   const [modalVisible, setModalVisible] = useState(false);
@@ -207,67 +207,6 @@ const Expense = () => {
     }
   };
 
-
-
-
-  // const handleSubmit = async () => {
-  //   try {
-  //     // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg';
-  //     const payload = {
-  //       head_id: headId,
-  //       amount: amount,
-  //       remark: remark,
-  //       wage_month: month,
-  //       wage_year: year,
-  //       type: 'reimbursement',
-  //     };
-
-
-
-  //     const response = await axios.post(
-  //       `${API_BASE_URL}employee/add-extra-earning-data`,
-  //       payload,
-  //       {
-  //         headers: {
-  //           'x-access-token': token,
-  //           'Content-Type': 'application/json',
-  //         },
-  //         timeout: 10000,
-  //       }
-  //     );
-
-  //     console.log('API Response:', response.data);
-
-
-  //     if (response.data.status === 'success') {
-  //       Alert.alert('Success', response.data.message);
-  //       fetchClaimsData();
-  //       setModalVisible(false)
-  //     } else {
-  //       Alert.alert('Error', response.data.message);
-  //     }
-
-  //   } catch (error) {
-  //     console.error('API Error:', error);
-  //     if (error.response) {
-  //       Alert.alert('Server Error', JSON.stringify(error.response.data));
-  //     } else if (error.request) {
-  //       Alert.alert('Network Error', 'No response from backend.');
-  //     } else {
-  //       Alert.alert('Error', error.message);
-  //     }
-  //   }
-  // };
-
-
-
-
-
-  // const handleChange = (key, value) => {
-  //   setFormData((prev) => ({ ...prev, [key]: value }));
-  // };
-
-
   const handleSubmit = async () => {
     try {
       if (!token) {
@@ -325,36 +264,17 @@ const Expense = () => {
   const screenTitle = route.params?.title;
   return (
     <LinearGradient
-      colors={["#001B3A", "#003366"]}
-      style={styles.container}
+      colors={["#000000ff", "#1c68beff"]}
       start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.container}
     >
+    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Icon name="wallet-outline" size={22} color="#fff" />
-          {/* <Text style={styles.headerText}>Expense Management</Text> */}
-          <Navbar style={styles.headerText} title={screenTitle}/>
+       <View style={styles.header}>
+          <Navbar title={screenTitle} />
         </View>
-        <View style={styles.headerRight}>
-          <Icon name="search-outline" size={22} color="#fff" style={styles.icon} />
-          <View style={styles.notificationWrapper}>
-            <Icon name="notifications-outline" size={22} color="#fff" />
-            <View style={styles.notificationDot} />
-          </View>
-        </View>
-      </View>
 
-      {/* Tabs */}
-      {/* <View style={styles.tabContainer}>
-        <TouchableOpacity style={[styles.tab, styles.activeTab]}>
-          <Text style={styles.activeTabText}>Previous Claims</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tab}>
-          <Text style={styles.inactiveTabText}>Claim Status</Text>
-        </TouchableOpacity>
-      </View> */}
 
       <View style={styles.tabContainer}>
         <TouchableOpacity
@@ -514,24 +434,7 @@ const Expense = () => {
               </View>
 
               <View style={styles.formContainer}>
-                {/* <View style={styles.row}>
-                    <Text style={styles.label}>Enter Head:</Text>
-                    <TextInput style={styles.input}
-                      placeholder="Enter Head"
-                      onChangeText={(text) => handleChange("head", text)}
-                      placeholderTextColor="#ccc" />
-                  </View>
-                  <View style={styles.row}>
-                    <Text style={styles.label}>Amount:</Text>
-                    <TextInput
-                      style={styles.input}
-                      onChangeText={(text) => handleChange("amount", text)}
-                      placeholder="Enter Amount"
-                      keyboardType="numeric"
-                      placeholderTextColor="#ccc"
-                    />
-                  </View> */}
-
+                
                 <TextInput
                   placeholder="Head ID"
                   value={headId}
@@ -595,20 +498,7 @@ const Expense = () => {
 
                 </View>
                 <Text style={styles.label}>Upload Image:</Text>
-                {/* <View style={styles.imageUploadContainer}>
-                  {image ? (
-                    <Image
-                      source={{ uri: image }}
-                      style={{ width: 100, height: 100, borderRadius: 8, marginBottom: 10 }}
-                    />
-                  ) : (
-                    <Text style={{ color: "#ccc", marginBottom: 10 }}>No image selected</Text>
-                  )}
-                  <TouchableOpacity style={styles.uploadBtn} onPress={pickImage}>
-                    <Text style={styles.uploadBtnText}>Choose Image</Text>
-                  </TouchableOpacity>
-                </View> */}
-
+                
                 <View style={styles.imageUploadContainer}>
                   <Text style={{ color: "#ccc", marginBottom: 10 }}>
                     {image ? image.name : "No file selected"}
@@ -619,60 +509,6 @@ const Expense = () => {
                   </TouchableOpacity>
                 </View>
 
-
-
-                {/* Other Dropdowns */}
-                {/* <Text style={styles.label}>Branch:</Text>
-                  <Picker
-                    selectedValue={branch}
-                    onValueChange={setBranch}
-                    style={styles.picker}
-                    dropdownIconColor="#fff"
-                  >
-                    <Picker.Item label="Select Branch" value="" />
-                    <Picker.Item label="Delhi" value="Delhi" />
-                    <Picker.Item label="Mumbai" value="Mumbai" />
-                  </Picker> */}
-
-                {/* <Text style={styles.label}>Department:</Text>
-                  <Picker
-                    selectedValue={dept}
-                    onValueChange={setDept}
-                    style={styles.picker}
-                    dropdownIconColor="#fff"
-                  >
-                    <Picker.Item label="Select Department" value="" />
-                    <Picker.Item label="HR" value="HR" />
-                    <Picker.Item label="Accounts" value="Accounts" />
-                  </Picker> */}
-
-                {/* <Text style={styles.label}>Designation:</Text>
-                  <Picker
-                    selectedValue={designation}
-                    onValueChange={setDesignation}
-                    style={styles.picker}
-                    dropdownIconColor="#fff"
-                  >
-                    <Picker.Item label="Select Designation" value="" />
-                    <Picker.Item label="Manager" value="Manager" />
-                    <Picker.Item label="Executive" value="Executive" />
-                  </Picker> */}
-
-                {/* <Text style={styles.label}>HOD:</Text>
-                  <Picker
-                    selectedValue={hod}
-                    onValueChange={setHod}
-                    style={styles.picker}
-                    dropdownIconColor="#fff"
-                  >
-                    <Picker.Item label="Select HOD" value="" />
-                    <Picker.Item label="John" value="John" />
-                    <Picker.Item label="Amit" value="Amit" />
-                  </Picker> */}
-
-                {/* <TouchableOpacity style={styles.submitBtn}>
-                    <Text style={styles.submitText}>SUBMIT</Text>
-                  </TouchableOpacity> */}
                 <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
                   <Text style={styles.submitText}>SUBMIT</Text>
                 </TouchableOpacity>
@@ -681,6 +517,7 @@ const Expense = () => {
           </View>
         </Modal>
       </View>
+      </SafeAreaView>
       <BottomNavigation />
     </LinearGradient>
   );
@@ -689,15 +526,16 @@ const Expense = () => {
 export default Expense;
 
 const styles = StyleSheet.create({
-  container: {
+    container: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 50,
+    padding: 15,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    // marginBottom: 10,
+    marginLeft:-18
   },
   headerLeft: {
     flexDirection: "row",
@@ -734,6 +572,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.1)",
     borderRadius: 15,
     padding: 4,
+    width:340,
+    marginLeft:-20
   },
   tab: {
     flex: 1,
@@ -759,14 +599,16 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "600",
+    marginLeft:-10
   },
   newClaimBtn: {
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 6,
+    left:20
   },
   newClaimText: {
     color: "#fff",

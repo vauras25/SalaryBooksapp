@@ -503,28 +503,41 @@ const DocumentVaultScreen = () => {
           >
         <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
 
+         <View style={styles.header}>
           <Navbar title={screenTitle} />
+        </View>
 
-          <View style={styles.tabRow}>
-            <TouchableOpacity
-              style={[styles.tabButton, activeTab === "Personal" && styles.tabButtonActive]}
-              onPress={() => setActiveTab("Personal")}
-            >
-              <Text style={[styles.tabText, activeTab === "Personal" && styles.tabTextActive]}>
-                Personal
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.tabButton, activeTab === "Others" && styles.tabButtonActive]}
-              onPress={() => setActiveTab("Others")}
-            >
-              <Text style={[styles.tabText, activeTab === "Others" && styles.tabTextActive]}>
-                Others
-              </Text>
-            </TouchableOpacity>
-          </View>
-
+          <View style={styles.tabContainer}>
+                  <TouchableOpacity
+                    style={[styles.tab, activeTab === "Personal" && styles.activeTab]}
+                    onPress={() => setActiveTab("Personal")}
+                  >
+                    <Text
+                      style={
+                        activeTab === "Personal"
+                          ? styles.activeTabText
+                          : styles.inactiveTabText
+                      }
+                    >
+                      Personal
+                    </Text>
+                  </TouchableOpacity>
+          
+                  <TouchableOpacity
+                    style={[styles.tab, activeTab === "Others" && styles.activeTab]}
+                    onPress={() => setActiveTab("Others")}
+                  >
+                    <Text
+                      style={
+                        activeTab === "Others"
+                          ? styles.activeTabText
+                          : styles.inactiveTabText
+                      }
+                    >
+                      Others
+                    </Text>
+                  </TouchableOpacity>
+                </View>
           <View style={styles.titleRow}>
             <Text style={styles.sectionTitle}>Uploaded PDFs</Text>
 
@@ -787,7 +800,12 @@ export default DocumentVaultScreen;
 const styles = StyleSheet.create({
   gradient: { flex: 1 },
   container: { flex: 1, paddingHorizontal: 15 },
-
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
   loaderOverlay: {
     position: "absolute",
     top: 0,
@@ -823,12 +841,12 @@ const styles = StyleSheet.create({
     zIndex: 40,
     elevation: 4,
   },
-  sectionTitle: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  sectionTitle: { color: "#fff", fontSize: 15, fontWeight: "700" },
   uploadBtn: {
-    backgroundColor: "#1c68be",
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
   },
   uploadText: { color: "#fff", fontSize: 13, fontWeight: "600" },
 
@@ -896,6 +914,29 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#fff",
     paddingBottom: 8,
+  },
+  tabContainer: {
+    flexDirection: "row",
+    marginTop: 10,
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderRadius: 15,
+    padding: 4,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  activeTab: {
+    backgroundColor: "#0D213A",
+  },
+  activeTabText: {
+    color: "#fff",
+    fontWeight: "500",
+  },
+  inactiveTabText: {
+    color: "#bbb",
   },
   modalTitle: { color: "#fff", fontSize: 16, fontWeight: "600" },
   closeBtn: { color: "red", fontSize: 20, fontWeight: "bold" },

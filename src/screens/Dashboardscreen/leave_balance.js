@@ -70,7 +70,7 @@ const Leave_Balance = () => {
                     const total =item.value
                         // item.stacks.reduce((sum, s) => sum + s.value, 0);
                     return (
-                        <Text style={{ color: "#fff", fontSize: 12, left: -20 }}>
+                        <Text style={styles.number}>
                             {total}
                         </Text>
                     );
@@ -102,11 +102,11 @@ const Leave_Balance = () => {
     );
 }
 const styles = StyleSheet.create({
-    //   barchart: {
-    //     marginTop: -29,
-    //     marginLeft: -31,
-    //     margin: -20,
 
-    // },
+    number:{
+         color: "#f8f4f4ff", 
+         fontSize: 12,
+          left: -20
+         }
 })
 export default Leave_Balance;

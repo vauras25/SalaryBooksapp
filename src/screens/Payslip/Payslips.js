@@ -8,6 +8,7 @@ import {
   Image,
   Alert,
 } from "react-native";
+import LinearGradient from "react-native-linear-gradient";
 import { useNavigation } from '@react-navigation/native';
 import Icon from "react-native-vector-icons/Ionicons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -204,6 +205,12 @@ const PayslipScreen = () => {
 const route = useRoute();
   const screenTitle = route.params?.title;
   return (
+     <LinearGradient
+       colors={["#000000ff", "#1c68beff"]}
+       start={{ x: 0, y: 0 }}
+       end={{ x: 1, y: 1 }}
+       style={{ flex: 1 }}
+     >
     <SafeAreaView style={styles.container}>
 
       {/* Header */}
@@ -284,6 +291,7 @@ const route = useRoute();
       <BottomNavigation />
 
     </SafeAreaView>
+    </LinearGradient>
   );
 };
 
@@ -293,7 +301,6 @@ export default PayslipScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#001F3F",
     paddingHorizontal: 15,
   },
 

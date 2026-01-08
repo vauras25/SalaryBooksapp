@@ -4,9 +4,10 @@ import search from "../../assets/search.png";
 import notification from "../../assets/notification.png"
 const Navbar = ({ title }) => {
   return (
-    <View style={styles.header}>
+    <View style={styles.nav}>
+      <View style={styles.header}>
       <Text style={styles.headerTitle}>{title}</Text>
-
+      </View>
       <View style={styles.headerIcons}>
         <Image source={search} style={styles.imageIcon} />
         <Image source={notification} style={styles.imageIcon} />
@@ -17,7 +18,10 @@ const Navbar = ({ title }) => {
 
 export default Navbar;
 const styles = StyleSheet.create({
-  header: {
+  header:{
+    width:164
+  },
+  nav: {
     height: 52,                 
     flexDirection: "row",
     alignItems: "center",
@@ -29,12 +33,14 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 17,               
     fontWeight: "600",
+    marginLeft:-6
   },
 
   headerIcons: {
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
+    marginLeft:95
   },
 
   imageIcon: {
