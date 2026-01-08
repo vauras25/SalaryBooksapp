@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -9,20 +9,40 @@ import {
 } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
+import { API_BASE_URL } from "@env";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 const { width } = Dimensions.get("window");
 
 const Advance = ({ rights }) => {
     const navigation = useNavigation();
-    const progress = 0.75;
-    console.log("rights22", rights);
+    const [token, setToken] = useState(null);
+    const [advanceList, setAdvanceList] = useState([]);
+    const [totalAdvanceAmount, setTotalAdvanceAmount] = useState(0);
+    const [totalOutstanding, setTotalOutstanding] = useState(0);
+    // console.log("rights22", rights);
 
-    if (!rights) return null;
-    const canApplyAttendance = rights.apply?.includes("attendance");
-    const canApplyleave = rights.apply?.includes("leave");
-    const canApplyadvance = rights.apply?.includes("advance");
-    const canApplyreimburdement = rights.apply?.includes("reimburdement");
+    // if (!rights) return null;
+    const canApplyAttendance = rights?.apply?.includes("attendance");
+    const canApplyleave = rights?.apply?.includes("leave");
+    const canApplyadvance = rights?.apply?.includes("advance");
+    const canApplyreimburdement = rights?.apply?.includes("reimburdement");
     console.log("canApplyAttendance", canApplyAttendance);
+    useEffect(() => {
+        const loadToken = async () => {
+            const t = await AsyncStorage.getItem("authToken");
+            setToken(t);
+        };
+        loadToken();
+    }, []);
 
+    useEffect(() => {
+        if (token) {
+            fetchAdvanceList();
+        }
+    }, [token]);
 
     const handlePress = (item) => {
 
@@ -40,7 +60,7 @@ const Advance = ({ rights }) => {
             navigation.navigate("Payslips", { title: item });
         }
         else if (item === "Expense Management") {
-             if (!canApplyreimburdement) {
+            if (!canApplyreimburdement) {
                 Alert.alert(
                     "Permission Denied",
                     "you don't have This functionality"
@@ -50,7 +70,7 @@ const Advance = ({ rights }) => {
             navigation.navigate("Expense", { title: item });
         }
         else if (item === "Advance Management") {
-             if (!canApplyadvance) {
+            if (!canApplyadvance) {
                 Alert.alert(
                     "Permission Denied",
                     "you don't have This functionality"
@@ -63,7 +83,7 @@ const Advance = ({ rights }) => {
             navigation.navigate("document_vault", { title: item });
         }
         else if (item === "Leave Management") {
-             if (!canApplyleave) {
+            if (!canApplyleave) {
                 Alert.alert(
                     "Permission Denied",
                     "you don't have This functionality"
@@ -73,6 +93,60 @@ const Advance = ({ rights }) => {
             navigation.navigate("Leave_Management", { title: item });
         }
     }
+
+
+
+
+    const fetchAdvanceList = async () => {
+        console.log("Advancepage", token)
+        if (!token) return;
+        console.log("Advancepage1")
+        try {
+            // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
+            const payload = {
+                pageno: 1,
+            };
+            const res = await axios.post(`${API_BASE_URL}employee/employee-get-advance-list`,
+                payload,
+                {
+                    headers: {
+                        "x-access-token": token,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+            if (res.data?.status === "success") {
+
+                // setAdvanceList(res.data.advance_data.docs || []);
+                const docs = res.data.advance_data.docs || [];
+                setAdvanceList(docs);
+                const totalAdvance = docs.reduce(
+                    (sum, item) => sum + (Number(item.advance_amount) || 0),
+                    0
+                );
+                const totalOutstanding = docs.reduce(
+                    (sum, item) => sum + (Number(item.advance_outstanding) || 0),
+                    0
+                );
+
+                setTotalAdvanceAmount(totalAdvance);
+                setTotalOutstanding(totalOutstanding);
+                console.log("res.data.advance_data.docs", res.data.advance_data.docs);
+
+            }
+        } catch (error) {
+            console.log("Advance list error:", error);
+        }
+    };
+
+    const percentage =
+        totalAdvanceAmount > 0
+            ? Math.round((totalOutstanding / totalAdvanceAmount) * 100)
+            : 0;
+
+    const progress = percentage / 100;
+
+
 
     return (
         <View>
@@ -97,7 +171,8 @@ const Advance = ({ rights }) => {
                             </View>
                         </View>
 
-                        <Text style={styles.percentage}>75%</Text>
+                        {/* Percentage */}
+                        <Text style={styles.percentage}>{percentage}%</Text>
                     </View>
                 </View>
                 <View style={styles.advanceText}>
@@ -106,8 +181,8 @@ const Advance = ({ rights }) => {
                         <Text style={styles.labelRight}>Total</Text>
                     </View>
                     <View style={styles.amountItemRight}>
-                        <Text style={styles.amount}>₹5000</Text>
-                        <Text style={styles.amountRight}>₹20000</Text>
+                        <Text style={styles.amount}>₹{totalOutstanding}</Text>
+                        <Text style={styles.amountRight}>₹{totalAdvanceAmount}</Text>
                     </View>
                 </View>
 

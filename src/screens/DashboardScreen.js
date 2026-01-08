@@ -31,6 +31,8 @@ const Dashboard = () => {
   const [imageUrl, setImageUrl] = useState(null);
   const [attendenceImageUrl, setAttendenceImageUrl] = useState(null);
   const [rights, setRights] = useState(null);
+  const [present, setPresent] = useState(null);
+  const [absent, setAbsent] = useState(null);
 
   const loadToken = async () => {
     const t = await AsyncStorage.getItem("authToken");
@@ -65,7 +67,7 @@ const Dashboard = () => {
         // console.log("employeeData",employeeData,"API_BASE_URL",API_BASE_URL);
         // console.log("employeeData",employeeData[0].employee_details.employee_id,"API_BASE_URL",API_BASE_URL);
           await AsyncStorage.setItem("employee_id", employeeData[0].employee_details.employee_id);
-        // console.log("employeeData", employeeData, "API_BASE_URL", API_BASE_URL);
+        console.log("employeeData", employeeData, "API_BASE_URL", API_BASE_URL);
 
         setEmpData(employeeData);
 
@@ -85,19 +87,6 @@ const Dashboard = () => {
     }
   };
 
-  // console.log("empData?.profile_pic",empData[0].profile_pic);
-
-  // const saveImageUrl = async () => {
-  // const profilePic = empData?.[0]?.profile_pic;
-
-
-  // const imageUrl = profilePic
-  //   ? `${API_BASE_URL}${profilePic.replace(/\\/g, "/")}`
-  //   : null;
-
-  //  await AsyncStorage.setItem("imageUrl", imageUrl);
-  //  };
-
   const saveImageUrl = async (profilePic) => {
     const url = profilePic
       ? `${API_BASE_URL}${profilePic.replace(/\\/g, "/")}`
@@ -113,6 +102,40 @@ const Dashboard = () => {
 
     setAttendenceImageUrl(url);
     await AsyncStorage.setItem("attendenceimageUrl", url);
+  };
+
+    const fetchattendencedata = async () => {
+    if (!token) return;
+    const now = new Date();
+    try {
+      const payload = {
+        // pageno: 1,
+        sys_emp_id: userData.sys_emp_id,
+        emp_id: userData.emp_id,
+        attendance_month: String(now.getMonth()),
+        attendance_year: String(now.getFullYear()),
+        register_type: empData?.[0].employee_details?.template_data?.attendance_temp_data?.register_type,
+      };
+      console.log("payload1234",payload);
+      
+      const res = await axios.post(`${API_BASE_URL}employee/employee-get-attendance-mobile`,
+        payload,
+        {
+          headers: {
+            "x-access-token": token,
+            "Content-Type": "application/json",
+          },
+        });
+        if (res.data?.status === "success") {
+          console.log("res.data",res.data);
+          
+        setPresent(res.data?.attendance_summary.present)
+        setAbsent(res.data?.attendance_summary.leave)
+      }
+
+    } catch (error) {
+      console.log("Advance list error:", error);
+    }
   };
 
 
@@ -131,6 +154,7 @@ const Dashboard = () => {
     loadToken();
 
     fetchemployeedata();
+    fetchattendencedata();
   }, [token, imageUrl]);
 
 
@@ -273,9 +297,9 @@ const Dashboard = () => {
                 </View>
 
                 <View style={styles.stats}>
-                  <Text style={styles.present}>Present: 22</Text>
-                  <Text style={styles.absent}>Absent: 02</Text>
-                  <Text style={styles.late}>Late: 04</Text>
+                  <Text style={styles.present}>Present: {present}</Text>
+                  <Text style={styles.absent}>Absent: {absent}</Text>
+                  {/* <Text style={styles.late}>Late: 04</Text> */}
                 </View>
               </View>
 

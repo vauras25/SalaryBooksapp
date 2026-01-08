@@ -155,7 +155,7 @@ const Expense = () => {
   }, [token]);
 
   const fetchClaimsData = async () => {
-    console.log("Advancepage", token)
+    console.log("Expense", token)
     if (!token) return;
     try {
       // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjhhODBjZTVkN2M1ZDkwMDFiYWMzOWE0IiwidXNlcl9lbWFpbCI6IiIsImNvcnBvcmF0ZV9pZCI6IlZCTCIsInVzZXJpZCI6IlRFU1QwMjEiLCJmaXJzdF9uYW1lIjoiU3VqaXRhIiwibGFzdF9uYW1lIjoia3VtYXIgRGFzIiwidXNlcl90eXBlIjoiZW1wbG95ZWUiLCJpYXQiOjE3NjE4MDI5NzIsImV4cCI6MTc5MzMzODk3Mn0.SNqI6EjWD_yi9MRwaFsE1lfgRbsn_twKxW0cTw5rvsg";
@@ -180,11 +180,13 @@ const Expense = () => {
         const docs = response.data.data.docs || [];
         // Alert.alert("apisuccess");
         // transform data to match your UI
+        console.log("docsexpense",docs);
+        
         const formattedData = docs.map((item) => ({
           id: item._id,
           date: formatDate(item.created_at),
           type: item.head_id || "N/A",
-          amount: `₹${item.amount}`,
+          amount: `${item.amount}`,
           status: capitalize(item.status),
         }));
 
