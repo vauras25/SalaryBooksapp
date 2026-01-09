@@ -67,6 +67,7 @@ const Dashboard = () => {
         // console.log("employeeData",employeeData,"API_BASE_URL",API_BASE_URL);
         // console.log("employeeData",employeeData[0].employee_details.employee_id,"API_BASE_URL",API_BASE_URL);
           await AsyncStorage.setItem("employee_id", employeeData[0].employee_details.employee_id);
+          await AsyncStorage.setItem("employee_mongose_id", employeeData[0]._id);
         console.log("employeeData", employeeData, "API_BASE_URL", API_BASE_URL);
 
         setEmpData(employeeData);

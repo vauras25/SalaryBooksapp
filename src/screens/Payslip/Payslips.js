@@ -20,12 +20,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from "../Dashboardscreen/navbar";
 import { useRoute } from "@react-navigation/native";
 import { API_BASE_URL } from "@env";
+import { PermissionsAndroid, Platform } from "react-native";
 const PayslipScreen = () => {
 
 
 
- const currentDate = new Date();
-  const currentMonthIndex = currentDate.getMonth(); 
+  const currentDate = new Date();
+  const currentMonthIndex = currentDate.getMonth();
   const currentYear = currentDate.getFullYear();
 
   const months = [
@@ -76,7 +77,7 @@ const PayslipScreen = () => {
     }
   }, [monthsToShow]);
 
-  
+
   const fetchPayslips = async () => {
     if (!token) return;
 
@@ -121,21 +122,113 @@ const PayslipScreen = () => {
   }, [selectedMonth, selectedYear, token]);
 
 
+
+  const requestStoragePermission = async () => {
+    if (Platform.OS !== "android") return true;
+
+    // Android 11+ → NO permission needed
+    if (Platform.Version >= 30) {
+      return true;
+    }
+
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: "Storage Permission",
+          message: "App needs access to storage to download payslip",
+          buttonNeutral: "Ask Me Later",
+          buttonNegative: "Cancel",
+          buttonPositive: "OK",
+        }
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+  };
+
+
+
+  // const download_payslip = async (monthKey, year) => {
+  //   if (!payslipData) {
+  //     Alert.alert("Error", "Payslip data not loaded");
+  //     return;
+  //   }
+
+  //   const docs = payslipData.master_data.docs;
+  //   console.log(docs, "docs");
+
+  //   let matched = docs.find((item) => item.wage_month === monthKey);
+
+  //   if (!matched) {
+  //     Alert.alert("Error", "No payslip found for this month");
+  //     return;
+  //   }
+
+  //   const payload = {
+  //     row_checked_all: false,
+  //     pageno: 1,
+  //     perpage: 20,
+  //     wage_month: monthKey,
+  //     wage_year: parseInt(year),
+  //     checked_row_ids: JSON.stringify([matched._id]),
+  //     unchecked_row_ids: "[]",
+  //     type: "download",
+  //   };
+
+  //   try {
+  //     const { config, fs } = RNBlobUtil;
+  //     const downloads = fs.dirs.DownloadDir;
+  //     const path = `${downloads}/payslip_${monthKey}_${year}.pdf`;
+
+  //     const res = await config({
+  //       fileCache: true,
+  //       path,
+  //       overwrite: true,
+  //     }).fetch(
+  //       "POST",
+  //       `${API_BASE_URL}employee/download-payslip-data`,
+  //       {
+  //         "Content-Type": "application/json",
+  //         "x-access-token": token,
+  //       },
+  //       JSON.stringify(payload)
+  //     );
+
+  //     Alert.alert("Success", "Payslip downloaded!");
+
+  //   } catch (err) {
+  //     console.log("Download Error:", err);
+  //     Alert.alert("Download Failed", err.message);
+  //   }
+  // };
+
   const download_payslip = async (monthKey, year) => {
+    console.log("API_BASE_URL", API_BASE_URL);
     if (!payslipData) {
       Alert.alert("Error", "Payslip data not loaded");
       return;
     }
 
+    const hasPermission = await requestStoragePermission();
+    if (!hasPermission) {
+      Alert.alert("Permission Denied", "Storage permission is required");
+      return;
+    }
+
+    console.log("payslipDatapayslipData", payslipData);
+
     const docs = payslipData.master_data.docs;
-    console.log(docs,"docs");
-    
-    let matched = docs.find((item) => item.wage_month === monthKey);
+    const matched = docs.find((item) => item.wage_month === monthKey);
 
     if (!matched) {
       Alert.alert("Error", "No payslip found for this month");
       return;
     }
+    const emp_id = await AsyncStorage.getItem("employee_mongose_id");
+    console.log("emp_id", emp_id);
 
     const payload = {
       row_checked_all: false,
@@ -143,32 +236,84 @@ const PayslipScreen = () => {
       perpage: 20,
       wage_month: monthKey,
       wage_year: parseInt(year),
+      // checked_row_ids: JSON.stringify([matched._id]),
+      // checked_row_ids: emp_id,
       checked_row_ids: JSON.stringify([matched._id]),
       unchecked_row_ids: "[]",
       type: "download",
     };
 
-    try {
-      const { config, fs } = RNBlobUtil;
-      const downloads = fs.dirs.DownloadDir;
-      const path = `${downloads}/payslip_${monthKey}_${year}.pdf`;
+    console.log("payload", payload);
 
-      const res = await config({
-        fileCache: true,
-        path,
-        overwrite: true,
-      }).fetch(
-        "POST",
+    try {
+      const { fs, config } = RNBlobUtil;
+
+      const downloadPath =
+        fs.dirs.DownloadDir + `/payslip_${monthKey}_${year}.pdf`;
+
+      // await config({
+      //   fileCache: true,
+      //   appendExt: "pdf",
+      //   path: downloadPath,
+      //   addAndroidDownloads: {
+      //     useDownloadManager: true,
+      //     notification: true,
+      //     path: downloadPath,
+      //     description: "Payslip downloaded",
+      //     mime: "application/pdf",
+      //     mediaScannable: true,
+      //   },
+      // }).fetch(
+      //   "POST",
+      //   `${API_BASE_URL}employee/download-payslip-data`,
+      //   {
+      //     "Content-Type": "application/json",
+      //     "x-access-token": token,
+      //   },
+      //   JSON.stringify(payload)
+      // );
+
+
+      const res = await axios.post(
         `${API_BASE_URL}employee/download-payslip-data`,
+        payload,
         {
-          "Content-Type": "application/json",
-          "x-access-token": token,
-        },
-        JSON.stringify(payload)
+          headers: {
+            "x-access-token": token,
+          },
+        }
       );
 
-      Alert.alert("Success", "Payslip downloaded!");
+      if (!res.data?.file_url) {
+        Alert.alert("Error", "Payslip not found");
+        return;
+      }
 
+      // const fileUrl = res.data.file_url;
+      // const fileUrl = normalizeUrl(API_BASE_URL, matched.pdf_link);
+      // const fileUrl =API_BASE_URL.replace(/\/$/, "") +matched.pdf_link;
+      const fileUrl =
+        API_BASE_URL.replace(/\/$/, "") +
+        res.data.file_url;
+      console.log("fileUrl", fileUrl, res.data.file_url, API_BASE_URL);
+
+
+      await RNBlobUtil.config({
+        fileCache: true,
+        appendExt: "pdf",
+        addAndroidDownloads: {
+          useDownloadManager: true,
+          notification: true,
+          path: downloadPath,
+          mime: "application/pdf",
+          description: "Payslip downloaded",
+          mediaScannable: true,
+        },
+      }).fetch("GET", fileUrl);
+      // Alert.alert(
+      //   "Success",
+      //   "Payslip downloaded to Downloads folder 📂"
+      // );
     } catch (err) {
       console.log("Download Error:", err);
       Alert.alert("Download Failed", err.message);
@@ -176,121 +321,87 @@ const PayslipScreen = () => {
   };
 
 
-  // const view_payslip = async (monthKey, year) => {
-  //   try {
-  //     const filePath = `${RNBlobUtil.fs.dirs.DownloadDir}/payslip_${monthKey}_${year}.pdf`;
-  //     await FileViewer.open(filePath);
-  //   } catch (error) {
-  //     Alert.alert("Cannot open file", "Install a PDF viewer");
-  //   }
-  // };
-
   const view_payslip = (monthKey, year) => {
-  if (!payslipData) {
-    Alert.alert("Error", "Payslip data not loaded");
-    return;
-  }
+    if (!payslipData) {
+      Alert.alert("Error", "Payslip data not loaded");
+      return;
+    }
 
-  const docs = payslipData.master_data.docs;
+    const docs = payslipData.master_data.docs;
 
-  let matched = docs.find((item) => item.wage_month === monthKey);
+    let matched = docs.find((item) => item.wage_month === monthKey);
 
-  if (!matched) {
-    Alert.alert("Error", "No payslip found for this month");
-    return;
-  }
+    if (!matched) {
+      Alert.alert("Error", "No payslip found for this month");
+      return;
+    }
 
-  navigation.navigate("ViewPayslipScreen", { data: matched });
-};
-const route = useRoute();
+    navigation.navigate("ViewPayslipScreen", { data: matched });
+  };
+  const route = useRoute();
   const screenTitle = route.params?.title;
   return (
-     <LinearGradient
-       colors={["#000000ff", "#1c68beff"]}
-       start={{ x: 0, y: 0 }}
-       end={{ x: 1, y: 1 }}
-       style={{ flex: 1 }}
-     >
-    <SafeAreaView style={styles.container}>
+    <LinearGradient
+      colors={["#000000ff", "#1c68beff"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={styles.container}>
+        <Navbar title={screenTitle} />
 
-      {/* Header */}
-      {/* <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Icon name="logo-usd" size={24} color="#fff" />
-          <Text style={styles.headerTitle}>Payslips</Text>
-        </View>
-        <View style={styles.headerIcons}>
-          <Icon name="search-outline" size={22} color="#fff" style={styles.icon} />
-          <Icon name="notifications-outline" size={22} color="#fff" />
-        </View>
-      </View> */}
-       <Navbar title={screenTitle}/>
-      {/* Filters */}
-      <View style={styles.filterContainer}>
+        <View style={styles.filterContainer}>
 
-        {/* Month Dropdown */}
-        {/* <ModalSelector
-          data={monthsToShow}
-          initValue="Select Month"
-          onChange={(option) => setSelectedMonth(option.label)}
-        >
-          <TouchableOpacity style={styles.filterButton}>
-            <Text style={styles.filterText}>{selectedMonth}</Text>
-            <Icon name="chevron-down-outline" size={18} color="#ccc" />
-          </TouchableOpacity>
-        </ModalSelector> */}
-
-        {/* Year Dropdown */}
-        <ModalSelector
-          data={years}
-          initValue="Select Year"
-          onChange={(option) => setSelectedYear(option.label)}
-        >
-          <TouchableOpacity style={styles.filterButton}>
-            <Text style={styles.filterText}>{selectedYear}</Text>
-            <Icon name="chevron-down-outline" size={18} color="#ccc" />
-          </TouchableOpacity>
-        </ModalSelector>
-
-      </View>
-
-
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {monthsToShow.map((month) => (
-          <TouchableOpacity
-            key={month.key}
-            style={[
-              styles.monthCard,
-              selectedMonth === month.label && { backgroundColor: "#0D1B2A" },
-            ]}
-            onPress={() => setSelectedMonth(month.label)}
+          <ModalSelector
+            data={years}
+            initValue="Select Year"
+            onChange={(option) => setSelectedYear(option.label)}
           >
-            <Text style={styles.monthText}>{month.label}</Text>
+            <TouchableOpacity style={styles.filterButton}>
+              <Text style={styles.filterText}>{selectedYear}</Text>
+              <Icon name="chevron-down-outline" size={18} color="#ccc" />
+            </TouchableOpacity>
+          </ModalSelector>
 
-            <View style={styles.actionIcons}>
-              <TouchableOpacity onPress={() => view_payslip(month.key, selectedYear)}>
-                <Image
-                  source={require("../../assets/eye.png")}
-                  style={styles.iconImage}
-                />
-              </TouchableOpacity>
+        </View>
 
-              <TouchableOpacity
-                onPress={() => download_payslip(month.key, selectedYear)}
-              >
-                <Image
-                  source={require("../../assets/download.png")}
-                  style={styles.iconImage}
-                />
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
 
-      <BottomNavigation />
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {monthsToShow.map((month) => (
+            <TouchableOpacity
+              key={month.key}
+              style={[
+                styles.monthCard,
+                selectedMonth === month.label && { backgroundColor: "#0D1B2A" },
+              ]}
+              onPress={() => setSelectedMonth(month.label)}
+            >
+              <Text style={styles.monthText}>{month.label}</Text>
 
-    </SafeAreaView>
+              <View style={styles.actionIcons}>
+                <TouchableOpacity onPress={() => view_payslip(month.key, selectedYear)}>
+                  <Image
+                    source={require("../../assets/eye.png")}
+                    style={styles.iconImage}
+                  />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => download_payslip(month.key, selectedYear)}
+                >
+                  <Image
+                    source={require("../../assets/download.png")}
+                    style={styles.iconImage}
+                  />
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        <BottomNavigation />
+
+      </SafeAreaView>
     </LinearGradient>
   );
 };
