@@ -349,6 +349,7 @@ const PayslipScreen = () => {
     >
       <SafeAreaView style={styles.container}>
 
+
       {/* Header */}
       {/* <View style={styles.header}>
         <View style={styles.headerLeft}>

@@ -50,11 +50,11 @@ const BottomNavigation = () => {
   ).current;
 
   const navItems = [
-    { label: 'Expenses', icon: require('../assets/expenses.png'), screen: 'Expense' },
-    { label: 'Leaves', icon: require('../assets/leaves.png'), screen: 'Leaves' },
-    { label: 'Payslips', icon: require('../assets/payslips.png'), screen: 'Payslips' },
-    { label: 'Check In', icon: require('../assets/checkin.png'), screen: 'AttendanceScreen' },
-    { label: 'Settings', icon: require('../assets/settings.png'), screen: 'Settings' },
+    { label: 'Expenses', icon: require('../assets/expenses.png'), screen: 'Expense',title:"Expense Management"},
+    { label: 'Leaves', icon: require('../assets/leaves.png'), screen: 'Leave_Management',title:"Leave Management" },
+    { label: 'Payslips', icon: require('../assets/payslips.png'), screen: 'Payslips',title:"Payslips" },
+    { label: 'Check In', icon: require('../assets/checkin.png'), screen: 'AttendanceScreen',title:"Attendance Management" },
+    { label: 'Settings', icon: require('../assets/settings.png'), screen: 'Settings',title:"Settings" },
   ];
 
   return (
@@ -65,7 +65,7 @@ const BottomNavigation = () => {
           <TouchableOpacity
             key={index}
             style={styles.navItem}
-            onPress={() => navigation.navigate(item.screen)}
+            onPress={() => navigation.navigate(item.screen, { title: item.title })}
           >
             <Image
               source={item.icon}

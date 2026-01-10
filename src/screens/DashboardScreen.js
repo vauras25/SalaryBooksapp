@@ -293,7 +293,7 @@ const Dashboard = () => {
                   />
 
                   <Text style={{ position: "absolute", color: "#ffffff", fontSize: 14, fontWeight: "600" }}>
-                    88%
+                    {Math.round((present / (present + absent)) * 100)}%
                   </Text>
                 </View>
 
@@ -463,18 +463,20 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: "column",
     alignItems: "right",
-    justifyContent: "center",
+    // justifyContent: "center",
     width: "120%",
-    marginBottom: 16,
+    marginBottom: 20,
     marginLeft: -40
   },
 
   stats: {
     width: "100%",
-    marginTop: -65,
+    marginTop: -56,
+    // margin:"auto",
     alignItems: "flex-end",
-    paddingRight: 0,
-    marginLeft: 10
+    // textAlign:"right"
+    // paddingRight: 0,
+    marginLeft: 8
   },
 
   present: {
