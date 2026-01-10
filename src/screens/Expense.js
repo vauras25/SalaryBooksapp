@@ -9,6 +9,7 @@ import {
   Modal,
   TextInput,
   Alert,
+   Dimensions,
   ScrollView,
 } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -24,6 +25,7 @@ import { useRoute } from "@react-navigation/native";
 import Navbar from "./Dashboardscreen/navbar";
 import { NativeModules } from "react-native";
 const { PdfPicker } = NativeModules;
+const { width } = Dimensions.get('window');
 const Expense = () => {
   const insets = useSafeAreaInsets();
   const [claimsData, setClaimsData] = useState([]);
@@ -274,6 +276,10 @@ const Expense = () => {
     <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
        <View style={styles.header}>
+         <Image
+             source={require("../assets/Expance_Management.png")}
+             style={styles.header_iconImage}
+           />
           <Navbar title={screenTitle} />
         </View>
 
@@ -527,192 +533,419 @@ const Expense = () => {
 
 export default Expense;
 
+// const styles = StyleSheet.create({
+//     container: {
+//     flex: 1,
+//     padding: 15,
+//   },
+//   header: {
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//     // marginBottom: 10,
+//     marginLeft:-18
+//   },
+//   headerLeft: {
+//     flexDirection: "row",
+//     alignItems: "center",
+//   },
+//   headerText: {
+//     color: "#fff",
+//     fontSize: 18,
+//     fontWeight: "600",
+//     marginLeft: 8,
+//   },
+//   headerRight: {
+//     flexDirection: "row",
+//     alignItems: "center",
+//   },
+//   icon: {
+//     marginRight: 16,
+//   },
+//   notificationWrapper: {
+//     position: "relative",
+//   },
+//   notificationDot: {
+//     position: "absolute",
+//     top: -3,
+//     right: -3,
+//     width: 8,
+//     height: 8,
+//     backgroundColor: "red",
+//     borderRadius: 4,
+//   },
+//   tabContainer: {
+//     flexDirection: "row",
+//     marginTop: 25,
+//     backgroundColor: "rgba(255,255,255,0.1)",
+//     borderRadius: 15,
+//     padding: 4,
+//     width:340,
+//     marginLeft:-20
+//   },
+//   tab: {
+//     flex: 1,
+//     paddingVertical: 10,
+//     borderRadius: 12,
+//     alignItems: "center",
+//   },
+//   activeTab: {
+//     backgroundColor: "#0D213A",
+//   },
+//   activeTabText: {
+//     color: "#fff",
+//     fontWeight: "500",
+//   },
+//   inactiveTabText: {
+//     color: "#bbb",
+//   },
+//   sectionHeader: {
+//     marginTop: 25,
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//   },
+//   sectionTitle: {
+//     color: "#fff",
+//     fontSize: 15,
+//     fontWeight: "600",
+//     marginLeft:-10
+//   },
+//   newClaimBtn: {
+//     backgroundColor: "rgba(255,255,255,0.2)",
+//     borderRadius: 12,
+//     paddingHorizontal: 16,
+//     paddingVertical: 6,
+//     left:20
+//   },
+//   newClaimText: {
+//     color: "#fff",
+//     fontWeight: "500",
+//   },
+//   list: {
+//     marginTop: 15,
+//   },
+//   expenseCard: {
+//     backgroundColor: "rgba(255,255,255,0.1)",
+//     borderRadius: 14,
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     padding: 16,
+//     marginBottom: 10,
+//   },
+//   expenseTitle: {
+//     color: "#fff",
+//     fontSize: 15,
+//     fontWeight: "500",
+//   },
+//   amountTag: {
+//     backgroundColor: "rgba(255,255,255,0.1)",
+//     borderRadius: 8,
+//     paddingHorizontal: 12,
+//     paddingVertical: 4,
+//   },
+//   amountText: {
+//     color: "#fff",
+//     fontWeight: "600",
+//   },
+
+//   formContainer: {
+//     maxHeight: "75%",
+//   },
+//   overlay: {
+//     flex: 1,
+//     backgroundColor: "rgba(0,0,0,0.6)",
+//     justifyContent: "center",
+//     alignItems: "center",
+//   },
+//   modalContainer: {
+//     width: "90%",
+//     borderRadius: 20,
+//     padding: 20,
+//     maxHeight: "85%",
+//   },
+//   modalHeader: {
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//     // marginBottom: 10,
+//     borderBottomWidth: 1,
+//     borderBottomColor: "#fff",
+//     paddingBottom: 8,
+//   },
+//   modalTitle: {
+//     color: "#fff",
+//     fontSize: 16,
+//     fontWeight: "600",
+//   },
+//   closeBtn: {
+//     color: "red",
+//     fontSize: 20,
+//     fontWeight: "bold",
+//   },
+//   label: {
+//     color: "#fff",
+//     marginTop: 10,
+//     marginBottom: 4,
+//   },
+//   input: {
+//     backgroundColor: "rgba(255,255,255,0.1)",
+//     borderRadius: 10,
+//     padding: 10,
+//     color: "#fff",
+//     marginLeft: "-20px"
+//   },
+//   picker: {
+//     backgroundColor: "rgba(255,255,255,0.1)",
+//     color: "#fff",
+//     height: 50,
+//     // borderRadius: 10,
+//     // marginBottom: 10,
+//   },
+//   row: {
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//   },
+//   halfPicker: {
+//     flex: 0.48,
+//   },
+//   submitBtn: {
+//     backgroundColor: "#3B82F6",
+//     borderRadius: 10,
+//     paddingVertical: 10,
+//     marginTop: 20,
+//   },
+//   submitText: {
+//     color: "#fff",
+//     textAlign: "center",
+//     fontWeight: "bold",
+//   },
+
+//   imageUploadContainer: {
+//     alignItems: "center",
+//     marginVertical: 15,
+//   },
+
+//   uploadBtn: {
+//     backgroundColor: "#004B8D",
+//     paddingVertical: 10,
+//     paddingHorizontal: 20,
+//     borderRadius: 10,
+//   },
+
+//   uploadBtnText: {
+//     color: "#fff",
+//     fontSize: 14,
+//     fontWeight: "bold",
+//   },
+
+
+// });
 const styles = StyleSheet.create({
-    container: {
+  container: {
     flex: 1,
-    padding: 15,
+    padding:7
+    // paddingHorizontal: 16,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    // marginBottom: 10,
-    marginLeft:-18
+
+   header: {
+    flexDirection:"row",
+    width: "100%",
+    marginBottom: 12,
+    alignItems:"center",
+    gap:5
   },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+   header_iconImage: {
+    width: 35,
+    padding:20,
+    height: 20,
+    marginLeft: -5,
   },
-  headerText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "600",
-    marginLeft: 8,
-  },
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  icon: {
-    marginRight: 16,
-  },
-  notificationWrapper: {
-    position: "relative",
-  },
-  notificationDot: {
-    position: "absolute",
-    top: -3,
-    right: -3,
-    width: 8,
-    height: 8,
-    backgroundColor: "red",
-    borderRadius: 4,
-  },
+
   tabContainer: {
     flexDirection: "row",
-    marginTop: 25,
+    marginTop: 20,
     backgroundColor: "rgba(255,255,255,0.1)",
     borderRadius: 15,
     padding: 4,
-    width:340,
-    marginLeft:-20
+    width: "100%",
+    margin:"auto"
   },
+
   tab: {
     flex: 1,
     paddingVertical: 10,
     borderRadius: 12,
     alignItems: "center",
   },
+
   activeTab: {
     backgroundColor: "#0D213A",
   },
+
   activeTabText: {
     color: "#fff",
     fontWeight: "500",
   },
+
   inactiveTabText: {
     color: "#bbb",
   },
+
   sectionHeader: {
-    marginTop: 25,
+    marginTop: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    // margin:"auto"
   },
+
   sectionTitle: {
     color: "#fff",
     fontSize: 15,
     fontWeight: "600",
-    marginLeft:-10
   },
+
   newClaimBtn: {
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 6,
-    left:20
   },
+
   newClaimText: {
     color: "#fff",
     fontWeight: "500",
   },
+
   list: {
     marginTop: 15,
+    flexGrow: 1,
   },
+
   expenseCard: {
     backgroundColor: "rgba(255,255,255,0.1)",
     borderRadius: 14,
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 16,
+    alignItems: "center",
+    padding: 14,
     marginBottom: 10,
   },
+
   expenseTitle: {
     color: "#fff",
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "500",
+    flex: 1,
+    marginRight: 10,
   },
+
   amountTag: {
     backgroundColor: "rgba(255,255,255,0.1)",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 4,
   },
+
   amountText: {
     color: "#fff",
     fontWeight: "600",
+    fontSize: 13,
   },
 
-  formContainer: {
-    maxHeight: "75%",
+  dateText: {
+    color: "#ccc",
+    fontSize: 12,
+    marginTop: 4,
   },
+
+  statusText: {
+    color: "#fff",
+    fontSize: 12,
+    marginTop: 2,
+  },
+
+  /* ---------- MODAL ---------- */
+
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.6)",
     justifyContent: "center",
     alignItems: "center",
+    padding: 16,
   },
+
   modalContainer: {
-    width: "90%",
+    width: "100%",
     borderRadius: 20,
     padding: 20,
-    maxHeight: "85%",
+    maxHeight: "90%",
   },
+
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    // marginBottom: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#fff",
     paddingBottom: 8,
+    marginBottom: 10,
   },
+
   modalTitle: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
+    flex: 1,
   },
+
   closeBtn: {
     color: "red",
     fontSize: 20,
     fontWeight: "bold",
+    marginLeft: 10,
   },
+
+  formContainer: {
+    flexGrow: 1,
+  },
+
   label: {
     color: "#fff",
     marginTop: 10,
     marginBottom: 4,
+    fontSize: 13,
   },
-  input: {
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderRadius: 10,
-    padding: 10,
-    color: "#fff",
-    marginLeft: "-20px"
-  },
+
   picker: {
     backgroundColor: "rgba(255,255,255,0.1)",
     color: "#fff",
-    height: 50,
-    // borderRadius: 10,
-    // marginBottom: 10,
+    height: 48,
+    borderRadius: 8,
   },
+
   row: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    gap: 10,
   },
+
   halfPicker: {
-    flex: 0.48,
+    flex: 1,
   },
+
   submitBtn: {
     backgroundColor: "#3B82F6",
     borderRadius: 10,
-    paddingVertical: 10,
+    paddingVertical: 12,
     marginTop: 20,
   },
+
   submitText: {
     color: "#fff",
     textAlign: "center",
     fontWeight: "bold",
+    fontSize: 14,
   },
 
   imageUploadContainer: {
@@ -732,6 +965,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
   },
-
-
 });

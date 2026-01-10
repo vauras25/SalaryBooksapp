@@ -348,9 +348,27 @@ const PayslipScreen = () => {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={styles.container}>
-        <Navbar title={screenTitle} />
 
-        <View style={styles.filterContainer}>
+      {/* Header */}
+      {/* <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <Icon name="logo-usd" size={24} color="#fff" />
+          <Text style={styles.headerTitle}>Payslips</Text>
+        </View>
+        <View style={styles.headerIcons}>
+          <Icon name="search-outline" size={22} color="#fff" style={styles.icon} />
+          <Icon name="notifications-outline" size={22} color="#fff" />
+        </View>
+      </View> */}
+       <View style={styles.header}>
+          <Image
+              source={require("../../assets/Paysilp.png")}
+              style={styles.header_iconImage}
+            />
+          <Navbar title={screenTitle} />
+       </View>
+      {/* Filters */}
+      <View style={styles.filterContainer}>
 
           <ModalSelector
             data={years}
@@ -416,11 +434,17 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 10,
-    marginBottom: 15,
+    flexDirection:"row",
+    width: "100%",
+    marginBottom: 12,
+    alignItems:"center",
+    gap:5
+  },
+   header_iconImage: {
+    width: 35,
+    padding:17,
+    height: 20,
+    marginLeft: -5,
   },
   headerLeft: {
     flexDirection: "row",

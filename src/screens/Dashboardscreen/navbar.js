@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image,Dimensions } from "react-native";
 import search from "../../assets/search.png";
 import notification from "../../assets/notification.png"
+const { width } = Dimensions.get("window");
 const Navbar = ({ title }) => {
   return (
     <View style={styles.nav}>
@@ -17,42 +18,76 @@ const Navbar = ({ title }) => {
 };
 
 export default Navbar;
+
+// const styles = StyleSheet.create({
+//   nav: {
+//     height: 52,
+//     flexDirection: "row",
+//     alignItems: "center",
+//     justifyContent: "space-between",
+//     paddingHorizontal: 12,
+//     width: "100%",
+//   },
+
+//   header: {
+//     flex: 1,
+//     justifyContent: "center",
+//   },
+
+//   headerTitle: {
+//     color: "#fff",
+//     fontSize: 17,
+//     fontWeight: "600",
+//   },
+
+//   headerIcons: {
+//     flexDirection: "row",
+//     alignItems: "center",
+//     gap: 14,
+//   },
+
+//   imageIcon: {
+//     width: 22,
+//     height: 22,
+//     resizeMode: "contain",
+//     tintColor: "#fff",
+//   },
+// });
+
+
 const styles = StyleSheet.create({
-  header:{
-    width:164
-  },
   nav: {
-    height: 52,                 
+    marginTop:10,
+    height: 52,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 8,
+    // paddingHorizontal: 5,
+    width: width*.77,
+  },
+
+  header: {
+    flex: 1,
+    alignItems: "flex-start",   
+    justifyContent: "flex-start",
   },
 
   headerTitle: {
     color: "#fff",
-    fontSize: 17,               
+    fontSize: 17,
     fontWeight: "600",
-    marginLeft:-6
   },
 
   headerIcons: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
-    marginLeft:95
+    justifyContent: "flex-end",
+    gap: 10,
   },
 
   imageIcon: {
-    width: 20,
-    height: 30,
+    width: 22,
+    height: 22,
     resizeMode: "contain",
     tintColor: "#fff",
-    // left:100
-  },
-
-  bellIcon: {
-    fontSize: 18,
-    color: "#fff",
   },
 });

@@ -7,6 +7,7 @@ import {
   TextInput,
   ScrollView,
   Modal,
+  Image,
   Alert,
   ActivityIndicator,
 } from "react-native";
@@ -157,7 +158,7 @@ export default function LeaveManagementScreen() {
         }
       );
 
-      console.log("API Response:", response.data);
+      // console.log("API Response:", response.data);
       if (response.data.status === "success") {
         setLeaveList(response.data);
         // await AsyncStorage.setItem('Leavelist',response.data)
@@ -351,6 +352,10 @@ export default function LeaveManagementScreen() {
 
         {/* Header */}
         <View style={styles.header}>
+          <Image
+              source={require("../../assets/Leave_Management.png")}
+              style={styles.header_iconImage}
+            />
           <Navbar title={screenTitle} />
         </View>
 
@@ -734,14 +739,21 @@ const BarItem = ({ label, value, total, color }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 15,
+    padding: 13,
   },
 
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
+    header: {
+    flexDirection:"row",
+    width: "100%",
+    marginBottom: 12,
+    alignItems:"center",
+    gap:5
+  },
+   header_iconImage: {
+    width: 35,
+    padding:20,
+    height: 20,
+    marginLeft: -5,
   },
   // headerText: {
   //   color: "#fff",

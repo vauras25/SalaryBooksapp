@@ -22,6 +22,9 @@ const Advance = ({ rights }) => {
     const [advanceList, setAdvanceList] = useState([]);
     const [totalAdvanceAmount, setTotalAdvanceAmount] = useState(0);
     const [totalOutstanding, setTotalOutstanding] = useState(0);
+    const [percentage, setPercentage] = useState(0);
+    const [progress, setProgress] = useState(0);
+
     // console.log("rights22", rights);
 
     // if (!rights) return null;
@@ -47,14 +50,15 @@ const Advance = ({ rights }) => {
     const handlePress = (item) => {
 
         if (item === "Attendance Management") {
-            if (!canApplyAttendance) {
-                Alert.alert(
-                    "Permission Denied",
-                    "you don't have This functionality"
-                );
-                return;
-            }
-            navigation.navigate("AttendanceScreen", { title: "Attendance" });
+            // if (!canApplyAttendance) {
+            //     Alert.alert(
+            //         "Permission Denied",
+            //         "you don't have This functionality"
+            //     );
+            //     return;
+            // }
+            // navigation.navigate("AttendanceScreen", { title: "Attendance" });
+            navigation.navigate("Blank", { title: "Attendance" });
         }
         else if (item === "Payslips") {
             navigation.navigate("Payslips", { title: item });
@@ -98,7 +102,7 @@ const Advance = ({ rights }) => {
 
 
     const fetchAdvanceList = async () => {
-        console.log("Advancepage", token)
+        // console.log("Advancepage", token)
         if (!token) return;
         console.log("Advancepage1")
         try {
@@ -129,9 +133,22 @@ const Advance = ({ rights }) => {
                     0
                 );
 
-                setTotalAdvanceAmount(totalAdvance);
-                setTotalOutstanding(totalOutstanding);
-                console.log("res.data.advance_data.docs", res.data.advance_data.docs);
+                // setTotalAdvanceAmount(totalAdvance);
+                // setTotalOutstanding(totalOutstanding);
+                const percent =
+                    totalAdvance > 0
+                        ? Math.round((totalOutstanding / totalAdvance) * 100)
+                        : 0;
+
+                const prog = percent / 100;
+
+                setPercentage(percent);
+                setProgress(prog);
+
+                await AsyncStorage.setItem("percentage", JSON.stringify(percent));
+                await AsyncStorage.setItem("progress", JSON.stringify(prog));
+                console.log("res.data.advance_data.docs1", JSON.stringify(percent));
+                console.log("res.data.advance_data.docs1", JSON.stringify(prog));
 
             }
         } catch (error) {
@@ -139,12 +156,12 @@ const Advance = ({ rights }) => {
         }
     };
 
-    const percentage =
-        totalAdvanceAmount > 0
-            ? Math.round((totalOutstanding / totalAdvanceAmount) * 100)
-            : 0;
+    // const percentage =
+    //     totalAdvanceAmount > 0
+    //         ? Math.round((totalOutstanding / totalAdvanceAmount) * 100)
+    //         : 0;
 
-    const progress = percentage / 100;
+    // const progress = percentage / 100;
 
 
 
