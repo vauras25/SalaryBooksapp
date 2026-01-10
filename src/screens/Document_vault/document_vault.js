@@ -30,7 +30,7 @@ import axios from "axios";
 import RNFS from "react-native-fs";
 import { API_BASE_URL } from "@env";
 const { width } = Dimensions.get("window");
-
+// import pdf_icon from '../../assets/pdf_icon'
 const DocumentVaultScreen = () => {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState("Personal");
@@ -504,6 +504,10 @@ const DocumentVaultScreen = () => {
         <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
 
          <View style={styles.header}>
+          <Image
+              source={require("../../assets/document_vault.png")}
+              style={styles.header_iconImage}
+            />
           <Navbar title={screenTitle} />
         </View>
 
@@ -558,13 +562,12 @@ const DocumentVaultScreen = () => {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="always"
           >
+            {activeTab === "Personal" &&
+            <View  style={styles.card}>
+            { uploadedFiles.documents.map((file, index) => (
+              
+                <View key={index} style={styles.card_inner}>
 
-            {activeTab === "Personal" && uploadedFiles.documents.map((file, index) => (
-              <View key={index} style={styles.card}>
-                {/* <View style={styles.cardLeft}>
-                <Text style={styles.cardIcon}>📄</Text>
-                <Text style={styles.cardTitle}>{file.file_name}</Text>
-              </View> */}
                 <TouchableOpacity
                   key={index}
                   // style={styles.card}
@@ -577,7 +580,11 @@ const DocumentVaultScreen = () => {
                   }}
                 >
                   <View style={styles.cardLeft}>
-                    <Text style={styles.cardIcon}>📄</Text>
+                    {/* <Text style={styles.cardIcon}>{pdf_icon}</Text> */}
+                    <Image
+                        source={require("../../assets/pdf_icon.png")}
+                        style={styles.iconImage}
+                      />
                     <Text style={styles.cardTitle}>{file.file_name}</Text>
                   </View>
 
@@ -640,11 +647,15 @@ const DocumentVaultScreen = () => {
                   )}
                 </View>
               </View>
+              
             ))}
-
+            </View>}
             {/* Others */}
-            {activeTab === "Others" && uploadedFiles.other_documents.map((file, index) => (
-              <View key={index} style={styles.card}>
+            {activeTab === "Others" &&
+            <View style={styles.card}>
+            { uploadedFiles.other_documents.map((file, index) => (
+              
+                <View key={index} style={styles.card_inner}>
                 {/* <View style={styles.cardLeft}>
                 <Text style={styles.cardIcon}>📄</Text>
                 <Text style={styles.cardTitle}>{file.file_name}</Text>
@@ -659,7 +670,11 @@ const DocumentVaultScreen = () => {
                   }}
                 >
                   <View style={styles.cardLeft}>
-                    <Text style={styles.cardIcon}>📄</Text>
+                    {/* <Text style={styles.cardIcon}>📄</Text> */}
+                     <Image
+                        source={require("../../assets/pdf_icon.png")}
+                        style={styles.iconImage}
+                      />
                     <Text style={styles.cardTitle}>{file.file_name}</Text>
                   </View>
                 </TouchableOpacity>
@@ -722,7 +737,7 @@ const DocumentVaultScreen = () => {
                 </View>
               </View>
             ))}
-
+              </View>}
             <View style={{ height: 140 }} />
           </ScrollView>
           <Modal
@@ -797,14 +812,180 @@ const DocumentVaultScreen = () => {
 
 export default DocumentVaultScreen;
 
+// const styles = StyleSheet.create({
+//   gradient: { flex: 1 },
+//   container: { flex: 1, paddingHorizontal: 15 },
+//   header: {
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//     marginBottom: 16,
+//   },
+//   loaderOverlay: {
+//     position: "absolute",
+//     top: 0,
+//     left: 0,
+//     right: 0,
+//     bottom: 0,
+//     backgroundColor: "rgba(0,0,0,0.5)",
+//     justifyContent: "center",
+//     alignItems: "center",
+//     zIndex: 100,
+//   },
+
+//   tabRow: {
+//     flexDirection: "row",
+//     backgroundColor: "#0f1b33",
+//     borderRadius: 15,
+//     // marginTop: -450,
+//     zIndex: 50,
+//     elevation: 6,
+//     padding: 10,
+//   },
+//   tabButton: { flex: 1, paddingVertical: 10, alignItems: "center", borderRadius: 20 },
+//   tabButtonActive: { backgroundColor: "#1c68be", borderRadius: 20 },
+//   tabText: { color: "#788a9e", fontWeight: "600" },
+//   tabTextActive: { color: "#fff" },
+
+
+//   titleRow: {
+//     marginTop: 12,
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//     zIndex: 40,
+//     elevation: 4,
+//   },
+//   sectionTitle: { color: "#fff", fontSize: 15, fontWeight: "700" },
+//   uploadBtn: {
+//     backgroundColor: "rgba(255,255,255,0.2)",
+//     borderRadius: 12,
+//     paddingHorizontal: 16,
+//     paddingVertical: 6,
+//   },
+//   uploadText: { color: "#fff", fontSize: 13, fontWeight: "600" },
+
+
+//   fileScroll: {
+//     flex: 1,
+//     marginTop: 8,
+//     zIndex: 1,
+//   },
+//   fileScrollContent: {
+//     paddingBottom: 20,
+//   },
+
+//   card: {
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     backgroundColor: "rgba(255,255,255,0.08)",
+//     padding: 15,
+//     borderRadius: 12,
+//     marginTop: 12,
+//     borderWidth: 1,
+//     borderColor: "rgba(255,255,255,0.1)",
+//   },
+//   cardLeft: { flexDirection: "row", alignItems: "center", marginTop:5},
+//   cardIcon: { fontSize: 22, marginRight: 10, color: "#fff" },
+//   cardTitle: { color: "#fff", fontSize: 15, fontWeight: "600" },
+
+//   menuDots: { color: "#fff", fontSize: 22, padding: 5 },
+
+//   dropdown: {
+//     position: "absolute",
+//     top: 28,
+//     right: 0,
+//     backgroundColor: "#1c1c2b",
+//     padding: 8,
+//     borderRadius: 6,
+//     width: 140,
+//     zIndex: 999,
+//     elevation: 20,
+//     shadowColor: "#000",
+//     shadowOpacity: 0.25,
+//     shadowRadius: 6,
+//     shadowOffset: { width: 0, height: 3 },
+//   },
+//   dropdownItem: { paddingVertical: 8 },
+//   dropdownText: { color: "#fff", fontSize: 14 },
+
+
+//   overlay: {
+//     flex: 1,
+//     backgroundColor: "rgba(0,0,0,0.6)",
+//     justifyContent: "center",
+//     alignItems: "center",
+//   },
+//   modalContainer: {
+//     width: "90%",
+//     borderRadius: 20,
+//     padding: 20,
+//     maxHeight: "85%",
+//   },
+//   modalHeader: {
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//     borderBottomWidth: 1,
+//     borderBottomColor: "#fff",
+//     paddingBottom: 8,
+//   },
+//   tabContainer: {
+//     flexDirection: "row",
+//     marginTop: 10,
+//     backgroundColor: "rgba(255,255,255,0.1)",
+//     borderRadius: 15,
+//     padding: 4,
+//   },
+//   tab: {
+//     flex: 1,
+//     paddingVertical: 10,
+//     borderRadius: 12,
+//     alignItems: "center",
+//   },
+//   activeTab: {
+//     backgroundColor: "#0D213A",
+//   },
+//   activeTabText: {
+//     color: "#fff",
+//     fontWeight: "500",
+//   },
+//   inactiveTabText: {
+//     color: "#bbb",
+//   },
+//   modalTitle: { color: "#fff", fontSize: 16, fontWeight: "600" },
+//   closeBtn: { color: "red", fontSize: 20, fontWeight: "bold" },
+
+//   modalOverlay: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.6)" },
+//   modalBox: { width: "80%", backgroundColor: "#1c1c2b", padding: 20, borderRadius: 10 },
+//   modalBtns: { flexDirection: "row", justifyContent: "flex-end" },
+//   cancelBtn: { marginRight: 15 },
+//   saveBtn: { backgroundColor: "#1c68be", paddingHorizontal: 15, paddingVertical: 8, borderRadius: 6 },
+//   saveText: { color: "#fff", fontWeight: "600" },
+//   cancelText: { color: "#bbb", fontSize: 15 },
+//   input: { backgroundColor: "#303045", color: "#fff", padding: 10, borderRadius: 8, marginBottom: 15 },
+// });
+
 const styles = StyleSheet.create({
   gradient: { flex: 1 },
-  container: { flex: 1, paddingHorizontal: 15 },
+
+  container: {
+    flex: 1,
+    paddingHorizontal: 13,
+  },
+
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
+    flexDirection:"row",
+    width: "100%",
+    marginBottom: 12,
+    alignItems:"center",
+    gap:5
+  },
+   header_iconImage: {
+    width: 35,
+    padding:20,
+    height: 20,
+    marginLeft: -5,
   },
   loaderOverlay: {
     position: "absolute",
@@ -818,95 +999,167 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
 
-  tabRow: {
+  /* Tabs */
+  tabContainer: {
     flexDirection: "row",
-    backgroundColor: "#0f1b33",
-    borderRadius: 15,
-    // marginTop: -450,
-    zIndex: 50,
-    elevation: 6,
-    padding: 10,
-  },
-  tabButton: { flex: 1, paddingVertical: 10, alignItems: "center", borderRadius: 20 },
-  tabButtonActive: { backgroundColor: "#1c68be", borderRadius: 20 },
-  tabText: { color: "#788a9e", fontWeight: "600" },
-  tabTextActive: { color: "#fff" },
-
-
-  titleRow: {
     marginTop: 12,
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderRadius: 15,
+    padding: 4,
+    width: "100%",
+  },
+
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+
+  activeTab: {
+    backgroundColor: "#0D213A",
+  },
+
+  activeTabText: {
+    color: "#fff",
+    fontWeight: "500",
+  },
+
+  inactiveTabText: {
+    color: "#bbb",
+  },
+
+  /* Title row */
+  titleRow: {
+    marginTop: 14,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    zIndex: 40,
-    elevation: 4,
   },
-  sectionTitle: { color: "#fff", fontSize: 15, fontWeight: "700" },
+
+  sectionTitle: {
+    color: "#fff",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+
   uploadBtn: {
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 6,
   },
-  uploadText: { color: "#fff", fontSize: 13, fontWeight: "600" },
 
+  uploadText: {
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "600",
+  },
 
+  /* File list */
   fileScroll: {
     flex: 1,
     marginTop: 8,
-    zIndex: 1,
   },
+
   fileScrollContent: {
-    paddingBottom: 20,
+    paddingBottom: 40,
   },
 
   card: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    alignItems: "center",
     backgroundColor: "rgba(255,255,255,0.08)",
-    padding: 15,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
     borderRadius: 12,
     marginTop: 12,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.1)",
+    rowGap:10
   },
-  cardLeft: { flexDirection: "row", alignItems: "center", marginTop:5},
-  cardIcon: { fontSize: 22, marginRight: 10, color: "#fff" },
-  cardTitle: { color: "#fff", fontSize: 15, fontWeight: "600" },
+  card_inner:{
+    backgroundColor:"rgba(255,255,255,0.1)",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding:6,
+    // marginLeft:4,
+    // margin:"auto",
+     alignItems: "center",
+    borderRadius:8,
+    // marginBottom:10,
+    height:50,
+    width:width * .87
+  },
+  cardLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+ 
+  iconImage: {
+    width: 35,
+    padding:23,
+    height: 20,
+    marginLeft: 5,
+  },
 
-  menuDots: { color: "#fff", fontSize: 22, padding: 5 },
+  cardIcon: {
+    fontSize: 22,
+    marginRight: 10,
+    color: "#fff",
+  },
+
+  cardTitle: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
+    flexShrink: 1,
+    marginLeft:10
+  },
+
+  menuDots: {
+    color: "#fff",
+    fontSize: 22,
+    paddingHorizontal: 6,
+  },
 
   dropdown: {
     position: "absolute",
-    top: 28,
+    top: 30,
     right: 0,
     backgroundColor: "#1c1c2b",
-    padding: 8,
-    borderRadius: 6,
-    width: 140,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    width: 150,
     zIndex: 999,
     elevation: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
   },
-  dropdownItem: { paddingVertical: 8 },
-  dropdownText: { color: "#fff", fontSize: 14 },
 
+  dropdownItem: {
+    paddingVertical: 8,
+  },
 
+  dropdownText: {
+    color: "#fff",
+    fontSize: 14,
+  },
+
+  /* Preview modal */
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.6)",
     justifyContent: "center",
     alignItems: "center",
   },
+
   modalContainer: {
-    width: "90%",
+    width: "92%",
     borderRadius: 20,
-    padding: 20,
+    padding: 16,
     maxHeight: "85%",
   },
+
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -915,39 +1168,67 @@ const styles = StyleSheet.create({
     borderBottomColor: "#fff",
     paddingBottom: 8,
   },
-  tabContainer: {
-    flexDirection: "row",
-    marginTop: 10,
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderRadius: 15,
-    padding: 4,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  activeTab: {
-    backgroundColor: "#0D213A",
-  },
-  activeTabText: {
+
+  modalTitle: {
     color: "#fff",
-    fontWeight: "500",
+    fontSize: 15,
+    fontWeight: "600",
+    flex: 1,
   },
-  inactiveTabText: {
+
+  closeBtn: {
+    color: "red",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginLeft: 10,
+  },
+
+  /* Rename modal */
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.6)",
+  },
+
+  modalBox: {
+    width: "85%",
+    backgroundColor: "#1c1c2b",
+    padding: 20,
+    borderRadius: 12,
+  },
+
+  modalBtns: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+
+  cancelBtn: {
+    marginRight: 15,
+  },
+
+  saveBtn: {
+    backgroundColor: "#1c68be",
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+
+  saveText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+
+  cancelText: {
     color: "#bbb",
+    fontSize: 15,
   },
-  modalTitle: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  closeBtn: { color: "red", fontSize: 20, fontWeight: "bold" },
 
-  modalOverlay: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.6)" },
-  modalBox: { width: "80%", backgroundColor: "#1c1c2b", padding: 20, borderRadius: 10 },
-  modalBtns: { flexDirection: "row", justifyContent: "flex-end" },
-  cancelBtn: { marginRight: 15 },
-  saveBtn: { backgroundColor: "#1c68be", paddingHorizontal: 15, paddingVertical: 8, borderRadius: 6 },
-  saveText: { color: "#fff", fontWeight: "600" },
-  cancelText: { color: "#bbb", fontSize: 15 },
-  input: { backgroundColor: "#303045", color: "#fff", padding: 10, borderRadius: 8, marginBottom: 15 },
+  input: {
+    backgroundColor: "#303045",
+    color: "#fff",
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 15,
+  },
 });
-

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Modal,
+  Image,
   Alert,
   ScrollView,
   Dimensions,
@@ -24,7 +25,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeModules } from "react-native";
 const { PdfPicker } = NativeModules;
 const { width } = Dimensions.get("window");
-const AdvanceManagement = () => {
+const AdvanceManagement =() => {
   const progress = 0.75;
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
@@ -39,18 +40,26 @@ const AdvanceManagement = () => {
   const [token, setToken] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState(false);
-
+  const [percentage, setPercentage] = useState(0);
+  const [prog, setProgress] = useState(0);
   useEffect(() => {
     const loadToken = async () => {
       const t = await AsyncStorage.getItem("authToken");
+     
       setToken(t);
+       const storedProgress =await AsyncStorage.getItem("progress");
+      const storedpercentage =await AsyncStorage.getItem("percentage");
+      const Progress = storedProgress? JSON.parse(storedProgress): 0;
+      const percentage = storedpercentage? JSON.parse(storedpercentage): 0;
+      setPercentage(percentage);
+      setProgress(Progress);
       console.log("TOKEN LOADED:", t);
     };
     loadToken();
   }, []);
 
   const fetchAdvanceList = async () => {
-    console.log("Advancepage", token)
+    // console.log("Advancepage", token)
     if (!token) return;
     console.log("Advancepage1")
     try {
@@ -69,6 +78,8 @@ const AdvanceManagement = () => {
         });
 
       if (res.data?.status === "success") {
+        console.log(res.data,"res.data");
+        
         setAdvanceList(res.data.advance_data.docs || []);
       }
     } catch (error) {
@@ -230,6 +241,10 @@ const AdvanceManagement = () => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
 
         <View style={styles.header}>
+          <Image
+              source={require("../../assets/Advance_management.png")}
+              style={styles.header_iconImage}
+            />
           <Navbar title={screenTitle} />
         </View>
         <View style={styles.dropdownRow}>
@@ -401,7 +416,7 @@ const AdvanceManagement = () => {
           </View>
         </View>
         <View style={styles.overviewBox}>
-          <Text style={styles.percentage}>75%</Text>
+          <Text style={styles.percentage}>{percentage}%</Text>
           <View style={styles.progressRow}>
             
             <View style={styles.progressBarContainer}>
@@ -409,7 +424,7 @@ const AdvanceManagement = () => {
                 <View
                   style={[
                     styles.progressBarFill,
-                    { width: `${progress * 100}%` }
+                    { width: `${prog * 100}%` }
                   ]}
                 />
               </View>
@@ -443,19 +458,19 @@ const AdvanceManagement = () => {
         </View>
 
 
-        <View style={styles.section}>
+        <View style={styles.section1}>
           <Text style={styles.sectionTitle1}>Upcoming Deduction</Text>
           <View style={styles.card}>
           <View style={styles.card_inner}>
             <Text style={styles.cardDate}>Oct 01</Text>
-            <Text style={styles.cardAmount}>₹2000 due</Text>
+            <Text style={styles.cardAmount1}>₹2000 due</Text>
           </View>
           </View>
         </View>
 
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Advance History</Text>
+          <Text style={styles.sectionTitle1}>Advance History</Text>
 
           {advanceList.map((item) => (
             <TouchableOpacity
@@ -463,10 +478,11 @@ const AdvanceManagement = () => {
               onPress={() => navigation.navigate("AdvanceInstallmentScreen", { data: item })}
               style={styles.card}
             >
+              <View style={styles.card_inner}>
               <Text style={styles.cardDate}>
                 {new Date(item.created_at).toDateString().slice(4, 10)}
               </Text>
-
+              
               <View style={styles.cardRight}>
                 <Text style={styles.cardAmount}>₹{item.advance_amount}</Text>
                 <Text
@@ -477,6 +493,7 @@ const AdvanceManagement = () => {
                 >
                   {item.status}
                 </Text>
+              </View>
               </View>
             </TouchableOpacity>
           ))}
@@ -492,7 +509,7 @@ const AdvanceManagement = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 15,
+    padding: 13,
   },
   scrollContainer: {
     // padding: 5,
@@ -500,10 +517,17 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
+    flexDirection:"row",
+    width: "100%",
+    marginBottom: 12,
+    alignItems:"center",
+    gap:5
+  },
+    header_iconImage: {
+    width: 40,
+    padding:21,
+    height: 20,
+    marginLeft: -7,
   },
   // headerIcons: {
   //   flexDirection: "row",
@@ -610,19 +634,19 @@ const styles = StyleSheet.create({
   amountRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 2,
+    marginTop: -7,
   },
   amountLabel1: {
     textAlign:"left",
     color: "#fff",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 14,
   },
   amountLabel2: {
     textAlign:"right",
     color: "#fff",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 14,
   },
   amountSub: {
     color: "#B0C4DE",
@@ -637,8 +661,12 @@ const styles = StyleSheet.create({
     textAlign: "left",
     marginTop: 10,
   },
+  section1: {
+    marginTop: 10,
+  },
   section: {
     marginTop: 10,
+    marginBottom:40
   },
   sectionTitle: {
     color: "#fff",
@@ -665,26 +693,43 @@ const styles = StyleSheet.create({
     backgroundColor:"rgba(255,255,255,0.1)",
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding:14,
-    marginLeft:4,
-    borderRadius:12,
-    width:width * .85
+    padding:8,
+    // marginLeft:4,
+     alignItems: "center",
+    borderRadius:8,
+    width:width * .885
   },
   cardDate: {
     color: "#fff",
-    fontSize: 15,
+    fontSize: 14,
+    marginLeft:5
   },
-  cardAmount: {
+  cardAmount1: {
     color: "#fff",
     fontSize: 15,
     fontWeight: "600",
   },
+  cardAmount: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
+  },
   cardRight: {
-    alignItems: "flex-end",
+    // alignItems: "flex-end",
+    flexDirection:"row",
+    justifyContent: "space-between",
+    gap:10,
+    backgroundColor: "#2c4f70ff",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    // marginLeft: 10,
+    width: width*.45
   },
   status: {
     fontSize: 13,
-    marginTop: 3,
+    // marginTop: 3,
+    
   },
 
   container1: { flex: 1, padding: 20 },
@@ -708,12 +753,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 16,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
+  // header: {
+  //   flexDirection: "row",
+  //   justifyContent: "space-between",
+  //   alignItems: "center",
+  //   marginBottom: 10,
+  // },
   headerTitle: { color: "#fff", fontSize: 16, fontWeight: "600" },
   closeBtn: { color: "#f55", fontSize: 20 },
   field: { marginVertical: 5 },

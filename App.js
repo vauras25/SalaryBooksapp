@@ -10,7 +10,8 @@ import Document_vault from './src/screens/Document_vault/document_vault';
 import BankDetailsForm from './src/screens/BankDetailsForm';
 import Personal_Details from './src/screens/Personal_Details';
 import Address from './src/screens/Address';
-import AttendanceScreen from './src/screens/AttendanceScreen';
+// import AttendanceScreen from './src/screens/AttendanceScreen';
+import Blank from './src/screens/AttendanceScreen/blank';
 import Leaves from './src/screens/Leaves';
 import Settings from './src/screens/Settings';
 import { ThemeProvider } from './src/screens/ThemeContext';
@@ -62,7 +63,8 @@ useEffect(() => {
         <NavigationContainer ref={navigationRef}>
           <Stack.Navigator initialRouteName="SignUpScreen" >
             <Stack.Screen name="SignUpScreen" component={SignUpScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="AttendanceScreen" component={AttendanceScreen} options={{ headerShown: false }} />
+            {/* <Stack.Screen name="AttendanceScreen" component={AttendanceScreen} options={{ headerShown: false }} /> */}
+            <Stack.Screen name="Blank" component={Blank} options={{ headerShown: false }} />
             <Stack.Screen name="BankDetailsForm" component={BankDetailsForm} options={{ headerShown: false }} />
             <Stack.Screen name="Address" component={Address} options={{ headerShown: false }} />
             <Stack.Screen name="Personal_Details" component={Personal_Details} options={{ headerShown: false }} />
