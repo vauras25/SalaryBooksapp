@@ -348,7 +348,6 @@ const PayslipScreen = () => {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={styles.container}>
-        <Navbar title={screenTitle} />
 
       {/* Header */}
       {/* <View style={styles.header}>
