@@ -563,6 +563,7 @@ const DocumentVaultScreen = () => {
             keyboardShouldPersistTaps="always"
           >
             {activeTab === "Personal" &&
+            uploadedFiles?.documents?.length > 0 && (
             <View  style={styles.card}>
             { uploadedFiles.documents.map((file, index) => (
               
@@ -649,9 +650,10 @@ const DocumentVaultScreen = () => {
               </View>
               
             ))}
-            </View>}
+            </View>)}
             {/* Others */}
             {activeTab === "Others" &&
+            uploadedFiles?.other_documents?.length > 0 && (
             <View style={styles.card}>
             { uploadedFiles.other_documents.map((file, index) => (
               
@@ -737,7 +739,7 @@ const DocumentVaultScreen = () => {
                 </View>
               </View>
             ))}
-              </View>}
+              </View>)}
             <View style={{ height: 140 }} />
           </ScrollView>
           <Modal

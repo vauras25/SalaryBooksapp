@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  Dimensions
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation } from '@react-navigation/native';
@@ -21,6 +22,7 @@ import Navbar from "../Dashboardscreen/navbar";
 import { useRoute } from "@react-navigation/native";
 import { API_BASE_URL } from "@env";
 import { PermissionsAndroid, Platform } from "react-native";
+const { width } = Dimensions.get("window");
 const PayslipScreen = () => {
 
 
@@ -386,21 +388,21 @@ const PayslipScreen = () => {
 
 
         <ScrollView showsVerticalScrollIndicator={false}>
+          <View  style={styles.card}>
           {monthsToShow.map((month) => (
+            
             <TouchableOpacity
               key={month.key}
-              style={[
-                styles.monthCard,
-                selectedMonth === month.label && { backgroundColor: "#0D1B2A" },
-              ]}
               onPress={() => setSelectedMonth(month.label)}
             >
+               <View style={styles.card_inner}>
+              
               <Text style={styles.monthText}>{month.label}</Text>
 
               <View style={styles.actionIcons}>
                 <TouchableOpacity onPress={() => view_payslip(month.key, selectedYear)}>
                   <Image
-                    source={require("../../assets/eye.png")}
+                    source={require("../../assets/view_white.png")}
                     style={styles.iconImage}
                   />
                 </TouchableOpacity>
@@ -409,13 +411,16 @@ const PayslipScreen = () => {
                   onPress={() => download_payslip(month.key, selectedYear)}
                 >
                   <Image
-                    source={require("../../assets/download.png")}
+                    source={require("../../assets/download_white.png")}
                     style={styles.iconImage}
                   />
                 </TouchableOpacity>
               </View>
+              </View>
             </TouchableOpacity>
+            
           ))}
+          </View>
         </ScrollView>
 
         <BottomNavigation />
@@ -484,7 +489,30 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#fff",
   },
-
+   card: {
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.08)",
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
+    rowGap:10,
+  },
+    card_inner:{
+    backgroundColor:"rgba(255,255,255,0.1)",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding:6,
+    // marginLeft:4,
+    // margin:"auto",
+     alignItems: "center",
+    borderRadius:8,
+    // marginBottom:10,
+    height:50,
+    width:width * .87
+  },
   monthCard: {
     backgroundColor: "#123456",
     borderRadius: 15,
@@ -499,14 +527,16 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "500",
+    marginLeft:8
   },
   iconImage: {
-    width: 20,
-    height: 20,
+    width: 25,
+    height: 23,
     marginLeft: 10,
   },
   actionIcons: {
     flexDirection: "row",
     alignItems: "center",
+    marginRight:10
   },
 });
