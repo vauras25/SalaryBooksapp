@@ -228,6 +228,8 @@ export default function LeaveManagementScreen() {
   };
 
   const handleSubmit = async () => {
+    // console.log("LOG");
+    
     if (!token || !selectedLeave) {
       Alert.alert("Error", "Please select leave type");
       return;
@@ -286,7 +288,7 @@ export default function LeaveManagementScreen() {
 
       if (response.data.success) {
         setLeavedata(response.data.data)
-        // console.log(Leavedata.length, "response.data");
+        // console.log(response.data.data, "response.data1");
 
       }
     } catch (error) {
@@ -330,13 +332,15 @@ export default function LeaveManagementScreen() {
       item.leave_approval_status !== "pending"
     );
   });
+  console.log(historyData,"historyData");
+  
   const statusData = Leavedata?.filter(item => {
     const toDate = new Date(item.leave_to_date);
     toDate.setHours(0, 0, 0, 0);
 
     return (
       item.leave_approval_status === "pending" ||
-      (item.leave_approval_status === "approved" && toDate >= today)
+      ((item.leave_approval_status === "approved" || item.leave_approval_status === "rejected") && toDate >= today)
     );
   });
 
