@@ -301,6 +301,11 @@ const styles = StyleSheet.create({
         marginBottom: -10,
         textAlign: "center",
     },
+    loading:{
+        margin:"auto",
+        marginTop:90,
+        marginLeft:45
+    }
 });
 
 export default Leave_Balance;

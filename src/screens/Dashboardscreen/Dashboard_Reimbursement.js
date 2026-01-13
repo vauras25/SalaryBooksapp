@@ -311,16 +311,17 @@ const styles = StyleSheet.create({
     },
 
 
-    card2: {
-        width: width * 0.48,
-        backgroundColor: "#1C2541",
-        borderRadius: 20,
-        padding: 10,
-        marginHorizontal: 1,
-        marginVertical: 5,
-        marginBottom: 50,
-        marginLeft: 1
-    },
+   card2: {
+    width: width * 0.48,
+    backgroundColor: "#1C2541",
+    borderRadius: 20,
+    padding: 10,
+    marginHorizontal: 1,
+    marginVertical: 5,
+    marginBottom: 50,
+    marginLeft: 1,
+},
+
     title2: {
         color: "#FFFFFF",
         fontSize: 14,
@@ -329,18 +330,17 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     barchart: {
-        marginTop: -29,
-        marginLeft: -40,
-        margin: -20,
+    marginTop: -29, marginLeft: -40, margin: -20,
+},
 
-    },
     button2: {
-        backgroundColor: "#005C99",
-        borderRadius: 15,
-        paddingVertical: 6,
-        marginTop: 35,
-        alignItems: "center",
-    },
+    backgroundColor: "#005C99",
+    borderRadius: 15,
+    paddingVertical: 6,
+    alignItems: "center",
+    marginTop: "auto",           // ✅ KEY LINE (locks position)
+},
+
     buttonText2: {
         color: "#FFFFFF",
         fontSize: 11,

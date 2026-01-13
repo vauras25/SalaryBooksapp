@@ -1299,11 +1299,12 @@ const styles = StyleSheet.create({
     paddingVertical: -20
   },
   leaveList: {
-    marginTop: 20,
+    marginTop: 30,
     marginLeft: -100,
     backgroundColor: "#194a7ea2",
     borderRadius: 17,
-    paddingVertical: 10
+    paddingVertical: 10,
+    marginTop: "auto", 
   },
 
   leaveCountRow: {
