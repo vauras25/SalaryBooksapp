@@ -272,14 +272,13 @@ const AdvanceManagement =() => {
             <Modal visible={modalVisible} transparent animationType="fade">
               <View style={styles.overlay}>
                 <View style={styles.modalBox}>
-
-                  <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Enter the following details</Text>
+                <ScrollView style={styles.formContainer}>
+                  <View style={styles.modalHeader}>
+                    <Text style={styles.modalTitle}>Enter the following details</Text>
                     <TouchableOpacity onPress={() => setModalVisible(false)}>
-                      <Text style={styles.closeBtn}>✕</Text>
+                      <Text style={styles.closeBtn}>✖</Text>
                     </TouchableOpacity>
                   </View>
-
 
                   <View style={styles.field}>
                     <Text style={styles.label}>Advance Amount :</Text>
@@ -410,6 +409,7 @@ const AdvanceManagement =() => {
                   >
                     <Text style={styles.submitText}>SUBMIT</Text>
                   </TouchableOpacity>
+                  </ScrollView>
                 </View>
               </View>
             </Modal>
@@ -746,12 +746,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.6)",
+    marginBottom:10
   },
   modalBox: {
     width: "90%",
-    backgroundColor: "#02294f",
+    backgroundColor: "#24486b",
     borderRadius: 10,
-    padding: 16,
+    padding: 14,
+    // paddingBottom:-10
+    // marginBottom:10
   },
   // header: {
   //   flexDirection: "row",
@@ -760,17 +763,38 @@ const styles = StyleSheet.create({
   //   marginBottom: 10,
   // },
   headerTitle: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  closeBtn: { color: "#f55", fontSize: 20 },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255, 255, 255, 0.2)",
+    marginBottom: 15,
+  },
+  modalTitle: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  closeBtn: {
+    color: "#FF4444",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  formContainer: {
+    paddingTop: 5,
+  },
   field: { marginVertical: 5 },
   label: { color: "#fff", marginBottom: 4 },
   input: {
-    backgroundColor: "#003a6d",
+    backgroundColor: "#728da5",
     borderRadius: 6,
     paddingHorizontal: 10,
     color: "#fff",
   },
   pickerWrapper: {
-    backgroundColor: "#003a6d",
+    backgroundColor: "#728da5",
     borderRadius: 6,
   },
   picker: { color: "#fff", height: 52 },
@@ -782,6 +806,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
     paddingVertical: 10,
+    marginBottom:10
   },
   submitText: { color: "#001f3f", fontWeight: "700" },
   titleRow: {
@@ -799,7 +824,7 @@ const styles = StyleSheet.create({
   //   marginBottom:10
   // },
   uploadBtn: {
-    backgroundColor: "#1c68be",
+    backgroundColor: "#3c6ca3",
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 20,

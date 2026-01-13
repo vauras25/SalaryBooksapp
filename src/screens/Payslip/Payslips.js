@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
   filterButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#0F345C",
+    backgroundColor:"rgba(255,255,255,0.1)",
     borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 15,
@@ -499,6 +499,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.1)",
     rowGap:10,
+    marginBottom:90
   },
     card_inner:{
     backgroundColor:"rgba(255,255,255,0.1)",
