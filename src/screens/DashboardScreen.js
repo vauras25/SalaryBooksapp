@@ -298,9 +298,15 @@ const Dashboard = () => {
                 </View>
 
                 <View style={styles.stats}>
-                  <Text style={styles.present}>Present: {present}</Text>
+                  <View style={styles.present_box}>
+                    <Text style={styles.color}></Text>
+                    <Text style={styles.present}>Present: {present}</Text>
+                  </View>
+                  <View style={styles.present_box}>
+                    <Text style={styles.color_absent}></Text>
                   <Text style={styles.absent}>Absent: {absent}</Text>
                   {/* <Text style={styles.late}>Late: 04</Text> */}
+                </View>
                 </View>
               </View>
 
@@ -422,7 +428,7 @@ const styles = StyleSheet.create({
   },
 
   dayHeader: {
-    color: "#6b7c93",
+    color: "#936b87",
     width: "14.28%",
     textAlign: "center",
     fontSize: 8,
@@ -478,7 +484,23 @@ const styles = StyleSheet.create({
     // paddingRight: 0,
     marginLeft: 8
   },
-
+  present_box:{
+    display:"flex",
+    flexDirection:"row",
+    gap:3
+  },
+  color:{
+    marginTop:4,
+    backgroundColor:"#8fb8f5ff",
+    width:10,
+    height:10
+  },
+  color_absent:{
+    marginTop:4,
+    backgroundColor:"#fcb2b9ff",
+    width:10,
+    height:10
+  },
   present: {
     color: "#fff",
     fontSize: 13,
