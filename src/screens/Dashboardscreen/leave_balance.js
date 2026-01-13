@@ -145,6 +145,7 @@ const Leave_Balance = () => {
     }, [token]);
 
     const fetch_leave_list = async (token) => {
+        
         try {
             const response = await axios.post(
                 `${API_BASE_URL}employee/employee-leave-type-list`,
@@ -189,70 +190,11 @@ const Leave_Balance = () => {
     if (!LeaveList.length) {
         return <Text style={styles.loading}>No leave data found</Text>;
     }
-    // const value=(total_balance,available)=>{
-    //     return total_balance-available;
-    // }
-    // return (
-    //     <View style={styles.barchart}>
-    //         <BarChart
-    //             stackData={[
-    //                 {
-    //                     label: "Paid",
-    //                     stacks: [{ value: paid.available, color: "#4FC3F7" }],
-    //                 },
-    //                 {
-    //                     label: "",
-    //                     stacks: [{
-    //                         value: Math.max(paid.total_balance - paid.available, 0),
-    //                         color: "#000000",
-    //                     }],
-    //                 },
-    //                 {
-    //                     label: "Casual",
-    //                     stacks: [{ value: casual.available, color: "#4FC3F7" }],
-    //                 },
-    //                 {
-    //                     label: "",
-    //                     stacks: [{
-    //                         value: Math.max(casual.total_balance - casual.available, 0),
-    //                         color: "#000000",
-    //                     }],
-    //                 },
-    //                 {
-    //                     label: "Sick",
-    //                     stacks: [{ value: sick.available, color: "#4FC3F7" }],
-    //                 },
-    //                 {
-    //                     label: "",
-    //                     stacks: [{
-    //                         value: Math.max(sick.total_balance - sick.available, 0),
-    //                         color: "#000000",
-    //                     }],
-    //                 },
-    //             ]}
-    //             horizontal
-    //             height={110}
-    //             width={width * 0.38}
-    //             barWidth={16}
-    //             spacing={3}
-    //             maxValue={14}
-    //             noOfSections={7}
-    //             stepValue={2}
-    //             hideRules
-    //             yAxisThickness={0}
-    //             xAxisThickness={0}
-    //             showValuesAsTopLabel
-    //             topLabelComponent={(item) => (
-    //                 <Text style={styles.number}>{item.value}</Text>
-    //             )}
-    //             labelTextStyle={styles.label}
-    //             yAxisTextStyle={styles.axis}
-    //             isAnimated
-    //             animationDuration={700}
-    //         />
-    //     </View>
-    // );
-    return (
+    
+    return (    
+        <View>
+            
+        {/* <Text style={styles.title2}>Leave Balance</Text> */}
         <View style={styles.barchart}>
             <BarChart
                 stackData={[
@@ -297,7 +239,7 @@ const Leave_Balance = () => {
                 spacing={3}
 
 
-                maxValue={14}
+                maxValue={18}
                 noOfSections={7}
                 stepValue={2}
 
@@ -307,7 +249,6 @@ const Leave_Balance = () => {
                 showValuesAsTopLabel
                 topLabelComponent={(item) => {
                     const total = item.value
-                    // item.stacks.reduce((sum, s) => sum + s.value, 0);
                     return (
                         <Text style={styles.number}>
                             {total}
@@ -317,7 +258,8 @@ const Leave_Balance = () => {
                 xAxisLabelTextStyle={{
                     color: "#AFC3D6",
                     fontSize: 9,
-                    left: 0
+                    left: 0,
+                    marginLeft: -3
                 }}
 
                 labelTextStyle={{
@@ -325,7 +267,10 @@ const Leave_Balance = () => {
                     fontSize: 12,
                     width: 48,
                     textAlign: "right",
-                    marginRight: 8,
+                    marginRight: 4,
+                }}
+                topLabelTextStyle={{
+                     color: "#FFFFFF",
                 }}
 
                 yAxisTextStyle={{
@@ -338,6 +283,7 @@ const Leave_Balance = () => {
             />
 
         </View>
+        </View>
     );
 };
 
@@ -347,7 +293,14 @@ const styles = StyleSheet.create({
         color: "#f8f4f4ff",
         fontSize: 12,
         left: -20
-    }
+    },
+    title2: {
+        color: "#FFFFFF",
+        fontSize: 14,
+        fontWeight: "700",
+        marginBottom: -10,
+        textAlign: "center",
+    },
 });
 
 export default Leave_Balance;
