@@ -206,8 +206,6 @@ const Reimbursement = () => {
                 >
 
                     <Text style={styles.title2}>Leave Balance</Text>
-
-                    
                     <View style={styles.barchart}>
                         <LeaveManagement />
                     </View>
