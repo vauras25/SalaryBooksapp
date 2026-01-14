@@ -66,20 +66,32 @@ const Dashboard = () => {
         const employeeData = res.data.employee_data;
         // console.log("employeeData",employeeData,"API_BASE_URL",API_BASE_URL);
         // console.log("employeeData",employeeData[0].employee_details.employee_id,"API_BASE_URL",API_BASE_URL);
-          await AsyncStorage.setItem("employee_id", employeeData[0].employee_details.employee_id);
-          await AsyncStorage.setItem("employee_mongose_id", employeeData[0]._id);
+        await AsyncStorage.setItem("employee_id", employeeData[0].employee_details.employee_id);
+        await AsyncStorage.setItem("employee_mongose_id", employeeData[0]._id);
+        // await AsyncStorage.setItem("employee_bank_details", employeeData[0]?.employee_details?.bank_details);
+        const bankDetails = employeeData[0]?.employee_details?.bank_details;
+
+        if (bankDetails) {
+          await AsyncStorage.setItem(
+            "employee_bank_details",
+            JSON.stringify(bankDetails)
+          );
+        }
         console.log("employeeData", employeeData, "API_BASE_URL", API_BASE_URL);
+        console.log("bankDetails", bankDetails);
 
         setEmpData(employeeData);
 
         const profilePic = employeeData?.[0]?.profile_pic;
+        console.log("profilePic",profilePic);
+        
         saveImageUrl(profilePic);
         const attendencePic = employeeData?.[0]?.attendence_pic;
         saveAttendenceImageUrl(attendencePic);
 
-        const rightsData =employeeData?.[0]?.employee_details?.employment_hr_details?.emp_role_data?.rights;
-        console.log("rightsData",rightsData);
-        
+        const rightsData = employeeData?.[0]?.employee_details?.employment_hr_details?.emp_role_data?.rights;
+        console.log("rightsData", rightsData);
+
         setRights(rightsData);
       }
 
@@ -94,6 +106,8 @@ const Dashboard = () => {
       : null;
 
     setImageUrl(url);
+    console.log("urlurl",url);
+    
     await AsyncStorage.setItem("imageUrl", url);
   };
   const saveAttendenceImageUrl = async (profilePic) => {
@@ -105,7 +119,7 @@ const Dashboard = () => {
     await AsyncStorage.setItem("attendenceimageUrl", url);
   };
 
-    const fetchattendencedata = async () => {
+  const fetchattendencedata = async () => {
     if (!token) return;
     const now = new Date();
     try {
@@ -117,8 +131,8 @@ const Dashboard = () => {
         attendance_year: String(now.getFullYear()),
         register_type: empData?.[0].employee_details?.template_data?.attendance_temp_data?.register_type,
       };
-      console.log("payload1234",payload);
-      
+      console.log("payload1234", payload);
+
       const res = await axios.post(`${API_BASE_URL}employee/employee-get-attendance-mobile`,
         payload,
         {
@@ -127,9 +141,9 @@ const Dashboard = () => {
             "Content-Type": "application/json",
           },
         });
-        if (res.data?.status === "success") {
-          console.log("res.data",res.data);
-          
+      if (res.data?.status === "success") {
+        console.log("res.data", res.data);
+
         setPresent(res.data?.attendance_summary.present)
         setAbsent(res.data?.attendance_summary.leave)
       }
@@ -304,9 +318,9 @@ const Dashboard = () => {
                   </View>
                   <View style={styles.present_box}>
                     <Text style={styles.color_absent}></Text>
-                  <Text style={styles.absent}>Absent: {absent}</Text>
-                  {/* <Text style={styles.late}>Late: 04</Text> */}
-                </View>
+                    <Text style={styles.absent}>Absent: {absent}</Text>
+                    {/* <Text style={styles.late}>Late: 04</Text> */}
+                  </View>
                 </View>
               </View>
 
@@ -484,22 +498,22 @@ const styles = StyleSheet.create({
     // paddingRight: 0,
     marginLeft: 8
   },
-  present_box:{
-    display:"flex",
-    flexDirection:"row",
-    gap:3
+  present_box: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 3
   },
-  color:{
-    marginTop:4,
-    backgroundColor:"#8fb8f5ff",
-    width:10,
-    height:10
+  color: {
+    marginTop: 4,
+    backgroundColor: "#8fb8f5ff",
+    width: 10,
+    height: 10
   },
-  color_absent:{
-    marginTop:4,
-    backgroundColor:"#fcb2b9ff",
-    width:10,
-    height:10
+  color_absent: {
+    marginTop: 4,
+    backgroundColor: "#fcb2b9ff",
+    width: 10,
+    height: 10
   },
   present: {
     color: "#fff",
