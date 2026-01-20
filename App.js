@@ -25,7 +25,7 @@ const Stack = createNativeStackNavigator();
 import { BackHandler } from "react-native";
 import { useEffect } from "react";
 import { navigationRef } from "./NavigationRef";
-
+import "./src/theme/GlobalFont"
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';

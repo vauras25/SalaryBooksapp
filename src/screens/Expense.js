@@ -24,6 +24,8 @@ import { API_BASE_URL } from "@env";
 import { useRoute } from "@react-navigation/native";
 import Navbar from "./Dashboardscreen/navbar";
 import { NativeModules } from "react-native";
+import StatusPopup from "./StatusPopup/StatusPopup";
+import GlobalFont from "../theme/GlobalFont";
 const { PdfPicker } = NativeModules;
 const { width } = Dimensions.get('window');
 const Expense = () => {
@@ -46,7 +48,7 @@ const Expense = () => {
   const [image, setImage] = useState(null);
   const [token, setToken] = useState(null);
   const [file, setFile] = useState(false);
-
+  const [popupConfig, setPopupConfig] = useState({visible: false,type: "success", title: "",message: "",});
   useEffect(() => {
     const loadToken = async () => {
       const t = await AsyncStorage.getItem("authToken");
@@ -112,6 +114,15 @@ const Expense = () => {
   //   });
   // };
 
+
+  const showPopup = (type, title, message) => {
+    setPopupConfig({
+      visible: true,
+      type,
+      title,
+      message,
+    });
+  };
   const pickDocument = async () => {
     // console.log(field,"field");
 
@@ -182,7 +193,7 @@ const Expense = () => {
         const docs = response.data.data.docs || [];
         // Alert.alert("apisuccess");
         // transform data to match your UI
-        console.log("docsexpense",docs);
+        // console.log("docsexpense",docs);
         
         const formattedData = docs.map((item) => ({
           id: item._id,
@@ -194,17 +205,21 @@ const Expense = () => {
 
         setClaimsData(formattedData);
       } else {
-        Alert.alert("Error", response.data.message || "Failed to load data");
+        showPopup("error", "Error", response.data.message || "Failed to load data");
+        // Alert.alert("Error", response.data.message || "Failed to load data");
       }
     } catch (error) {
-      Alert.alert("Error", token);
-      console.error("API Error:", error);
+      // Alert.alert("Error", token);
+      // console.error("API Error:", error);
       if (error.response) {
-        Alert.alert("Server Error", JSON.stringify(error.response.data));
+        showPopup("error", "Server Error", JSON.stringify(error.response.data));
+        // Alert.alert("Server Error", JSON.stringify(error.response.data));
       } else if (error.request) {
-        Alert.alert("Network Error", "No response from backend.");
+        showPopup("error", "Network Error", "No response from backend.");
+        // Alert.alert("Network Error", "No response from backend.");
       } else {
-        Alert.alert("Error", error.message);
+        showPopup("error", "Error", error.message);
+        // Alert.alert("Error", error.message);
       }
     } finally {
       setLoading(false);
@@ -214,7 +229,8 @@ const Expense = () => {
   const handleSubmit = async () => {
     try {
       if (!token) {
-        Alert.alert("Error", "Token not found");
+        showPopup("error", "Error", "Token not found");
+        // Alert.alert("Error", "Token not found");
         return;
       }
 
@@ -252,16 +268,19 @@ const Expense = () => {
       console.log("API Response:", response.data);
 
       if (response.data.status === "success") {
-        Alert.alert("Success", response.data.message);
+        showPopup("success", "Success", response.data.message);
+        // Alert.alert("Success", response.data.message);
         setModalVisible(false);
         fetchClaimsData();
       } else {
-        Alert.alert("Error", response.data.message);
+        showPopup("error", "Error", response.data.message);
+        // Alert.alert("Error", response.data.message);
       }
 
     } catch (error) {
-      console.error("Upload Error:", error);
-      Alert.alert("Upload Failed", error.message);
+      // console.error("Upload Error:", error);
+      showPopup("error", "Upload Failed",  error.message);
+      // Alert.alert("Upload Failed", error.message);
     }
   };
   const route = useRoute();
@@ -291,10 +310,11 @@ const Expense = () => {
         >
           <Text
             style={
+              [GlobalFont.CustomFont,
               activeTab === "previous"
                 ? styles.activeTabText
                 : styles.inactiveTabText
-            }
+            ]}
           >
             Previous Claims
           </Text>
@@ -306,10 +326,11 @@ const Expense = () => {
         >
           <Text
             style={
+              [GlobalFont.CustomFont,
               activeTab === "status"
                 ? styles.activeTabText
                 : styles.inactiveTabText
-            }
+            ]}
           >
             Claim Status
           </Text>
@@ -321,7 +342,7 @@ const Expense = () => {
         <>
 
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Previous Claims</Text>
+            <Text style={[GlobalFont.semiBold,styles.sectionTitle]}>Previous Claims</Text>
             {/* <TouchableOpacity style={styles.newClaimBtn}>
               <Text style={styles.newClaimText}>File New Claim</Text>
             </TouchableOpacity> */}
@@ -329,7 +350,7 @@ const Expense = () => {
               style={styles.newClaimBtn}
               onPress={() => setModalVisible(true)}
             >
-              <Text style={styles.newClaimText}>File New Claim</Text>
+              <Text style={[GlobalFont.semiBold,styles.newClaimText]}>File New Claim</Text>
             </TouchableOpacity>
           </View>
 
@@ -346,20 +367,20 @@ const Expense = () => {
           </ScrollView> */}
           {loading ? (
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-              <Text>Loading...</Text>
+              <Text style={[GlobalFont.CustomFont]}>Loading...</Text>
             </View>
           ) : claimsData.length === 0 ? (
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-              <Text>No claims found</Text>
+              <Text style={[GlobalFont.CustomFont]}>No claims found</Text>
             </View>
           ) : (
             <ScrollView style={styles.list}>
               {claimsData.map((item) => (
                 <View key={item.id} style={styles.expenseCard}>
-                  <Text style={styles.expenseTitle}>{item.type}</Text>
+                  <Text style={[GlobalFont.CustomFont,styles.expenseTitle]}>{item.type}</Text>
 
                   <View style={styles.amountTag}>
-                    <Text style={styles.amountText}>₹ {item.amount}</Text>
+                    <Text style={[GlobalFont.semiBold,styles.amountText]}>₹ {item.amount}</Text>
                   </View>
 
                   {/* <Text style={styles.dateText}>{item.date}</Text>
@@ -373,7 +394,7 @@ const Expense = () => {
       {activeTab === "status" && (
         <>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Previous Claims</Text>
+            <Text style={[GlobalFont.semiBold,styles.sectionTitle]}>Previous Claims</Text>
             {/* <TouchableOpacity style={styles.newClaimBtn}>
               <Text style={styles.newClaimText}>File New Claim</Text>
             </TouchableOpacity> */}
@@ -381,7 +402,7 @@ const Expense = () => {
               style={styles.newClaimBtn}
               onPress={() => setModalVisible(true)}
             >
-              <Text style={styles.newClaimText}>File New Claim</Text>
+              <Text style={[GlobalFont.semiBold,styles.newClaimText]}>File New Claim</Text>
             </TouchableOpacity>
           </View>
           {/* <ScrollView style={styles.list}>
@@ -396,24 +417,24 @@ const Expense = () => {
           </ScrollView> */}
           {loading ? (
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-              <Text>Loading...</Text>
+              <Text style={[GlobalFont.CustomFont]}>Loading...</Text>
             </View>
           ) : claimsData.length === 0 ? (
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-              <Text>No claims found</Text>
+              <Text style={[GlobalFont.CustomFont]}>No claims found</Text>
             </View>
           ) : (
             <ScrollView style={styles.list}>
               {claimsData.map((item) => (
                 <View key={item.id} style={styles.expenseCard}>
-                  <Text style={styles.expenseTitle}>{item.type}</Text>
+                  <Text style={[GlobalFont.CustomFont,styles.expenseTitle]}>{item.type}</Text>
 
                   <View style={styles.amountTag}>
-                    <Text style={styles.amountText}>₹ {item.amount}</Text>
+                    <Text style={[GlobalFont.semiBold,styles.amountText]}>₹ {item.amount}</Text>
                   </View>
 
-                  <Text style={styles.dateText}>{item.date}</Text>
-                  <Text style={styles.statusText}>Status: {item.status}</Text>
+                  <Text style={[GlobalFont.CustomFont,styles.dateText]}>{item.date}</Text>
+                  <Text style={[GlobalFont.CustomFont,styles.statusText]}>Status: {item.status}</Text>
                 </View>
               ))}
             </ScrollView>
@@ -435,7 +456,7 @@ const Expense = () => {
               style={styles.modalContainer}
             >
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Enter the following details</Text>
+                <Text style={[GlobalFont.semiBold,styles.modalTitle]}>Enter the following details</Text>
                 <TouchableOpacity onPress={() => setModalVisible(false)}>
                   <Text style={styles.closeBtn}>✖</Text>
                 </TouchableOpacity>
@@ -447,26 +468,26 @@ const Expense = () => {
                   placeholder="Head ID"
                   value={headId}
                   onChangeText={setHeadId}
-                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff", borderColor: "#fff" }}
+                  style={[GlobalFont.CustomFont,{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff", borderColor: "#fff" }]}
                   placeholderTextColor="#fff"
                 />
                 <TextInput
                   placeholder="Amount"
                   value={amount}
                   onChangeText={setAmount}
-                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff", borderColor: "#fff" }}
+                  style={[GlobalFont.CustomFont,{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff", borderColor: "#fff" }]}
                   placeholderTextColor="#fff"
                 />
                 <TextInput
                   placeholder="Reason"
                   value={remark}
                   onChangeText={setRemark}
-                  style={{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff", borderColor: "#fff" }}
+                  style={[GlobalFont.CustomFont,{ borderWidth: 1, marginBottom: 10, padding: 8, color: "#fff", borderColor: "#fff" }]}
                   placeholderTextColor="#fff"
                 />
                 <View style={styles.row}>
                   <View style={styles.halfPicker}>
-                    <Text style={styles.label}>Month:</Text>
+                    <Text style={[GlobalFont.CustomFont,styles.label]}>Month:</Text>
                     <Picker
                       selectedValue={month}
                       onValueChange={setMonth}
@@ -489,7 +510,7 @@ const Expense = () => {
                     </Picker>
                   </View>
                   <View style={styles.halfPicker}>
-                    <Text style={styles.label}>Year:</Text>
+                    <Text style={[GlobalFont.CustomFont,styles.label]}>Year:</Text>
                     <Picker
                       selectedValue={year}
                       onValueChange={setYear}
@@ -505,26 +526,35 @@ const Expense = () => {
 
 
                 </View>
-                <Text style={styles.label}>Upload Image:</Text>
+                <Text style={[GlobalFont.semiBold,styles.label]}>Upload Image:</Text>
                 
                 <View style={styles.imageUploadContainer}>
-                  <Text style={{ color: "#ccc", marginBottom: 10 }}>
+                  <Text style={[GlobalFont.CustomFont,{ color: "#ccc", marginBottom: 10 }]}>
                     {image ? image.name : "No file selected"}
                   </Text>
 
                   <TouchableOpacity style={styles.uploadBtn} onPress={pickDocument}>
-                    <Text style={styles.uploadBtnText}>Choose Image</Text>
+                    <Text style={[GlobalFont.bold,styles.uploadBtnText]}>Choose Image</Text>
                   </TouchableOpacity>
                 </View>
 
                 <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
-                  <Text style={styles.submitText}>SUBMIT</Text>
+                  <Text style={[GlobalFont.CustomFont,styles.submitText]}>Submit</Text>
                 </TouchableOpacity>
               </View>
             </LinearGradient>
           </View>
         </Modal>
       </View>
+      <StatusPopup
+        visible={popupConfig.visible}
+        type={popupConfig.type}
+        title={popupConfig.title}
+        message={popupConfig.message}
+        onClose={() =>
+          setPopupConfig(prev => ({ ...prev, visible: false }))
+        }
+      />
       </SafeAreaView>
       <BottomNavigation />
     </LinearGradient>
@@ -830,6 +860,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 14,
+    gap:7,
     marginBottom: 10,
   },
 
@@ -915,7 +946,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginTop: 10,
     marginBottom: 4,
-    fontSize: 13,
+    fontSize: 15,
   },
 
   picker: {
@@ -962,7 +993,7 @@ const styles = StyleSheet.create({
 
   uploadBtnText: {
     color: "#fff",
-    fontSize: 14,
-    fontWeight: "bold",
+    fontSize: 15,
+    // fontWeight: "bold",
   },
 });

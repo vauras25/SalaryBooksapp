@@ -179,7 +179,7 @@ const Reimbursement = () => {
                                 <Text style={styles.claimAmount}>  ₹{latestClaim?.amount || 0}</Text>
                             </View>
                         ) : (
-                            <Text style={{ color: "#9AA5C4", fontSize: 11, textAlign: "center" }}>
+                            <Text style={{ color: "#9AA5C4", fontSize: 11, textAlign: "center",fontFamily:"Outfit-Regular" }}>
                                 No claims available
                             </Text>
                         )}
@@ -238,14 +238,15 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
         marginVertical: 5,
         marginBottom: 50,
-        marginLeft: -1
+        marginLeft: -1,
     },
     title: {
         color: "#FFFFFF",
         fontSize: 14,
-        fontWeight: "700",
+        // fontWeight: "700",
         marginBottom: 10,
-        textAlign: "center"
+        textAlign: "center",
+        fontFamily:"Outfit-Bold"
     },
     chartRow: {
         flexDirection: "row",
@@ -262,10 +263,12 @@ const styles = StyleSheet.create({
         color: "#9AA5C4",
         fontSize: 11,
         marginVertical: 2,
+        fontFamily:"Outfit-Regular"
     },
     value: {
         color: "#FFFFFF",
         fontWeight: "600",
+        fontFamily:"Outfit-Regular"
     },
     latestClaims: {
         marginTop: 6,
@@ -278,7 +281,8 @@ const styles = StyleSheet.create({
         fontSize: 11,
         marginBottom: 5,
         marginTop: -5,
-        textAlign: "center"
+        textAlign: "center",
+        fontFamily:"Outfit-Regular"
     },
     claimRow: {
         flexDirection: "row",
@@ -289,13 +293,15 @@ const styles = StyleSheet.create({
     claimType: {
         color: "#9AA5C4",
         fontSize: 11,
-        marginLeft: 30
+        marginLeft: 30,
+        fontFamily:"Outfit-Regular"
     },
     claimAmount: {
         color: "#FFFFFF",
         fontSize: 11,
         fontWeight: "600",
-        marginRight: 29
+        marginRight: 29,
+        fontFamily:"Outfit-Regular"
     },
     button: {
         backgroundColor: "#005C99",
@@ -308,6 +314,7 @@ const styles = StyleSheet.create({
         color: "#FFFFFF",
         fontSize: 11,
         fontWeight: "600",
+        fontFamily:"Outfit-Regular"
     },
 
 
@@ -325,9 +332,10 @@ const styles = StyleSheet.create({
     title2: {
         color: "#FFFFFF",
         fontSize: 14,
-        fontWeight: "700",
+        // fontWeight: "700",
         marginBottom: -10,
         textAlign: "center",
+        fontFamily:"Outfit-Bold"
     },
     barchart: {
     marginTop: -29, marginLeft: -40, margin: -20,
@@ -338,13 +346,14 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingVertical: 6,
     alignItems: "center",
-    marginTop: "auto",           // ✅ KEY LINE (locks position)
+    marginTop: "auto",          
 },
 
     buttonText2: {
         color: "#FFFFFF",
         fontSize: 11,
         fontWeight: "600",
+        fontFamily:"Outfit-Regular"
     },
 
 });

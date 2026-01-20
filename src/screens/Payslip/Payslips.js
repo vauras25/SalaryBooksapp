@@ -5,10 +5,12 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Modal,
   Image,
   Alert,
   Dimensions
 } from "react-native";
+import Pdf from "react-native-pdf";
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation } from '@react-navigation/native';
 import Icon from "react-native-vector-icons/Ionicons";
@@ -23,9 +25,9 @@ import { useRoute } from "@react-navigation/native";
 import { API_BASE_URL } from "@env";
 import { PermissionsAndroid, Platform } from "react-native";
 const { width } = Dimensions.get("window");
+import StatusPopup from "../StatusPopup/StatusPopup";
+import GlobalFont from "../../theme/GlobalFont";
 const PayslipScreen = () => {
-
-
 
   const currentDate = new Date();
   const currentMonthIndex = currentDate.getMonth();
@@ -56,6 +58,9 @@ const PayslipScreen = () => {
   const [payslipData, setPayslipData] = useState(null);
   const [token, setToken] = useState(null);
   const navigation = useNavigation();
+  const [popupConfig, setPopupConfig] = useState({visible: false,type: "success", title: "",message: "",});
+  const [modalVisible, setModalVisible] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState(null);
   useEffect(() => {
     const loadToken = async () => {
       const t = await AsyncStorage.getItem("authToken");
@@ -79,7 +84,24 @@ const PayslipScreen = () => {
     }
   }, [monthsToShow]);
 
+  const availableMonths = useMemo(() => {
+  if (!payslipData?.master_data?.docs) return [];
 
+  const monthSet = new Set(
+    payslipData.master_data.docs.map(item => item.wage_month)
+  );
+
+  return months.filter(month => monthSet.has(month.key));
+}, [payslipData]);
+
+   const showPopup = (type, title, message) => {
+    setPopupConfig({
+      visible: true,
+      type,
+      title,
+      message,
+    });
+  };
   const fetchPayslips = async () => {
     if (!token) return;
 
@@ -111,11 +133,13 @@ const PayslipScreen = () => {
       if (response.data.status === "success") {
         setPayslipData(response.data);
       } else {
-        Alert.alert("Error", "Unable to load payslip data");
+        showPopup("error", "Error", "Unable to load payslip data");
+        // Alert.alert("Error", "Unable to load payslip data");
       }
     } catch (error) {
-      console.log("API Error:", error);
-      Alert.alert("API Error", error.message);
+      // console.log("API Error:", error);
+      showPopup("error", "API Error", error.message);
+      // Alert.alert("API Error", error.message);
     }
   };
 
@@ -206,17 +230,66 @@ const PayslipScreen = () => {
   //     Alert.alert("Download Failed", err.message);
   //   }
   // };
+  const viewPayslipInOverlay = async (monthKey, year) => {
+  if (!payslipData) {
+    showPopup("error", "Error", "Payslip data not loaded");
+    return;
+  }
+
+  const matched = payslipData.master_data.docs.find(
+    item => item.wage_month === monthKey
+  );
+
+  if (!matched) {
+    showPopup("error", "Error", "Payslip not found");
+    return;
+  }
+
+  try {
+    const res = await axios.post(
+      `${API_BASE_URL}employee/download-payslip-data`,
+      {
+        row_checked_all: false,
+        pageno: 1,
+        perpage: 1,
+        wage_month: monthKey,
+        wage_year: parseInt(year),
+        checked_row_ids: JSON.stringify([matched._id]),
+        unchecked_row_ids: "[]",
+        type: "view",
+      },
+      {
+        headers: { "x-access-token": token },
+      }
+    );
+
+    if (!res.data?.file_url) {
+      showPopup("error", "Error", "Payslip not available");
+      return;
+    }
+
+    const finalUrl =
+      API_BASE_URL.replace(/\/$/, "") + res.data.file_url;
+
+    setPdfUrl(finalUrl);
+    setModalVisible(true);
+  } catch (err) {
+    showPopup("error", "View Failed", err.message);
+  }
+};
 
   const download_payslip = async (monthKey, year) => {
     console.log("API_BASE_URL", API_BASE_URL);
     if (!payslipData) {
-      Alert.alert("Error", "Payslip data not loaded");
+      showPopup("error", "Error", "Payslip data not loaded");
+      // Alert.alert("Error", "Payslip data not loaded");
       return;
     }
 
     const hasPermission = await requestStoragePermission();
     if (!hasPermission) {
-      Alert.alert("Permission Denied", "Storage permission is required");
+      showPopup("error", "Permission Denied", "Storage permission is required");
+      // Alert.alert("Permission Denied", "Storage permission is required");
       return;
     }
 
@@ -226,11 +299,12 @@ const PayslipScreen = () => {
     const matched = docs.find((item) => item.wage_month === monthKey);
 
     if (!matched) {
-      Alert.alert("Error", "No payslip found for this month");
+      showPopup("error", "Error", "No payslip found for this month");
+      // Alert.alert("Error", "No payslip found for this month");
       return;
     }
     const emp_id = await AsyncStorage.getItem("employee_mongose_id");
-    console.log("emp_id", emp_id);
+    // console.log("emp_id", emp_id);
 
     const payload = {
       row_checked_all: false,
@@ -287,7 +361,8 @@ const PayslipScreen = () => {
       );
 
       if (!res.data?.file_url) {
-        Alert.alert("Error", "Payslip not found");
+        showPopup("error", "Error", "Payslip not found");
+        // Alert.alert("Error", "Payslip not found");
         return;
       }
 
@@ -317,29 +392,32 @@ const PayslipScreen = () => {
       //   "Payslip downloaded to Downloads folder 📂"
       // );
     } catch (err) {
-      console.log("Download Error:", err);
-      Alert.alert("Download Failed", err.message);
+      // console.log("Download Error:", err);
+      showPopup("error","Download Failed", err.message);
+      // Alert.alert("Download Failed", err.message);
     }
   };
 
 
-  const view_payslip = (monthKey, year) => {
-    if (!payslipData) {
-      Alert.alert("Error", "Payslip data not loaded");
-      return;
-    }
+  // const view_payslip = (monthKey, year) => {
+  //   if (!payslipData) {
+  //     showPopup("error","Error", "Payslip data not loaded");
+  //     // Alert.alert("Error", "Payslip data not loaded");
+  //     return;
+  //   }
 
-    const docs = payslipData.master_data.docs;
+  //   const docs = payslipData.master_data.docs;
 
-    let matched = docs.find((item) => item.wage_month === monthKey);
+  //   let matched = docs.find((item) => item.wage_month === monthKey);
 
-    if (!matched) {
-      Alert.alert("Error", "No payslip found for this month");
-      return;
-    }
+  //   if (!matched) {
+  //     showPopup("error","Error", "No payslip found for this month");
+  //     // Alert.alert("Error", "No payslip found for this month");
+  //     return;
+  //   }
 
-    navigation.navigate("ViewPayslipScreen", { data: matched });
-  };
+  //   navigation.navigate("ViewPayslipScreen", { data: matched });
+  // };
   const route = useRoute();
   const screenTitle = route.params?.title;
   return (
@@ -379,7 +457,7 @@ const PayslipScreen = () => {
             onChange={(option) => setSelectedYear(option.label)}
           >
             <TouchableOpacity style={styles.filterButton}>
-              <Text style={styles.filterText}>{selectedYear}</Text>
+              <Text style={[GlobalFont.CustomFont,styles.filterText]}>{selectedYear}</Text>
               <Icon name="chevron-down-outline" size={18} color="#ccc" />
             </TouchableOpacity>
           </ModalSelector>
@@ -388,41 +466,93 @@ const PayslipScreen = () => {
 
 
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View  style={styles.card}>
-          {monthsToShow.map((month) => (
+          
+        <View style={styles.card}>
+          {availableMonths.length === 0 ? (
+            // <View style={styles.card_inner}>
+            <Text style={[GlobalFont.CustomFont,styles.noDataText]}>
+              No payslips available for {selectedYear}
+            </Text>
+            // </View>
+          ) : (
             
-            <TouchableOpacity
-              key={month.key}
-              onPress={() => setSelectedMonth(month.label)}
-            >
-               <View style={styles.card_inner}>
-              
-              <Text style={styles.monthText}>{month.label}</Text>
+            availableMonths.map((month) => (
+              <TouchableOpacity
+                key={month.key}
+                onPress={() => setSelectedMonth(month.label)}
+              >
+                <View style={styles.card_inner}>
+                  <Text style={[GlobalFont.CustomFont,styles.monthText]}>{month.label}</Text>
 
-              <View style={styles.actionIcons}>
-                <TouchableOpacity onPress={() => view_payslip(month.key, selectedYear)}>
-                  <Image
-                    source={require("../../assets/view_white.png")}
-                    style={styles.iconImage}
-                  />
-                </TouchableOpacity>
+                  <View style={styles.actionIcons}>
+                    <TouchableOpacity
+                      onPress={() => viewPayslipInOverlay(month.key, selectedYear)}
+                    >
+                      <Image
+                        source={require("../../assets/view_white.png")}
+                        style={styles.iconImage}
+                      />
+                    </TouchableOpacity>
 
-                <TouchableOpacity
-                  onPress={() => download_payslip(month.key, selectedYear)}
-                >
-                  <Image
-                    source={require("../../assets/download_white.png")}
-                    style={styles.iconImage}
-                  />
-                </TouchableOpacity>
-              </View>
-              </View>
-            </TouchableOpacity>
-            
-          ))}
-          </View>
+                    <View>
+
+                      <Modal
+                        visible={modalVisible}
+                        transparent
+                        animationType="fade"
+                        onRequestClose={() => setModalVisible(false)}
+                      >
+                        <View style={styles.overlay}>
+                          {/* <LinearGradient
+                            colors={["#00213F", "#002C56"]}
+                            style={styles.modalContainer}
+                          > */}
+                            <View style={styles.pdfContainer}>
+                              <View style={styles.modalHeader}>
+                                <Text style={styles.modalTitle}>Payslip Preview</Text>
+                                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                                  <Text style={styles.closeBtn}>✖</Text>
+                                </TouchableOpacity>
+                              </View>
+
+                              {pdfUrl && (
+                                <Pdf
+                                  source={{ uri: pdfUrl }}
+                                  style={styles.pdf}
+                                  trustAllCerts={false}
+                                />
+                              )}
+                            </View>
+                          {/* </LinearGradient> */}
+                        </View>
+                      </Modal>
+
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => download_payslip(month.key, selectedYear)}
+                    >
+                      <Image
+                        source={require("../../assets/download_white.png")}
+                        style={styles.iconImage}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))
+          )}
+        </View>
+
         </ScrollView>
-
+        <StatusPopup
+          visible={popupConfig.visible}
+          type={popupConfig.type}
+          title={popupConfig.title}
+          message={popupConfig.message}
+          onClose={() =>
+            setPopupConfig(prev => ({ ...prev, visible: false }))
+          }
+        />
         <BottomNavigation />
 
       </SafeAreaView>
@@ -476,14 +606,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   filterButton: {
+    backgroundColor: "rgba(255,255,255,0.1)",
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor:"rgba(255,255,255,0.1)",
-    borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    width: "80%",
     justifyContent: "space-between",
+    borderRadius: 10,
+    padding: 12,
+    width: "70%",
   },
   filterText: {
     fontSize: 14,
@@ -530,6 +659,61 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     marginLeft:8
   },
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  pdfContainer: {
+    width: "95%",
+    height: "85%",
+    backgroundColor: "#002C56",
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+
+  pdf: {
+    textAlign:"center",
+    margin:"auto",
+    flex: 1,
+    width: "90%",
+    backgroundColor: "#fff",
+    marginBottom:20,
+    borderRadius:20,
+  },
+
+  modalTitle: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+    marginLeft:10
+  },
+
+  modalContainer: {
+    width: "90%",
+    maxHeight: "85%",
+    borderRadius: 12,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255, 255, 255, 0.2)",
+    marginBottom: 15,
+    marginTop:10
+  },
+  closeBtn: {
+    color: "#FF4444",
+    fontSize: 18,
+    fontWeight: "bold",
+    marginRight:20
+  },
   iconImage: {
     width: 25,
     height: 23,
@@ -540,4 +724,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight:10
   },
+  noDataText: {
+  color: "#ccc",
+  textAlign: "center",
+  // marginTop: 30,
+  fontSize: 14,
+  paddingVertical:20
+},
+
 });

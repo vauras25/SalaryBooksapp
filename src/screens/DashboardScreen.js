@@ -33,7 +33,8 @@ const Dashboard = () => {
   const [rights, setRights] = useState(null);
   const [present, setPresent] = useState(null);
   const [absent, setAbsent] = useState(null);
-
+  const [presentDates, setPresentDates] = useState([]);
+  const [absentDates, setAbsentDates] = useState([]);
   const loadToken = async () => {
     const t = await AsyncStorage.getItem("authToken");
     setToken(t);
@@ -68,7 +69,7 @@ const Dashboard = () => {
         // console.log("employeeData",employeeData[0].employee_details.employee_id,"API_BASE_URL",API_BASE_URL);
           await AsyncStorage.setItem("employee_id", employeeData[0].employee_details.employee_id);
           await AsyncStorage.setItem("employee_mongose_id", employeeData[0]._id);
-        console.log("employeeData", employeeData, "API_BASE_URL", API_BASE_URL);
+        // console.log("employeeData", employeeData, "API_BASE_URL", API_BASE_URL);
 
         setEmpData(employeeData);
 
@@ -132,6 +133,8 @@ const Dashboard = () => {
           
         setPresent(res.data?.attendance_summary.present)
         setAbsent(res.data?.attendance_summary.leave)
+        setPresentDates(res.data?.attendance_summary.present_date || []);
+        setAbsentDates(res.data?.attendance_summary.absent_date || []);
       }
 
     } catch (error) {
@@ -139,6 +142,22 @@ const Dashboard = () => {
     }
   };
 
+  const getDaySetFromDates = (dates, year, month) => {
+    return new Set(
+      dates
+        .map(d => {
+          const dateObj = new Date(d);
+          if (
+            dateObj.getFullYear() === year &&
+            dateObj.getMonth() === month
+          ) {
+            return dateObj.getDate();
+          }
+          return null;
+        })
+        .filter(Boolean)
+    );
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -158,6 +177,10 @@ const Dashboard = () => {
     fetchattendencedata();
   }, [token, imageUrl]);
 
+  const attendancePercentage =
+  present + absent === 0
+    ? 0
+    : Math.round((present / (present + absent)) * 100);
 
   return (
 
@@ -214,7 +237,8 @@ const Dashboard = () => {
                   const month = now.getMonth();
                   const totalDays = new Date(year, month + 1, 0).getDate();
                   const firstDay = new Date(year, month, 1).getDay();
-
+                  const presentDaySet = getDaySetFromDates(presentDates, year, month);
+                  const absentDaySet = getDaySetFromDates(absentDates, year, month);
                   const calendarCells = [];
 
 
@@ -232,14 +256,15 @@ const Dashboard = () => {
                     const date = new Date(year, month, day);
                     const isSunday = date.getDay() === 0;
 
-                    const isPresent = [1, 3, 5, 7, 9, 11, 13, 15].includes(day);
-                    const isAbsent = [2, 10].includes(day);
-                    const isLate = [6, 14, 21].includes(day);
-
+                    // const isPresent = [1, 3, 5, 7, 9, 11, 13, 15].includes(day);
+                    // const isAbsent = [2, 10].includes(day);
+                    // const isLate = [6, 14, 21].includes(day);
+                    const isPresent = presentDaySet.has(day);
+                    const isAbsent = absentDaySet.has(day);
                     let bgColor = "#1C2541";
                     if (isPresent) bgColor = "#8fb8f5ff";
                     if (isAbsent) bgColor = "#fcb2b9ff";
-                    if (isLate) bgColor = "#F4A261";
+                    // if (isLate) bgColor = "#F4A261";
                     if (isSunday) bgColor = "#ffffff";
 
                     const textColor = isSunday ? "#000" : "#fff";
@@ -293,7 +318,7 @@ const Dashboard = () => {
                   />
 
                   <Text style={{ position: "absolute", color: "#ffffff", fontSize: 14, fontWeight: "600" }}>
-                    {Math.round((present / (present + absent)) * 100)}%
+                    {attendancePercentage}%
                   </Text>
                 </View>
 
@@ -338,6 +363,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "600",
     marginBottom: 10,
+    fontFamily:"Outfit-Regular"
   },
   card: {
     backgroundColor: "#1C2541",
@@ -350,6 +376,7 @@ const styles = StyleSheet.create({
     color: "#aaa",
     fontSize: 13,
     marginTop: 8,
+    fontFamily:"Outfit-Regular"
   },
   advanceText: {
     flexDirection: "row",
@@ -391,11 +418,11 @@ const styles = StyleSheet.create({
     borderColor: "#1E90FF",
   },
 
-  greeting: {
-    color: "#fff",
-    fontSize: 22,
-    fontWeight: "600",
-  },
+  // greeting: {
+  //   color: "#fff",
+  //   fontSize: 22,
+  //   fontWeight: "600",
+  // },
 
   attendanceCard: {
     flexDirection: "row",
@@ -418,7 +445,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
     marginBottom: 10,
-    marginTop: 5
+    marginTop: 5,
+    fontFamily:"Outfit-Regular"
   },
 
   calendarGrid: {
@@ -464,6 +492,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     textAlign: "left",
     letterSpacing: 0.3,
+    fontFamily:"Outfit-Regular"
   },
 
   statsRow: {
@@ -507,6 +536,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     marginBottom: 6,
     textAlign: "right",
+    fontFamily:"Outfit-Regular"
   },
 
   absent: {
@@ -515,6 +545,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     marginBottom: 6,
     textAlign: "right",
+    fontFamily:"Outfit-Regular"
   },
 
   late: {
@@ -539,6 +570,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 12,
     fontWeight: "600",
+    fontFamily:"Outfit-Regular"
   },
 
 });

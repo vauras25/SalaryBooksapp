@@ -9,10 +9,12 @@ import {
   Modal,
   Image,
   Alert,
+    Dimensions,
   ActivityIndicator,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from "react-native-vector-icons/Ionicons";
 // import { PieChart } from "react-native-svg-charts";
 // import { G, Line } from "react-native-svg";
 import * as Progress from "react-native-progress";
@@ -24,6 +26,9 @@ import axios from "axios";
 import { API_BASE_URL } from "@env";
 import { useRoute } from "@react-navigation/native";
 import Navbar from "../Dashboardscreen/navbar"
+import StatusPopup from "../StatusPopup/StatusPopup";
+const { width } = Dimensions.get('window');
+import GlobalFont from "../../theme/GlobalFont";
 // import { useEffect } from "react";
 export default function LeaveManagementScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -43,6 +48,8 @@ export default function LeaveManagementScreen() {
   const [Leavedata, setLeavedata] = useState(null);
   const [employee_id, setemployee_id] = useState(null);
   const [loading, setloading] = useState(false);
+  const [popupConfig, setPopupConfig] = useState({visible: false,type: "success", title: "",message: "",});
+
 
   // useEffect(() => {
   //   const loadToken = async () => {
@@ -164,11 +171,13 @@ export default function LeaveManagementScreen() {
         // await AsyncStorage.setItem('Leavelist',response.data)
         setRemainingLeaves(response.data.leave_type[0].available);
       } else {
-        Alert.alert("Error", "Unable to load payslip data");
+        showPopup("error", "Error", "Unable to load payslip data");
+        // Alert.alert("Error", "Unable to load payslip data");
       }
     } catch (error) {
       console.log("API Error:", error);
-      Alert.alert("API Error", error.message);
+      showPopup("error", "API Error", error.message);
+      // Alert.alert("API Error", error.message);
     }
   }
 
@@ -226,12 +235,21 @@ export default function LeaveManagementScreen() {
 
     return `${fromDate} - ${toDate}`;
   };
+  const showPopup = (type, title, message) => {
+    setPopupConfig({
+      visible: true,
+      type,
+      title,
+      message,
+    });
+  };
 
   const handleSubmit = async () => {
     // console.log("LOG");
     
     if (!token || !selectedLeave) {
-      Alert.alert("Error", "Please select leave type");
+      showPopup("error", "Error", "Please select leave type");
+      // Alert.alert("Error", "Please select leave type");
       return;
     }
 
@@ -262,16 +280,18 @@ export default function LeaveManagementScreen() {
       // console.log("1");
 
       if (response.data.status === "success") {
-        Alert.alert("Success", "Leave request submitted");
+        // Alert.alert("Success", "Leave request submitted");
+        showPopup("success", "Success", "Leave request submitted");
         setModalVisible(false);
         fetch_applied_leave_data();
       } else {
-        Alert.alert("Error", response.data.message);
+        showPopup("error", "Error", response.data.message);
+        // Alert.alert("Error", response.data.message);
       }
     } catch (err) {
       // console.log(err,"err");
-
-      Alert.alert("Error", "Failed to submit Leave request");
+      showPopup("error", "Error", "Failed to submit Leave request");
+      // Alert.alert("Error", "Failed to submit Leave request");
     }
   };
 
@@ -332,7 +352,7 @@ export default function LeaveManagementScreen() {
       item.leave_approval_status !== "pending"
     );
   });
-  console.log(historyData,"historyData");
+  // console.log(historyData,"historyData");
   
   const statusData = Leavedata?.filter(item => {
     const toDate = new Date(item.leave_to_date);
@@ -340,7 +360,7 @@ export default function LeaveManagementScreen() {
 
     return (
       item.leave_approval_status === "pending" ||
-      ((item.leave_approval_status === "approved" || item.leave_approval_status === "rejected") && toDate >= today)
+      ((item.leave_approval_status === "approved" || item.leave_approval_status === "rejected" || item.leave_approval_status === "cancelled") && toDate >= today)
     );
   });
 
@@ -364,13 +384,14 @@ export default function LeaveManagementScreen() {
         </View>
 
         {/* Month Selector */}
-        <View style={styles.selectorRow}>
-          <TouchableOpacity style={styles.selectorBox}>
-            <Text style={styles.selectorText}>September</Text>
+        <View style={styles.dropdownRow}>
+          <TouchableOpacity style={styles.dropdown}>
+            <Text style={styles.dropdownText}>September</Text>
+            <Icon name="chevron-down" color="#fff" />
           </TouchableOpacity>
-
-          <TouchableOpacity style={styles.selectorBox}>
-            <Text style={styles.selectorText}>2025</Text>
+          <TouchableOpacity style={styles.dropdown}>
+            <Text style={styles.dropdownText}>2025</Text>
+            <Icon name="chevron-down" color="#fff" />
           </TouchableOpacity>
         </View>
 
@@ -383,13 +404,13 @@ export default function LeaveManagementScreen() {
 
           {/* Header */}
           <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Leave Summary</Text>
+            <Text style={[GlobalFont.semiBold,styles.cardTitle]}>Leave Summary</Text>
 
             <TouchableOpacity
               style={styles.leaveButton}
               onPress={() => setModalVisible(true)}
             >
-              <Text style={styles.leaveBtnText}>+ Leave Request</Text>
+              <Text style={[GlobalFont.CustomFont,styles.leaveBtnText]}>+ Leave Request</Text>
             </TouchableOpacity>
           </View>
 
@@ -407,7 +428,7 @@ export default function LeaveManagementScreen() {
                 unfilledColor="#18384A"
                 strokeCap="round"
               />
-              <Text style={styles.circleText}>{getUsedLeavePercentage()}%</Text>
+              <Text style={[GlobalFont.CustomFont,styles.circleText]}>{getUsedLeavePercentage()}%</Text>
             </View>
 
             {/* Bars + counts */}
@@ -422,11 +443,11 @@ export default function LeaveManagementScreen() {
               <View style={styles.leaveList}>
                 {LeaveList?.leave_type?.map((item) => (
                   <View style={styles.leaveCountRow} key={item._id}>
-                    <Text style={styles.leaveCountText}>
+                    <Text style={[GlobalFont.CustomFont,styles.leaveCountText]}>
                       {item.abbreviation}
                     </Text>
 
-                    <Text style={styles.leaveCountValue}>
+                    <Text style={[GlobalFont.CustomFont,styles.leaveCountValue]}>
                       {item.available} left
                     </Text>
                   </View>
@@ -451,7 +472,7 @@ export default function LeaveManagementScreen() {
                 style={styles.modalContainer}
               >
                 <View style={styles.modalHeader}>
-                  <Text style={styles.modalTitle}>Enter the following details</Text>
+                  <Text style={[GlobalFont.semiBold,styles.modalTitle]}>Enter the following details</Text>
                   <TouchableOpacity onPress={() => setModalVisible(false)}>
                     <Text style={styles.closeBtn}>✖</Text>
                   </TouchableOpacity>
@@ -461,13 +482,13 @@ export default function LeaveManagementScreen() {
 
 
                   <View style={styles.rowContainer}>
-                    <Text style={styles.labelRow}>Select Leave Type:</Text>
+                    <Text style={[GlobalFont.semiBold,styles.labelRow]}>Select Leave Type:</Text>
 
                     <TouchableOpacity
                       style={styles.customSelect}
                       onPress={() => setDropdownOpen(prev => !prev)}
                     >
-                      <Text style={styles.selectedText}>
+                      <Text style={[GlobalFont.CustomFont,styles.selectedText]}>
                         {selectedLeave?.abbreviation || "Select Leave Type"}
                       </Text>
                     </TouchableOpacity>
@@ -492,8 +513,8 @@ export default function LeaveManagementScreen() {
                             }}
 
                           >
-                            <Text style={styles.dropdownAbbr}>{item.abbreviation}</Text>
-                            <Text style={styles.dropdownValue}>
+                            <Text style={[GlobalFont.CustomFont,styles.dropdownAbbr]}>{item.abbreviation}</Text>
+                            <Text style={[GlobalFont.CustomFont,styles.dropdownValue]}>
                               {item.available}/{item.quota}
                             </Text>
                           </TouchableOpacity>
@@ -504,12 +525,12 @@ export default function LeaveManagementScreen() {
 
                   <View style={styles.dateRow}>
                     <View style={styles.dateInputContainer}>
-                      <Text style={styles.labelColumn}>From:</Text>
+                      <Text style={[GlobalFont.CustomFont,styles.labelColumn]}>From:</Text>
                       <TouchableOpacity
                         style={styles.dateInput}
                         onPress={() => setOpenFromDate(true)}
                       >
-                        <Text style={styles.dateTextDisplay}>
+                        <Text style={[GlobalFont.CustomFont,styles.dateTextDisplay]}>
                           {formatDate(fromDate)}
                         </Text>
                         <Text style={styles.calendarIcon}>📅</Text>
@@ -517,12 +538,12 @@ export default function LeaveManagementScreen() {
                     </View>
 
                     <View style={styles.dateInputContainer}>
-                      <Text style={styles.labelColumn}>To:</Text>
+                      <Text style={[GlobalFont.CustomFont,styles.labelColumn]}>To:</Text>
                       <TouchableOpacity
                         style={styles.dateInput}
                         onPress={() => setOpenToDate(true)}
                       >
-                        <Text style={styles.dateTextDisplay}>
+                        <Text style={[GlobalFont.CustomFont,styles.dateTextDisplay]}>
                           {formatDate(toDate)}
                         </Text>
                         <Text style={styles.calendarIcon}>📅</Text>
@@ -561,9 +582,9 @@ export default function LeaveManagementScreen() {
 
 
                   <View style={styles.rowContainer}>
-                    <Text style={styles.labelRow}>No. of Days:</Text>
+                    <Text style={[GlobalFont.CustomFont,styles.labelRow]}>No. of Days:</Text>
                     <TextInput
-                      style={[styles.inputRow1, styles.disabledInput]}
+                      style={[GlobalFont.CustomFont,styles.inputRow1, styles.disabledInput]}
                       value={noOfDays}
                       editable={false}
                       selectTextOnFocus={false}
@@ -571,9 +592,9 @@ export default function LeaveManagementScreen() {
                   </View>
 
                   <View style={styles.rowContainer}>
-                    <Text style={styles.labelRow}>Remaining Leaves:</Text>
+                    <Text style={[GlobalFont.CustomFont,styles.labelRow]}>Remaining Leaves:</Text>
                     <TextInput
-                      style={[styles.inputRow, styles.disabledInput]}
+                      style={[GlobalFont.CustomFont,styles.inputRow, styles.disabledInput]}
                       value={String(remainingLeaves)}
                       editable={false}
                       selectTextOnFocus={false}
@@ -581,9 +602,9 @@ export default function LeaveManagementScreen() {
                   </View>
 
                   <View style={styles.reasonContainer}>
-                    <Text style={styles.labelColumn}>Reason:</Text>
+                    <Text style={[GlobalFont.CustomFont,styles.labelColumn]}>Reason:</Text>
                     <TextInput
-                      style={styles.textArea}
+                      style={[GlobalFont.CustomFont,styles.textArea]}
                       placeholder=""
                       placeholderTextColor="#6B7280"
                       multiline
@@ -594,7 +615,7 @@ export default function LeaveManagementScreen() {
                   </View>
 
                   <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-                    <Text style={styles.submitButtonText}>Submit</Text>
+                    <Text style={[GlobalFont.CustomFont,styles.submitButtonText]}>Submit</Text>
                   </TouchableOpacity>
                 </ScrollView>
               </LinearGradient>
@@ -603,17 +624,17 @@ export default function LeaveManagementScreen() {
 
         </View>
 
-        <Text style={styles.sectionTitle}>Leave Status</Text>
+        <Text style={[GlobalFont.bold,styles.sectionTitle]}>Leave Status</Text>
 
         {loading && (
           <View style={styles.loaderOverlay}>
             <ActivityIndicator size="large" color="#fff" />
-            <Text style={{ color: "white", marginTop: 5 ,margin:"auto"}}>Loading...</Text>
+            <Text style={[GlobalFont.CustomFont,{ color: "white", marginTop: 5 ,margin:"auto"}]}>Loading...</Text>
           </View>
         )}
         {!loading && statusData?.length === 0 && (
           <View style={styles.centerBox}>
-            <Text style={styles.noDataText}>No status found</Text>
+            <Text style={[GlobalFont.CustomFont,styles.noDataText]}>No status found</Text>
           </View>
         )}
 
@@ -631,19 +652,19 @@ export default function LeaveManagementScreen() {
               end={{ x: 1, y: 1 }}
               style={styles.status_card}
             >
-              <Text style={styles.upcomingDate}>
+              <Text style={[GlobalFont.CustomFont,styles.upcomingDate]}>
                 {formatDateRange(item.leave_from_date, item.leave_to_date)}
               </Text>
 
               <View style={styles.leave_head}>
-                <Text style={styles.upcomingStatusText}>
+                <Text style={[GlobalFont.CustomFont,styles.upcomingStatusText]}>
                   {item.leave_head}
                 </Text>
               </View>
 
               <View style={styles.upcomingStatusBox}>
                 <Text
-                  style={[
+                  style={[GlobalFont.CustomFont,
                     styles.upcomingStatusText,
                     {
                       color:
@@ -666,7 +687,7 @@ export default function LeaveManagementScreen() {
 
 
 
-        <Text style={styles.sectionTitle}>Leave History</Text>
+        <Text style={[GlobalFont.bold,styles.sectionTitle]}>Leave History</Text>
 
         {historyData?.length > 0 ? (
           historyData.map(item => (
@@ -674,7 +695,7 @@ export default function LeaveManagementScreen() {
               colors={["#173e58ff", "#285879ff"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={styles.upcomingCard}
+              style={styles.upcomingCard_status}
               key={item._id}
             >
               <LinearGradient
@@ -683,19 +704,19 @@ export default function LeaveManagementScreen() {
                 end={{ x: 1, y: 1 }}
                 style={styles.status_card}
               >
-                <Text style={styles.upcomingDate}>
+                <Text style={[GlobalFont.CustomFont,styles.upcomingDate]}>
                   {formatDateRange(item.leave_from_date, item.leave_to_date)}
                 </Text>
 
                 <View style={styles.leave_head}>
-                  <Text style={styles.upcomingStatusText}>
+                  <Text style={[GlobalFont.CustomFont,styles.upcomingStatusText]}>
                     {item.leave_head}
                   </Text>
                 </View>
 
                 <View style={styles.upcomingStatusBox}>
                   <Text
-                    style={[
+                    style={[GlobalFont.CustomFont,
                       styles.upcomingStatusText,
                       {
                         color:
@@ -715,11 +736,21 @@ export default function LeaveManagementScreen() {
             </LinearGradient>
           ))
         ) : (
-          <Text style={styles.noDataText}>No history found</Text>
+          <Text style={[GlobalFont.CustomFont,styles.noDataText]}>No history found</Text>
         )}
 
 
       </ScrollView>
+      <StatusPopup
+        visible={popupConfig.visible}
+        type={popupConfig.type}
+        title={popupConfig.title}
+        message={popupConfig.message}
+        onClose={() =>
+          setPopupConfig(prev => ({ ...prev, visible: false }))
+        }
+      />
+
       <BottomNavigation />
     </LinearGradient>
   );
@@ -772,11 +803,7 @@ const styles = StyleSheet.create({
     top: 15,
     paddingBottom: 60,
   },
-  selectorRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 18,
-  },
+
   selectorBox: {
     backgroundColor: "#1c2a4e",
     padding: 12,
@@ -858,9 +885,9 @@ const styles = StyleSheet.create({
 
   sectionTitle: {
     color: "#fff",
-    fontSize: 17,
-    fontWeight: "600",
-    marginBottom: 10,
+    fontSize: 15,
+    // fontWeight: "600",
+    marginBottom: 8,
   },
   centerBox: {
     paddingVertical: 15,
@@ -871,21 +898,31 @@ const styles = StyleSheet.create({
 
   noDataText: {
     color: "#ccc",
-    fontSize: 16,
+    fontSize: 15,
     margin: "auto",
-    marginBottom: 30
+    marginBottom: 60
   },
 
+  upcomingCard_status: {
+    padding: 14,
+    paddingVertical: 8,
+    borderRadius: 15,
+    marginBottom: 50,
+    backgroundColor: "#194a7ea2",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
   upcomingCard: {
     padding: 14,
     paddingVertical: 8,
     borderRadius: 15,
-    marginBottom: 12,
+    marginBottom: 10,
     backgroundColor: "#194a7ea2",
     flexDirection: "row",
     justifyContent: "space-between",
   },
   status_card: {
+    width:width * 0.88,
     backgroundColor: "#0b3863ff",
     flexDirection: 'row',
     gap: 13,
@@ -894,7 +931,7 @@ const styles = StyleSheet.create({
     marginLeft: -5,
     padding: 12,
     borderRadius: 12,
-    paddingHorizontal: 10
+    // paddingHorizontal: 10
   },
   upcomingDate: {
     color: "#fff",
@@ -1021,7 +1058,7 @@ const styles = StyleSheet.create({
 
   labelColumn: {
     color: "#fff",
-    fontSize: 13,
+    fontSize: 14,
     marginBottom: 8,
     fontWeight: "500",
   },
@@ -1171,14 +1208,35 @@ const styles = StyleSheet.create({
     width: "50%"
   },
 
-  dropdownRow: {
+   dropdownRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#1f3b57",
+    // marginTop: 10,
+    marginBottom:10
   },
+  dropdown: {
+    backgroundColor: "rgba(255,255,255,0.1)",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: 10,
+    padding: 12,
+    width: "48%",
+  },
+  dropdownText: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily:"Outfit-Regular"
+  },
+
+  // dropdownRow: {
+  //   flexDirection: "row",
+  //   justifyContent: "space-between",
+  //   paddingVertical: 12,
+  //   paddingHorizontal: 14,
+  //   borderBottomWidth: 0.5,
+  //   borderBottomColor: "#1f3b57",
+  // },
 
   dropdownAbbr: {
     color: "#ffffff",
@@ -1207,6 +1265,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     padding: 16,
     marginBottom: 20,
+    // paddingVertical:-10
   },
 
   cardHeader: {
@@ -1231,7 +1290,7 @@ const styles = StyleSheet.create({
 
   leaveBtnText: {
     color: "#FFFFFF",
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "500",
   },
 
@@ -1244,7 +1303,7 @@ const styles = StyleSheet.create({
     width: 90,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: -110
+    marginTop: -60
   },
 
   circleText: {
@@ -1257,6 +1316,7 @@ const styles = StyleSheet.create({
   barSection: {
     flex: 1,
     paddingLeft: 10,
+    gap:20
   },
 
   barRow: {

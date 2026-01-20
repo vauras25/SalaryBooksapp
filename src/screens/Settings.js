@@ -17,14 +17,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import { useRoute } from "@react-navigation/native";
 import Navbar from "./Dashboardscreen/navbar"
+import GlobalFont from '../theme/GlobalFont';
 const { width } = Dimensions.get("window");
 const scale = width / 375;
+import StatusPopup from "./StatusPopup/StatusPopup";
 
 const Settings = ({ navigation }) => {
   const { isDarkMode, toggleDarkMode } = useTheme();
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const insets = useSafeAreaInsets();
   const [userData, setUserData] = useState(null);
-  
+  const [popupConfig, setPopupConfig] = useState({visible: false,type: "success", title: "",message: "",});
   const themeColors = {
     background: isDarkMode ? '#000' : '#fff',
     card: isDarkMode ? '#1c1c1e' : '#f4f4f4',
@@ -69,36 +72,56 @@ const Settings = ({ navigation }) => {
   //     },
   //   ]);
   // };
-
+  const showPopup = (type, title, message) => {
+    setPopupConfig({
+      visible: true,
+      type,
+      title,
+      message,
+    });
+  };
   const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      'Do you want to logout?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Yes',
-          onPress: confirmLogout,
-        },
-      ],
-      { cancelable: true }
-    );
+      setShowLogoutPopup(true);
+    // Alert.alert(
+    //   'Logout',
+    //   'Do you want to logout?',
+    //   [
+    //     {
+    //       text: 'Cancel',
+    //       style: 'cancel',
+    //     },
+    //     {
+    //       text: 'Yes',
+    //       onPress: confirmLogout,
+    //     },
+    //   ],
+    //   { cancelable: true }
+    // );
   };
 
-  const confirmLogout = async () => {
+  // const confirmLogout = async () => {
+  //   try {
+  //     await AsyncStorage.removeItem('authToken');
+  //     await AsyncStorage.removeItem('userData');
+  //     await AsyncStorage.clear();
+  //     navigation.replace('SignUpScreen');
+  //   } catch (error) {
+  //     console.log('Logout error:', error);
+  //   }
+  // };
+   const confirmLogout = async () => {
     try {
-      await AsyncStorage.removeItem('authToken');
-      await AsyncStorage.removeItem('userData');
+      setShowLogoutPopup(false);
+
+      await AsyncStorage.removeItem("authToken");
+      await AsyncStorage.removeItem("userData");
       await AsyncStorage.clear();
-      navigation.replace('SignUpScreen');
+
+      navigation.replace("SignUpScreen");
     } catch (error) {
-      console.log('Logout error:', error);
+      console.log("Logout error:", error);
     }
   };
-  
     const route = useRoute();
     const screenTitle = route.params?.title;
   return (
@@ -137,16 +160,16 @@ const Settings = ({ navigation }) => {
                     > */}
           <View style={styles.profileCard}>
             <Image source={require('../assets/photo.jpg')} style={styles.avatar} />
-            <TouchableOpacity style={styles.editIcon}>
+            {/* <TouchableOpacity style={styles.editIcon}>
               <Image
                 source={require('../assets/settings.png')}
                 style={{ width: 14, height: 14, tintColor: '#fff' }}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <View style={styles.profileText}>
-              <Text style={[styles.nameText, { color: "#fff" }]}>{userData?.emp_first_name}{"\n"}{userData?.emp_last_name}</Text>
-              <Text style={[styles.codeText, { color: "#fff" }]}>{userData?.emp_id}</Text>
-              <Text style={[styles.emailText, { color: "#fff" }]}>{userData?.email_id}</Text>
+              <Text style={[GlobalFont.semiBold,styles.nameText, { color: "#fff" }]}>{userData?.emp_first_name}{"\n"}{userData?.emp_last_name}</Text>
+              <Text style={[GlobalFont.CustomFont,styles.codeText, { color: "#fff" }]}>{userData?.emp_id}</Text>
+              <Text style={[GlobalFont.CustomFont,styles.emailText, { color: "#fff" }]}>{userData?.email_id}</Text>
 
             </View>
           </View>
@@ -166,17 +189,17 @@ const Settings = ({ navigation }) => {
           > */}
           <View style={styles.card1}>
             <View style={styles.infoRow}>
-              <Text style={[styles.label, { color: "#fff" }]}>E-mail</Text>
-              <Text style={[styles.value, { color: "#fff"}]}>{userData?.email_id}</Text>
+              <Text style={[GlobalFont.CustomFont,styles.label, { color: "#fff" }]}>E-mail</Text>
+              <Text style={[GlobalFont.CustomFont,styles.value, { color: "#fff"}]}>{userData?.email_id}</Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Text style={[styles.label, { color: "#fff" }]}>Phone</Text>
-              <Text style={[styles.value, { color: "#fff" }]}>{userData?.mobile_no}</Text>
+              <Text style={[GlobalFont.CustomFont,styles.label, { color: "#fff" }]}>Phone</Text>
+              <Text style={[GlobalFont.CustomFont,styles.value, { color: "#fff" }]}>{userData?.mobile_no}</Text>
             </View>
             <View style={styles.infoRow}>
-              <Text style={[styles.label, { color: "#fff"}]}>PAN</Text>
-              <Text style={[styles.value, { color: "#fff" }]}>{userData?.pan_no}</Text>
+              <Text style={[GlobalFont.CustomFont,styles.label, { color: "#fff"}]}>PAN</Text>
+              <Text style={[GlobalFont.CustomFont,styles.value, { color: "#fff" }]}>{userData?.pan_no}</Text>
             </View>
             </View>
           {/* </LinearGradient> */}
@@ -187,10 +210,10 @@ const Settings = ({ navigation }) => {
               style={styles.card}
           > */}
           <View style={styles.card}>
-            <Text style={[styles.label_bank, { color:  "#fff"  }]}>Bank Accounts</Text>
+            <Text style={[GlobalFont.CustomFont,styles.label_bank, { color:  "#fff"  }]}>Bank Accounts</Text>
             <View style={styles.infoRow1}>
-              <Text style={[styles.value, { color:  "#fff"  }]}>HDFC Bank</Text>
-              <Text style={[styles.value, { color:  "#fff" }]}>*7636</Text>
+              <Text style={[GlobalFont.CustomFont,styles.value, { color:  "#fff"  }]}>HDFC Bank</Text>
+              <Text style={[GlobalFont.CustomFont,styles.value, { color:  "#fff" }]}>*7636</Text>
             </View>
             </View>
           {/* </LinearGradient> */}
@@ -203,7 +226,7 @@ const Settings = ({ navigation }) => {
             <View style={styles.card}>
             <View style={styles.support}>
             <TouchableOpacity onPress={handleLogout}>
-              <Text style={[styles.value, { color: "#fff"  }]}>LOGOUT</Text>
+              <Text style={[GlobalFont.CustomFont,styles.value, { color: "#fff"  }]}>LOGOUT</Text>
             </TouchableOpacity>
             </View>
           {/* </View> */}
@@ -211,7 +234,13 @@ const Settings = ({ navigation }) => {
         </View>
         </View>
       </ScrollView>
-
+        <StatusPopup
+        visible={showLogoutPopup}
+        type="info"
+        title="Logout"
+        message="Do you want to logout?"
+        onClose={confirmLogout}
+      />
       <BottomNavigation />
     {/* </View> */}
     </LinearGradient>
@@ -395,7 +424,7 @@ profileText: {
 
 nameText: {
   fontSize: 16,
-  fontWeight: "bold",
+  // fontWeight: "bold",
   textAlign: "right",
   flexWrap: "wrap",
   maxWidth: "100%",

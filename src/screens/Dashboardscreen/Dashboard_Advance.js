@@ -258,7 +258,8 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         alignSelf: "flex-start",
         marginBottom: 4,
-        marginTop: 7
+        marginTop: 7,
+        fontFamily:"Outfit-Bold"
     },
     progressRow: {
         flexDirection: "row",
@@ -288,7 +289,8 @@ const styles = StyleSheet.create({
         fontWeight: "500",
         minWidth: 50,
         textAlign: "right",
-        right: 30
+        right: 30,
+        fontFamily:"Outfit-Regular"
     },
     advanceText: {
         top: -8,
@@ -319,24 +321,28 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontSize: 13,
         marginBottom: 2,
+        fontFamily:"Outfit-Regular"
     },
     labelRight: {
         color: "#fff",
         fontSize: 13,
         marginBottom: 2,
         textAlign: "left",
+        fontFamily:"Outfit-Regular"
     },
     amount: {
         color: "#ffffff",
         fontSize: 14,
         fontWeight: "500",
-        textAlign: "right"
+        textAlign: "right",
+        fontFamily:"Outfit-Regular"
     },
     amountRight: {
         color: "#ffffff",
         fontSize: 14,
         fontWeight: "500",
         textAlign: "right",
+        fontFamily:"Outfit-Regular"
     },
     grid: {
         flexDirection: "row",
@@ -355,6 +361,7 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontWeight: "600",
         fontSize: 12,
+        fontFamily:"Outfit-Regular"
     },
 });
 

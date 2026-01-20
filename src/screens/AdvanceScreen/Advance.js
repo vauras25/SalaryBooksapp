@@ -25,6 +25,8 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeModules } from "react-native";
 const { PdfPicker } = NativeModules;
 const { width } = Dimensions.get("window");
+import StatusPopup from "../StatusPopup/StatusPopup";
+import GlobalFont from "../../theme/GlobalFont";
 const AdvanceManagement =() => {
   const progress = 0.75;
   const navigation = useNavigation();
@@ -42,6 +44,7 @@ const AdvanceManagement =() => {
   const [file, setFile] = useState(false);
   const [percentage, setPercentage] = useState(0);
   const [prog, setProgress] = useState(0);
+  const [popupConfig, setPopupConfig] = useState({visible: false,type: "success", title: "",message: "",});
   useEffect(() => {
     const loadToken = async () => {
       const t = await AsyncStorage.getItem("authToken");
@@ -117,11 +120,21 @@ const AdvanceManagement =() => {
     }
   };
 
+  const showPopup = (type, title, message) => {
+    setPopupConfig({
+      visible: true,
+      type,
+      title,
+      message,
+    });
+  };
+
   const submitAdvanceRequest = async () => {
     if (!token) return;
     try {
       if (!advanceAmount || !installments || !frequency || !month || !year || !recoveryFrom) {
-        Alert.alert("Error", "Please fill all required fields.");
+        showPopup("error", "Error", "Please fill all required fields.");
+        // Alert.alert("Error", "Please fill all required fields.");
         return;
       }
       const monthMap = {
@@ -214,16 +227,19 @@ const AdvanceManagement =() => {
       console.log("API Response:", data);
 
       if (data.status === "success") {
-        Alert.alert("Success", "Advance request submitted");
+        showPopup("success", "Success",  "Advance request submitted");
+        // Alert.alert("Success", "Advance request submitted");
         fetchAdvanceList();
         setModalVisible(false);
       } else {
-        Alert.alert("Error", data.message || "Something went wrong");
+        showPopup("error", "Error",  data.message || "Something went wrong");
+        // Alert.alert("Error", data.message || "Something went wrong");
       }
 
     } catch (err) {
-      console.log(err);
-      Alert.alert("Error", "Failed to submit advance request");
+      // console.log(err);
+       showPopup("error", "Error",  "Failed to submit advance request");
+      // Alert.alert("Error", "Failed to submit advance request");
     }
   };
 
@@ -301,12 +317,12 @@ const AdvanceManagement =() => {
                         dropdownIconColor="#fff"
                         style={styles.picker}
                       >
-                        <Picker.Item label="Select One" value="" />
-                        <Picker.Item label="Annual Earning" value="salary" />
-                        <Picker.Item label="Reimbursement" value="reimbursement" />
-                        <Picker.Item label="Incentive" value="incentive" />
-                        <Picker.Item label="Gross Earning" value="gross_earning" />
-                        <Picker.Item label="Bonus" value="bonus" />
+                        <Picker.Item label="Select One" value="" style={styles.options}/>
+                        <Picker.Item label="Annual Earning" value="salary" style={styles.options}/>
+                        <Picker.Item label="Reimbursement" value="reimbursement" style={styles.options}/>
+                        <Picker.Item label="Incentive" value="incentive" style={styles.options}/>
+                        <Picker.Item label="Gross Earning" value="gross_earning" style={styles.options}/>
+                        <Picker.Item label="Bonus" value="bonus" style={styles.options}/>
 
                       </Picker>
                     </View>
@@ -378,7 +394,7 @@ const AdvanceManagement =() => {
                     <Text style={styles.sectionTitle}>Uploaded Document</Text>
 
                     <TouchableOpacity style={styles.uploadBtn} onPress={() => pickDocument()}>
-                      <Text style={styles.uploadText}>Upload File</Text>
+                      <Text style={[GlobalFont.CustomFont,styles.uploadText]}>Upload File</Text>
                     </TouchableOpacity>
                   </View>
                   {uploading && (
@@ -407,7 +423,7 @@ const AdvanceManagement =() => {
                       submitAdvanceRequest();
                     }}
                   >
-                    <Text style={styles.submitText}>SUBMIT</Text>
+                    <Text style={[GlobalFont.semiBold,styles.submitText]}>Submit</Text>
                   </TouchableOpacity>
                   </ScrollView>
                 </View>
@@ -437,19 +453,19 @@ const AdvanceManagement =() => {
           }]} />
 
           <View style={styles.amountRow}>
-            <Text style={styles.amountLabel1}>
+            <Text style={[GlobalFont.CustomFont,styles.amountLabel1]}>
               ₹{currentAdvance?.advance_amount || 0}{"\n"}
-              <Text style={styles.amountSub}>Total Advance</Text>
+              <Text style={[GlobalFont.CustomFont,styles.amountSub]}>Total Advance</Text>
             </Text>
 
             <Text style={styles.amountLabel2}>
               ₹{currentAdvance?.advance_outstanding || 0}{"\n"}
-              <Text style={styles.amountSub}>Remaining</Text>
+              <Text style={[GlobalFont.CustomFont,styles.amountSub]}>Remaining</Text>
             </Text>
           </View>
 
 
-          <Text style={styles.emiText}>
+          <Text style={[GlobalFont.CustomFont,styles.emiText]}>
             EMI: ₹
             {currentAdvance ? (currentAdvance.advance_amount / currentAdvance.no_of_instalments).toFixed(0) : 0}
             / month
@@ -462,8 +478,8 @@ const AdvanceManagement =() => {
           <Text style={styles.sectionTitle1}>Upcoming Deduction</Text>
           <View style={styles.card}>
           <View style={styles.card_inner}>
-            <Text style={styles.cardDate}>Oct 01</Text>
-            <Text style={styles.cardAmount1}>₹2000 due</Text>
+            <Text style={[GlobalFont.CustomFont,styles.cardDate]}>Oct 01</Text>
+            <Text style={[GlobalFont.CustomFont,styles.cardAmount1]}>₹2000 due</Text>
           </View>
           </View>
         </View>
@@ -479,14 +495,14 @@ const AdvanceManagement =() => {
               style={styles.card}
             >
               <View style={styles.card_inner}>
-              <Text style={styles.cardDate}>
+              <Text style={[GlobalFont.CustomFont,styles.cardDate]}>
                 {new Date(item.created_at).toDateString().slice(4, 10)}
               </Text>
               
               <View style={styles.cardRight}>
-                <Text style={styles.cardAmount}>₹{item.advance_amount}</Text>
+                <Text style={[GlobalFont.CustomFont,styles.cardAmount]}>₹{item.advance_amount}</Text>
                 <Text
-                  style={[
+                  style={[GlobalFont.CustomFont,
                     styles.status,
                     { color: item.status === "active" ? "#FF4D4D" : "#2ECC71" },
                   ]}
@@ -501,6 +517,15 @@ const AdvanceManagement =() => {
 
 
       </ScrollView>
+      <StatusPopup
+          visible={popupConfig.visible}
+          type={popupConfig.type}
+          title={popupConfig.title}
+          message={popupConfig.message}
+          onClose={() =>
+            setPopupConfig(prev => ({ ...prev, visible: false }))
+          }
+        />
       <BottomNavigation />
     </LinearGradient>
   );
@@ -558,6 +583,7 @@ const styles = StyleSheet.create({
   dropdownText: {
     color: "#fff",
     fontSize: 16,
+    fontFamily:"Outfit-Regular"
   },
   overviewBox: {
     backgroundColor: "rgba(255,255,255,0.08)",
@@ -610,11 +636,11 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     left: 20
   },
-  addBtnText: {
-    color: "#fff",
-    fontWeight: "600",
-    textAlign: "right"
-  },
+  // addBtnText: {
+  //   color: "#fff",
+  //   fontWeight: "600",
+  //   textAlign: "right"
+  // },
   progressText: {
     color: "#fff",
     fontSize: 16,
@@ -639,13 +665,15 @@ const styles = StyleSheet.create({
   amountLabel1: {
     textAlign:"left",
     color: "#fff",
-    fontWeight: "700",
+    // fontWeight: "700",
+    fontFamily:"Outfit-SemiBold",
     fontSize: 14,
   },
   amountLabel2: {
     textAlign:"right",
     color: "#fff",
-    fontWeight: "700",
+    // fontWeight: "700",
+    fontFamily:"Outfit-SemiBold",
     fontSize: 14,
   },
   amountSub: {
@@ -671,13 +699,16 @@ const styles = StyleSheet.create({
   sectionTitle: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "700",
+    // fontWeight: "700",
     // marginBottom: 10,
+    fontFamily:"Outfit-SemiBold"
+    
   },
   sectionTitle1: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "700",
+    // fontWeight: "700",
+    fontFamily:"Outfit-SemiBold",
     marginBottom: 10,
   },
   card: {
@@ -740,7 +771,7 @@ const styles = StyleSheet.create({
   //   paddingVertical: 8,
   //   paddingHorizontal: 16,
   // },
-  addBtnText: { color: "#fff", fontWeight: "bold" },
+  addBtnText: { color: "#fff",fontFamily:"Outfit-SemiBold"},
   overlay: {
     flex: 1,
     justifyContent: "center",
@@ -750,7 +781,7 @@ const styles = StyleSheet.create({
   },
   modalBox: {
     width: "90%",
-    backgroundColor: "#24486b",
+    backgroundColor: "#09345f",
     borderRadius: 10,
     padding: 14,
     // paddingBottom:-10
@@ -775,26 +806,30 @@ const styles = StyleSheet.create({
   modalTitle: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
+    // fontWeight: "600",
+    fontFamily:"Outfit-SemiBold"
   },
   closeBtn: {
     color: "#FF4444",
     fontSize: 18,
     fontWeight: "bold",
+    fontFamily:"Outfit-SemiBold"
   },
   formContainer: {
     paddingTop: 5,
   },
   field: { marginVertical: 5 },
-  label: { color: "#fff", marginBottom: 4 },
+  label: { color: "#fff", marginBottom: 4,fontFamily:"Outfit-Regular" },
   input: {
-    backgroundColor: "#728da5",
+    backgroundColor: "#205686",
     borderRadius: 6,
     paddingHorizontal: 10,
     color: "#fff",
+    fontFamily:"",
+    fontFamily:"Outfit-Regular" 
   },
   pickerWrapper: {
-    backgroundColor: "#728da5",
+    backgroundColor: "#205686",
     borderRadius: 6,
   },
   picker: { color: "#fff", height: 52 },
@@ -808,7 +843,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginBottom:10
   },
-  submitText: { color: "#001f3f", fontWeight: "700" },
+  submitText: { color: "#001f3f"},
   titleRow: {
     marginTop: 20,
     flexDirection: "row",

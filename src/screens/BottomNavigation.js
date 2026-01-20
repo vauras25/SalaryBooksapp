@@ -12,7 +12,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from './ThemeContext';
-
+import GlobalFont from '../theme/GlobalFont';
 const { width } = Dimensions.get('window');
 
 const BottomNavigation = () => {
@@ -74,7 +74,7 @@ const BottomNavigation = () => {
                 { tintColor: isDarkMode ? '#ececec' : '#ffffffff' }
               ]}
             />
-            <Text style={[styles.navLabel, { color: isDarkMode ? '#ececec' : '#ffffffff' }]}>
+            <Text style={[GlobalFont.CustomFont,styles.navLabel, { color: isDarkMode ? '#ececec' : '#ffffffff' }]}>
               {item.label}
             </Text>
           </TouchableOpacity>

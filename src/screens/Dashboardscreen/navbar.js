@@ -3,11 +3,12 @@ import { View, Text, StyleSheet, Image,Dimensions } from "react-native";
 import search from "../../assets/search.png";
 import notification from "../../assets/notification.png"
 const { width } = Dimensions.get("window");
+import GlobalFont from "../../theme/GlobalFont";
 const Navbar = ({ title }) => {
   return (
     <View style={styles.nav}>
       <View style={styles.header}>
-      <Text style={styles.headerTitle}>{title}</Text>
+      <Text style={[GlobalFont.bold, styles.headerTitle]}>{title}</Text>
       </View>
       <View style={styles.headerIcons}>
         <Image source={search} style={styles.imageIcon} />
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: "#fff",
     fontSize: 17,
-    fontWeight: "600",
+    // fontWeight: "600",
   },
 
   headerIcons: {

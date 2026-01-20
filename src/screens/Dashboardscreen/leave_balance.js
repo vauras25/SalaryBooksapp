@@ -259,7 +259,8 @@ const Leave_Balance = () => {
                     color: "#AFC3D6",
                     fontSize: 9,
                     left: 0,
-                    marginLeft: -3
+                    marginLeft: -3,
+                    fontFamily:"Outfit-Regular"
                 }}
 
                 labelTextStyle={{
@@ -268,14 +269,17 @@ const Leave_Balance = () => {
                     width: 48,
                     textAlign: "right",
                     marginRight: 4,
+                    fontFamily:"Outfit-Regular"
                 }}
                 topLabelTextStyle={{
                      color: "#FFFFFF",
+                     fontFamily:"Outfit-Regular"
                 }}
 
                 yAxisTextStyle={{
                     color: "#AFC3D6",
                     fontSize: 10,
+                    fontFamily:"Outfit-Regular"
                 }}
 
                 isAnimated

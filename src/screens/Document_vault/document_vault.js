@@ -30,12 +30,15 @@ import axios from "axios";
 import RNFS from "react-native-fs";
 import { API_BASE_URL } from "@env";
 const { width } = Dimensions.get("window");
+import StatusPopup from "../StatusPopup/StatusPopup";
 // import pdf_icon from '../../assets/pdf_icon'
+import GlobalFont from '../../theme/GlobalFont';
 const DocumentVaultScreen = () => {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState("Personal");
   const navigation = useNavigation();
-
+  const [popupConfig, setPopupConfig] = useState({visible: false,type: "success", title: "",message: "",});
+  
   const [uploadedFiles, setUploadedFiles] = useState({
     documents: [],
     other_documents: []
@@ -81,6 +84,14 @@ const DocumentVaultScreen = () => {
     loadToken();
   }, []);
 
+  const showPopup = (type, title, message) => {
+    setPopupConfig({
+      visible: true,
+      type,
+      title,
+      message,
+    });
+  };
 
   const pickDocument = async (field) => {
     // console.log(field,"field");
@@ -213,7 +224,8 @@ const DocumentVaultScreen = () => {
         fetchUploadedDocs(userData._id, token);
       }
       else {
-        alert("Upload Failed");
+        showPopup("error", "Error", "Upload Failed");
+        // alert("Upload Failed");
       }
     } catch (err) {
       console.log("UPLOAD ERROR:", err.response?.data || err);
@@ -385,10 +397,11 @@ const DocumentVaultScreen = () => {
       },
     }).fetch("GET", fileUrl);
 
-    console.log("Downloaded File Path:", res.path());
+    // console.log("Downloaded File Path:", res.path());
   } catch (e) {
-    console.log("Download error:", e);
-    alert("Download Failed");
+    // console.log("Download error:", e);
+    showPopup("error", "Error", "Download Failed");
+    // alert("Download Failed");
   }
 };
 
@@ -401,7 +414,8 @@ const DocumentVaultScreen = () => {
 
       const document_id = doc._id || doc.id;
       if (!document_id) {
-        alert("Unable to rename: document id missing.");
+        showPopup("error", "Error", "Unable to rename: document id missing.");
+        // alert("Unable to rename: document id missing.");
         setRenameModalVisible(false);
         return;
       }
@@ -430,11 +444,13 @@ const DocumentVaultScreen = () => {
 
         // alert("Renamed Successfully!");
       } else {
-        alert(response.data.message || "Rename Failed");
+        showPopup("error", "Error", response.data.message || "Rename Failed");
+        // alert(response.data.message || "Rename Failed");
       }
     } catch (error) {
-      console.log("Rename Error:", error.response?.data || error);
-      alert("Rename Failed");
+      // console.log("Rename Error:", error.response?.data || error);
+      showPopup("error", "Error","Rename Failed");
+      // alert("Rename Failed");
     }
 
     setRenameModalVisible(false);
@@ -479,7 +495,8 @@ const DocumentVaultScreen = () => {
           }
         });
       } else {
-        alert("Delete Failed");
+        showPopup("error", "Error","Delete Failed");
+        // alert("Delete Failed");
       }
 
     } catch (error) {
@@ -517,11 +534,11 @@ const DocumentVaultScreen = () => {
                     onPress={() => setActiveTab("Personal")}
                   >
                     <Text
-                      style={
+                      style={[GlobalFont.CustomFont,
                         activeTab === "Personal"
                           ? styles.activeTabText
                           : styles.inactiveTabText
-                      }
+                      ]}
                     >
                       Personal
                     </Text>
@@ -532,27 +549,27 @@ const DocumentVaultScreen = () => {
                     onPress={() => setActiveTab("Others")}
                   >
                     <Text
-                      style={
+                      style={[GlobalFont.CustomFont,
                         activeTab === "Others"
                           ? styles.activeTabText
                           : styles.inactiveTabText
-                      }
+                      ]}
                     >
                       Others
                     </Text>
                   </TouchableOpacity>
                 </View>
           <View style={styles.titleRow}>
-            <Text style={styles.sectionTitle}>Uploaded PDFs</Text>
+            <Text style={[GlobalFont.bold,styles.sectionTitle]}>Uploaded PDFs</Text>
 
             <TouchableOpacity style={styles.uploadBtn} onPress={() => pickDocument(activeTab)}>
-              <Text style={styles.uploadText}>Upload File</Text>
+              <Text style={[GlobalFont.CustomFont,styles.uploadText]}>Upload File</Text>
             </TouchableOpacity>
           </View>
           {uploading && (
             <View style={styles.loaderOverlay}>
               <ActivityIndicator size="large" color="#fff" />
-              <Text style={{ color: "white", marginTop: 5 }}>Uploading...</Text>
+              <Text style={[GlobalFont.CustomFont,{ color: "white", marginTop: 5 }]}>Uploading...</Text>
             </View>
           )}
 
@@ -586,7 +603,7 @@ const DocumentVaultScreen = () => {
                         source={require("../../assets/pdf_icon.png")}
                         style={styles.iconImage}
                       />
-                    <Text style={styles.cardTitle}>{file.file_name}</Text>
+                    <Text style={[GlobalFont.CustomFont,styles.cardTitle]}>{file.file_name}</Text>
                   </View>
 
                 </TouchableOpacity>
@@ -620,7 +637,11 @@ const DocumentVaultScreen = () => {
                           setMenuIndex(null);
                         }}
                       >
-                        <Text style={styles.dropdownText}>⬇️  Download</Text>
+                        <Image
+                          source={require("../../assets/DownloadVault.png")}
+                          style={styles.download}
+                        />
+                        <Text style={[GlobalFont.CustomFont,styles.dropdownText]}> Download</Text>
                       </TouchableOpacity>
 
                       <TouchableOpacity
@@ -632,7 +653,11 @@ const DocumentVaultScreen = () => {
                           setMenuIndex(null);
                         }}
                       >
-                        <Text style={styles.dropdownText}>✏️  Rename</Text>
+                        <Image
+                          source={require("../../assets/RenameVault.png")}
+                          style={styles.download}
+                        />
+                        <Text style={[GlobalFont.CustomFont,styles.dropdownText]}> Rename</Text>
                       </TouchableOpacity>
 
                       <TouchableOpacity
@@ -642,7 +667,11 @@ const DocumentVaultScreen = () => {
                           setMenuIndex(null);
                         }}
                       >
-                        <Text style={styles.dropdownText}>🗑️  Delete</Text>
+                        <Image
+                          source={require("../../assets/DeleteVault.png")}
+                          style={styles.download}
+                        />
+                        <Text style={[GlobalFont.CustomFont,styles.dropdownText]}> Delete</Text>
                       </TouchableOpacity>
                     </View>
                   )}
@@ -674,10 +703,10 @@ const DocumentVaultScreen = () => {
                   <View style={styles.cardLeft}>
                     {/* <Text style={styles.cardIcon}>📄</Text> */}
                      <Image
-                        source={require("../../assets/pdf_icon.png")}
-                        style={styles.iconImage}
+                        source={require("../../assets/pdf_others.png")}
+                        style={styles.iconImage_others}
                       />
-                    <Text style={styles.cardTitle}>{file.file_name}</Text>
+                    <Text style={[GlobalFont.CustomFont,styles.cardTitle]}>{file.file_name}</Text>
                   </View>
                 </TouchableOpacity>
                 <View>
@@ -710,7 +739,11 @@ const DocumentVaultScreen = () => {
                           setMenuIndex(null);
                         }}
                       >
-                        <Text style={styles.dropdownText}>⬇️  Download</Text>
+                        <Image
+                          source={require("../../assets/DownloadVault.png")}
+                          style={styles.download}
+                        />
+                        <Text style={[GlobalFont.CustomFont,styles.dropdownText]}> Download</Text>
                       </TouchableOpacity>
 
                       <TouchableOpacity
@@ -722,7 +755,11 @@ const DocumentVaultScreen = () => {
                           setMenuIndex(null);
                         }}
                       >
-                        <Text style={styles.dropdownText}>✏️  Rename</Text>
+                        <Image
+                          source={require("../../assets/RenameVault.png")}
+                          style={styles.download}
+                        />
+                        <Text style={[GlobalFont.CustomFont,styles.dropdownText]}> Rename</Text>
                       </TouchableOpacity>
 
                       <TouchableOpacity
@@ -732,7 +769,11 @@ const DocumentVaultScreen = () => {
                           setMenuIndex(null);
                         }}
                       >
-                        <Text style={styles.dropdownText}>🗑️  Delete</Text>
+                        <Image
+                          source={require("../../assets/DeleteVault.png")}
+                          style={styles.download}
+                        />
+                        <Text style={[GlobalFont.CustomFont,styles.dropdownText]}> Delete</Text>
                       </TouchableOpacity>
                     </View>
                   )}
@@ -759,7 +800,7 @@ const DocumentVaultScreen = () => {
 
                 <View style={{ height: 450, marginTop: 10 }}>
                   {!selectedFile ? (
-                    <Text style={{ color: "#fff" }}>No File Available</Text>
+                    <Text style={[GlobalFont.CustomFont,{ color: "#fff" }]}>No File Available</Text>
                   ) : isPDF ? (
                     <Pdf
                       source={{ uri: selectedFile.uri }}
@@ -781,7 +822,7 @@ const DocumentVaultScreen = () => {
           <Modal transparent={true} visible={renameModalVisible} animationType="fade">
             <View style={styles.modalOverlay}>
               <View style={styles.modalBox}>
-                <Text style={styles.modalTitle}>Rename File</Text>
+                <Text style={[GlobalFont.CustomFont,styles.modalTitle]}>Rename File</Text>
 
                 <TextInput
                   value={renameText}
@@ -793,19 +834,29 @@ const DocumentVaultScreen = () => {
 
                 <View style={styles.modalBtns}>
                   <TouchableOpacity style={styles.cancelBtn} onPress={() => setRenameModalVisible(false)}>
-                    <Text style={styles.cancelText}>Cancel</Text>
+                    <Text style={[GlobalFont.CustomFont,styles.cancelText]}>Cancel</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity style={styles.saveBtn} onPress={renameFile}>
-                    <Text style={styles.saveText}>Save</Text>
+                    <Text style={[GlobalFont.CustomFont,styles.saveText]}>Save</Text>
                   </TouchableOpacity>
                 </View>
               </View>
             </View>
           </Modal>
-
-          <BottomNavigation />
+          
+          
+          <StatusPopup
+            visible={popupConfig.visible}
+            type={popupConfig.type}
+            title={popupConfig.title}
+            message={popupConfig.message}
+            onClose={() =>
+              setPopupConfig(prev => ({ ...prev, visible: false }))
+            }
+          />
         </SafeAreaView>
+        <BottomNavigation />
       </LinearGradient>
     </TouchableWithoutFeedback>
   );
@@ -1042,7 +1093,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     color: "#fff",
     fontSize: 15,
-    fontWeight: "700",
+    // fontWeight: "700",
   },
 
   uploadBtn: {
@@ -1104,6 +1155,12 @@ const styles = StyleSheet.create({
     height: 20,
     marginLeft: 5,
   },
+  iconImage_others: {
+    width: 35,
+    padding:21,
+    height: 20,
+    marginLeft: 5,
+  },
 
   cardIcon: {
     fontSize: 22,
@@ -1139,7 +1196,10 @@ const styles = StyleSheet.create({
   },
 
   dropdownItem: {
+    display:"flex",
+    flexDirection:"row",
     paddingVertical: 8,
+    gap:8
   },
 
   dropdownText: {
@@ -1203,10 +1263,14 @@ const styles = StyleSheet.create({
   modalBtns: {
     flexDirection: "row",
     justifyContent: "flex-end",
+    gap:10
   },
 
   cancelBtn: {
-    marginRight: 15,
+    backgroundColor: "#ca4f4f",
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 6,
   },
 
   saveBtn: {
@@ -1222,7 +1286,7 @@ const styles = StyleSheet.create({
   },
 
   cancelText: {
-    color: "#bbb",
+    color: "#fff",
     fontSize: 15,
   },
 
@@ -1233,4 +1297,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 15,
   },
+  download:{
+     width: 20,
+    padding:10,
+    height: 10,
+    // marginLeft: -5,
+  }
 });
