@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -28,6 +28,9 @@ const Settings = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const [userData, setUserData] = useState(null);
   const [popupConfig, setPopupConfig] = useState({visible: false,type: "success", title: "",message: "",});
+  const [bankData, setBankData] = useState(null);
+  const [profilepic, setProfilepic] = useState(null);
+
   const themeColors = {
     background: isDarkMode ? '#000' : '#fff',
     card: isDarkMode ? '#1c1c1e' : '#f4f4f4',
@@ -40,14 +43,25 @@ const Settings = ({ navigation }) => {
   };
 
   const HorizontalLine = () => <View style={styles.line} />;
-    useEffect(() => {
+  useEffect(() => {
     const loadData = async () => {
       try {
         const userData = JSON.parse(await AsyncStorage.getItem("userData"));
-        
-        if(userData){
+        const employeeBankDetails = JSON.parse(await AsyncStorage.getItem("employee_bank_details"));
+        console.log("userData", userData);
+        const storedBankDetails = await AsyncStorage.getItem("employee_bank_details");
+        const profilepic = await AsyncStorage.getItem("imageUrl");
+        console.log("profilepicprofilepicprofilepicprofilepic", profilepic);
+
+        setProfilepic(profilepic)
+        const bankDetails = storedBankDetails
+          ? JSON.parse(storedBankDetails)
+          : null;
+        setBankData(bankDetails)
+        console.log(bankDetails);
+        if (userData) {
           // console.log(userData,"userData");
-        setUserData(userData);
+          setUserData(userData);
         }
       } catch (error) {
         console.log("Error loading userData:", error);
@@ -55,7 +69,7 @@ const Settings = ({ navigation }) => {
     };
 
     loadData();
-  }, []);
+  }, [profilepic]);
   // const handleLogout = () => {
   //   Alert.alert('Logout', 'Do you want to logout?', [
   //     {
@@ -126,12 +140,12 @@ const Settings = ({ navigation }) => {
     const screenTitle = route.params?.title;
   return (
     <LinearGradient
-              colors={["#000000ff", "#1c68beff"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.container}
-            >
-    {/* <View
+      colors={["#000000ff", "#1c68beff"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.container}
+    >
+      {/* <View
       style={[
         styles.container,
         {
@@ -141,13 +155,14 @@ const Settings = ({ navigation }) => {
       ]}
     > */}
       {/* Full Width Header */}
-        <View style={styles.header}>
-          <Image
-              source={require("../assets/Settings_nav.png")}
-              style={styles.header_iconImage}
-            />
-          <Navbar title={screenTitle} />
-        </View>
+      <View style={styles.header}>
+        <Image
+          source={require("../assets/Settings_nav.png")}
+          style={styles.header_iconImage}
+        />
+
+        <Navbar title={screenTitle} />
+      </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
         <View style={styles.contentPadding}>
@@ -159,13 +174,21 @@ const Settings = ({ navigation }) => {
                       style={styles.profileCard}
                     > */}
           <View style={styles.profileCard}>
-            <Image source={require('../assets/photo.jpg')} style={styles.avatar} />
+            {/* <Image source={require('../assets/photo.jpg')} style={styles.avatar} /> */}
+            <Image
+              source={
+                profilepic
+                  ? { uri: profilepic }
+                  : require("../assets/photo.jpg")
+              }
+              style={styles.profileImage}
+            />
             {/* <TouchableOpacity style={styles.editIcon}>
               <Image
                 source={require('../assets/settings.png')}
                 style={{ width: 14, height: 14, tintColor: '#fff' }}
               />
-            </TouchableOpacity> */}
+            </TouchableOpacity>  */}
             <View style={styles.profileText}>
               <Text style={[GlobalFont.semiBold,styles.nameText, { color: "#fff" }]}>{userData?.emp_first_name}{"\n"}{userData?.emp_last_name}</Text>
               <Text style={[GlobalFont.CustomFont,styles.codeText, { color: "#fff" }]}>{userData?.emp_id}</Text>
@@ -173,20 +196,7 @@ const Settings = ({ navigation }) => {
 
             </View>
           </View>
-          {/* </LinearGradient> */}
 
-          {/* <View style={[styles.infoBlock, { borderColor: themeColors.border, backgroundColor: themeColors.card }]}>
-            <View style={styles.infoRow}>
-              <Text style={[styles.label, { color: themeColors.label }]}>DarkMode</Text>
-              <Switch value={isDarkMode} onValueChange={toggleDarkMode} />
-            </View>
-          </View> */}
-          {/* <LinearGradient
-            colors={["#07162cff", "#23568fff"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.infoBlock}
-          > */}
           <View style={styles.card1}>
             <View style={styles.infoRow}>
               <Text style={[GlobalFont.CustomFont,styles.label, { color: "#fff" }]}>E-mail</Text>
@@ -201,7 +211,7 @@ const Settings = ({ navigation }) => {
               <Text style={[GlobalFont.CustomFont,styles.label, { color: "#fff"}]}>PAN</Text>
               <Text style={[GlobalFont.CustomFont,styles.value, { color: "#fff" }]}>{userData?.pan_no}</Text>
             </View>
-            </View>
+          </View>
           {/* </LinearGradient> */}
           {/* <LinearGradient
               colors={["#122441ff", "#0c3058ff"]}
@@ -216,6 +226,7 @@ const Settings = ({ navigation }) => {
               <Text style={[GlobalFont.CustomFont,styles.value, { color:  "#fff" }]}>*7636</Text>
             </View>
             </View>
+          </View>
           {/* </LinearGradient> */}
           {/* <LinearGradient
                       colors={["#000000ff", "#1c68beff"]}
@@ -223,16 +234,16 @@ const Settings = ({ navigation }) => {
                       end={{ x: 1, y: 1 }}
                       style={styles.card}
                     > */}
-            <View style={styles.card}>
+          <View style={styles.card}>
             <View style={styles.support}>
             <TouchableOpacity onPress={handleLogout}>
               <Text style={[GlobalFont.CustomFont,styles.value, { color: "#fff"  }]}>LOGOUT</Text>
             </TouchableOpacity>
             </View>
-          {/* </View> */}
-          {/* </LinearGradient> */}
-        </View>
-        </View>
+            {/* </View> */}
+            {/* </LinearGradient> */}
+          </View>
+        {/* </View> */}
       </ScrollView>
         <StatusPopup
         visible={showLogoutPopup}
@@ -242,7 +253,7 @@ const Settings = ({ navigation }) => {
         onClose={confirmLogout}
       />
       <BottomNavigation />
-    {/* </View> */}
+      {/* </View> */}
     </LinearGradient>
   );
 };
@@ -368,23 +379,23 @@ const styles = StyleSheet.create({
     padding: 13,
   },
 
-    header: {
-    flexDirection:"row",
+  header: {
+    flexDirection: "row",
     width: "100%",
     marginBottom: 12,
-    alignItems:"center",
-    gap:9
+    alignItems: "center",
+    gap: 9
   },
-   header_iconImage: {
+  header_iconImage: {
     width: 35,
-    padding:16,
+    padding: 16,
     height: 15,
     marginLeft: -5,
   },
   contentPadding: {
-    margin:"auto",
-    width:width*.93,
-    marginBottom:10
+    margin: "auto",
+    width: width * .93,
+    marginBottom: 10
   },
 
   profileCard: {
@@ -397,7 +408,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
 
-  avatar: {
+  profileImage: {
     width: 60 * scale,
     height: 60 * scale,
     borderRadius: 30 * scale,
@@ -412,15 +423,15 @@ const styles = StyleSheet.create({
     padding: 4 * scale,
   },
 
-profileText: {
-  flex: 1,
-  // marginLeft: 12,
-  // justifyContent: "space-between",
-  alignItems: "flex-end",
-  // textAlign:"right"
-  // margin:"auto",
-  // marginLeft:105
-},
+  profileText: {
+    flex: 1,
+    // marginLeft: 12,
+    // justifyContent: "space-between",
+    alignItems: "flex-end",
+    // textAlign:"right"
+    // margin:"auto",
+    // marginLeft:105
+  },
 
 nameText: {
   fontSize: 16,
@@ -430,21 +441,21 @@ nameText: {
   maxWidth: "100%",
 },
 
-codeText: {
-  fontSize: 12,
-  marginTop: 4,
-  textAlign: "right",
-  flexWrap: "wrap",
-  maxWidth: "100%",
-},
+  codeText: {
+    fontSize: 12,
+    marginTop: 4,
+    textAlign: "right",
+    flexWrap: "wrap",
+    maxWidth: "100%",
+  },
 
-emailText: {
-  fontSize: 12,
-  marginTop: 4,
-  textAlign: "right",
-  flexWrap: "wrap",
-  maxWidth: "100%",
-},
+  emailText: {
+    fontSize: 12,
+    marginTop: 4,
+    textAlign: "right",
+    flexWrap: "wrap",
+    maxWidth: "100%",
+  },
 
 
   infoBlock: {
@@ -454,7 +465,7 @@ emailText: {
   },
 
   infoRow: {
-       backgroundColor:"rgba(255,255,255,0.1)",
+    backgroundColor: "rgba(255,255,255,0.1)",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -464,7 +475,7 @@ emailText: {
     borderRadius: 12,
   },
   infoRow1: {
-       backgroundColor:"rgba(255,255,255,0.1)",
+    backgroundColor: "rgba(255,255,255,0.1)",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -498,7 +509,7 @@ emailText: {
     padding: 12 * scale,
     borderRadius: 15,
     marginBottom: 12 * scale,
-    height:158
+    height: 158
   },
   card: {
     backgroundColor: "rgba(255,255,255,0.08)",
@@ -514,7 +525,7 @@ emailText: {
   },
 
   support: {
-    backgroundColor:"rgba(255,255,255,0.1)",
+    backgroundColor: "rgba(255,255,255,0.1)",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",

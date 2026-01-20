@@ -224,7 +224,7 @@ const AdvanceManagement =() => {
       // const data = await response.json();
       const data = response.data;
 
-      console.log("API Response:", data);
+      console.log("API Response for advance:", data);
 
       if (data.status === "success") {
         showPopup("success", "Success",  "Advance request submitted");
